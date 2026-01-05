@@ -1,0 +1,360 @@
+/* ===================================
+   Comparison Detail Page
+   =================================== */
+
+.page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    width: 100%;
+}
+
+/* ================================
+   Header
+   ================================ */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.headerLeft {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.backBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color var(--transition-fast);
+}
+
+.backBtn:hover {
+    color: var(--color-primary);
+}
+
+.backBtn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.titleSection h1 {
+    margin: 0;
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.shareStatus {
+    color: #059669;
+    font-weight: 500;
+}
+
+.shareBtn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-spring);
+}
+
+.shareBtn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow-glow-blue);
+}
+
+.shareBtn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.shareBtn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* ================================
+   Cards Section
+   ================================ */
+.cardsSection h2,
+.chartsSection h2,
+.sharesSection h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 var(--space-lg);
+    color: var(--color-text);
+}
+
+.cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-lg);
+}
+
+/* ================================
+   Charts Section
+   ================================ */
+.chartsSection {
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+}
+
+/* ================================
+   Shares Section
+   ================================ */
+.sharesSection {
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+}
+
+.sharesList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.shareItem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-md);
+    background: var(--color-bg);
+    border-radius: var(--radius-md);
+}
+
+.shareId {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--color-text);
+}
+
+.shareViews {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.shareActive {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: auto;
+}
+
+.shareActive.active {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.shareActive.expired {
+    background: rgba(239, 68, 68, 0.1);
+    color: #DC2626;
+}
+
+/* ================================
+   Upgrade Modal
+   ================================ */
+.upgradeModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-modal);
+    padding: var(--space-md);
+}
+
+.upgradeContent {
+    background: white;
+    border-radius: var(--radius-2xl);
+    padding: var(--space-2xl);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: var(--shadow-2xl);
+    animation: upgradeIn 0.2s ease-out;
+    position: relative;
+}
+
+@keyframes upgradeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.upgradeClose {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: var(--color-bg);
+    border-radius: 50%;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.upgradeClose:hover {
+    background: var(--color-border);
+    color: var(--color-text);
+}
+
+.upgradeIcon {
+    font-size: 3rem;
+    margin-bottom: var(--space-md);
+}
+
+.upgradeContent h2 {
+    font-size: 1.5rem;
+    margin: 0 0 var(--space-sm);
+    color: var(--color-text);
+}
+
+.upgradeContent p {
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-lg);
+    line-height: 1.5;
+}
+
+.upgradeActions {
+    display: flex;
+    gap: var(--space-md);
+}
+
+.upgradeCancelBtn {
+    flex: 1;
+    padding: var(--space-md);
+    border: 1px solid var(--color-border);
+    background: white;
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.upgradeCancelBtn:hover {
+    border-color: var(--color-text-secondary);
+    color: var(--color-text);
+}
+
+.upgradeBtn {
+    flex: 1;
+    padding: var(--space-md);
+    border: none;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-spring);
+}
+
+.upgradeBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow-glow-blue);
+}
+
+/* ================================
+   Loading & Error States
+   ================================ */
+.loadingState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3xl);
+    gap: var(--space-md);
+    color: var(--color-text-secondary);
+}
+
+.spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.errorState {
+    text-align: center;
+    padding: var(--space-3xl);
+}
+
+.errorState h2 {
+    font-size: 1.5rem;
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+}
+
+/* ================================
+   Responsive
+   ================================ */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+    }
+
+    .shareBtn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .cardsGrid {
+        grid-template-columns: 1fr;
+    }
+}

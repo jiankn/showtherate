@@ -1,0 +1,144 @@
+.container {
+  min-height: 100vh;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex-grow: 1;
+  padding-top: 100px; /* Space for fixed header */
+  padding-bottom: var(--space-3xl);
+}
+
+.contentWrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+}
+
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: var(--space-2xl);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--color-border);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: var(--space-md);
+  background: linear-gradient(135deg, #0F172A 0%, #334155 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.lastUpdated {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  margin-bottom: var(--space-2xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.section {
+  margin-bottom: var(--space-xl);
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.sectionTitle::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 24px;
+  background: var(--color-primary);
+  border-radius: 2px;
+}
+
+.text {
+  color: var(--color-text);
+  line-height: 1.7;
+  margin-bottom: var(--space-md);
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-md) var(--space-md);
+}
+
+.list li {
+  position: relative;
+  padding-left: var(--space-lg);
+  margin-bottom: var(--space-xs);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+.list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
+.contactBox {
+  background: #F8FAFC;
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  margin-top: var(--space-lg);
+}
+
+.contactLabel {
+  font-weight: 600;
+  color: var(--color-text);
+  margin-right: var(--space-sm);
+}
+
+.contactLink {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.contactLink:hover {
+  text-decoration: underline;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: var(--space-xl);
+  transition: color 0.2s ease;
+}
+
+.backLink:hover {
+  color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: var(--space-lg);
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+}

@@ -1,0 +1,392 @@
+/* ===================================
+   Analytics Page
+   =================================== */
+
+.page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    max-width: 1200px;
+}
+
+/* Header */
+.header h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 var(--space-xs);
+}
+
+.header p {
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+/* KPI Cards */
+.kpiGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-lg);
+}
+
+.kpiCard {
+    --accent: #3B82F6;
+    background: white;
+    padding: var(--space-lg);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--accent);
+    transition: all var(--transition-fast);
+    position: relative;
+    overflow: hidden;
+}
+
+.kpiCard::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.kpiCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -8px color-mix(in srgb, var(--accent) 25%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 30%, var(--color-border));
+}
+
+.kpiCard:hover::after {
+    opacity: 1;
+}
+
+/* Color Variants */
+.kpiCardViews {
+    --accent: #3B82F6;
+}
+
+.kpiCardLinks {
+    --accent: #10B981;
+}
+
+.kpiCardRate {
+    --accent: #F59E0B;
+}
+
+.kpiCardClients {
+    --accent: #8B5CF6;
+}
+
+.kpiHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+}
+
+.kpiTitle {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.kpiIcon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--accent) 12%, white);
+    border-radius: var(--radius-lg);
+    color: var(--accent);
+    transition: all var(--transition-fast);
+}
+
+.kpiIcon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.kpiCard:hover .kpiIcon {
+    background: color-mix(in srgb, var(--accent) 20%, white);
+    transform: scale(1.05);
+}
+
+.kpiValue {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: var(--space-xs);
+    font-family: var(--font-mono);
+    line-height: 1.1;
+}
+
+.kpiTrend {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-text-muted);
+}
+
+.trendUp {
+    color: #10B981;
+    font-weight: 600;
+}
+
+.trendDown {
+    color: #EF4444;
+    font-weight: 600;
+}
+
+.trendIcon {
+    display: inline-flex;
+    font-size: 0.75rem;
+}
+
+/* Charts Section */
+.chartsGrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-lg);
+}
+
+.chartCard {
+    background: white;
+    padding: var(--space-xl);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chartCard h2 {
+    font-size: 1.125rem;
+    margin: 0 0 var(--space-lg);
+    color: var(--color-text);
+}
+
+.chartContainer {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+}
+
+/* Recent Activity */
+.activitySection {
+    background: white;
+    padding: var(--space-xl);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+}
+
+.activitySection h2 {
+    font-size: 1.125rem;
+    margin: 0 0 var(--space-lg);
+    color: var(--color-text);
+}
+
+.activityList {
+    display: flex;
+    flex-direction: column;
+}
+
+.activityItem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.activityItem:last-child {
+    border-bottom: none;
+}
+
+.activityIcon {
+    width: 40px;
+    height: 40px;
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--color-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.activityContent {
+    flex: 1;
+}
+
+.activityText {
+    font-size: 0.9375rem;
+    color: var(--color-text);
+    margin: 0 0 2px;
+}
+
+.activityText strong {
+    font-weight: 600;
+}
+
+.activityTime {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .chartsGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .page {
+        gap: var(--space-lg);
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .kpiGrid {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-sm);
+    }
+
+    .kpiCard {
+        padding: var(--space-sm);
+        min-width: 0;
+    }
+
+    .kpiValue {
+        font-size: 1.25rem;
+    }
+
+    .kpiTitle {
+        font-size: 0.75rem;
+    }
+
+    .chartCard {
+        padding: var(--space-md);
+        min-height: 200px;
+    }
+
+    .activitySection {
+        padding: var(--space-md);
+        margin-bottom: var(--space-xl);
+    }
+
+    .activityItem {
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+    }
+
+    .activityIcon {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+@media (max-width: 400px) {
+    .kpiGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Header with Range Selector */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.rangeSelector {
+    display: flex;
+    gap: var(--space-xs);
+    padding: 4px;
+    background: var(--color-bg);
+    border-radius: var(--radius-md);
+}
+
+.rangeBtn {
+    padding: var(--space-xs) var(--space-md);
+    border: none;
+    background: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.rangeBtn:hover {
+    color: var(--color-text);
+}
+
+.rangeBtn.active {
+    background: white;
+    color: var(--color-text);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Loading State */
+.loadingState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3xl);
+    gap: var(--space-md);
+    color: var(--color-text-secondary);
+}
+
+.spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Empty States */
+.emptyChart {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--color-text-muted);
+}
+
+.emptyActivity {
+    text-align: center;
+    padding: var(--space-xl);
+    color: var(--color-text-secondary);
+}
+
+/* Activity Link */
+.activityLink {
+    color: var(--color-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.activityLink:hover {
+    text-decoration: underline;
+}

@@ -1,0 +1,204 @@
+.userMenu {
+    position: relative;
+}
+
+.avatarBtn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: var(--radius-full);
+    transition: all var(--transition-fast);
+}
+
+.avatarBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.avatarImage {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.avatarInitial {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.chevron {
+    font-size: 0.625rem;
+    color: rgba(255, 255, 255, 0.7);
+    transition: transform var(--transition-fast);
+}
+
+/* Header Variant (dark background) */
+.headerVariant .chevron {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.headerVariant .dropdown {
+    background: var(--glass-dark-bg);
+    backdrop-filter: var(--glass-blur-xl);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.headerVariant .dropdownItem {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.headerVariant .dropdownItem:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.headerVariant .dropdownName {
+    color: white;
+}
+
+.headerVariant .dropdownEmail {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* TopBar Variant (light background) */
+.topbarVariant .avatarBtn:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.topbarVariant .chevron {
+    color: var(--text-secondary);
+}
+
+.topbarVariant .dropdown {
+    background: white;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg);
+}
+
+.topbarVariant .dropdownItem {
+    color: var(--text-secondary);
+}
+
+.topbarVariant .dropdownItem:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.topbarVariant .dropdownName {
+    color: var(--text-primary);
+}
+
+.topbarVariant .dropdownEmail {
+    color: var(--text-tertiary);
+}
+
+/* Dropdown */
+.dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 220px;
+    border-radius: var(--radius-lg);
+    padding: var(--space-sm);
+    z-index: var(--z-dropdown);
+    animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdownHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+}
+
+.dropdownAvatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.dropdownAvatarInitial {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+    color: white;
+}
+
+.dropdownInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+}
+
+.dropdownName {
+    font-weight: 600;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdownEmail {
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdownDivider {
+    height: 1px;
+    background: currentColor;
+    opacity: 0.1;
+    margin: var(--space-xs) 0;
+}
+
+.dropdownItem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+}

@@ -1,0 +1,422 @@
+/* ===================================
+   Global Toast & Confirm Styles
+   =================================== */
+
+/* Toast Container - fixed position */
+.toastContainer {
+    position: fixed;
+    top: var(--space-lg);
+    right: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    z-index: 9999;
+    pointer-events: none;
+}
+
+/* Individual Toast */
+.toast {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+    padding: 16px 20px;
+    animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: auto;
+    cursor: pointer;
+    min-width: 340px;
+    max-width: 440px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.toast:hover {
+    transform: translateX(-4px);
+    box-shadow: 0 6px 28px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Toast Icon Wrapper - Colored Circle */
+.toastIconWrapper {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.toastIconWrapper svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Icon Colors by Type */
+.icon_info {
+    background: #3B82F6;
+    color: white;
+}
+
+.icon_success {
+    background: #22C55E;
+    color: white;
+}
+
+.icon_warning {
+    background: #F59E0B;
+    color: white;
+}
+
+.icon_error {
+    background: #EF4444;
+    color: white;
+}
+
+/* Toast Content */
+.toastContent {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    padding-top: 2px;
+}
+
+.toastTitle {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+    line-height: 1.4;
+}
+
+.toastDescription {
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+/* Toast Type Borders (subtle) */
+.toast.info {
+    border-left: none;
+}
+
+.toast.success {
+    border-left: none;
+}
+
+.toast.warning {
+    border-left: none;
+}
+
+.toast.error {
+    border-left: none;
+}
+
+/* ================================
+   Confirm Modal (Admin Theme)
+   ================================ */
+.confirmBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(31, 42, 47, 0.6);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: var(--space-xl);
+    animation: adminFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes adminFadeIn {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+
+    to {
+        opacity: 1;
+        backdrop-filter: blur(12px);
+    }
+}
+
+.confirmModal {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(226, 215, 199, 0.8);
+    border-radius: 24px;
+    padding: 32px;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 25px 60px rgba(32, 35, 36, 0.15),
+        0 8px 24px rgba(32, 35, 36, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    animation: adminModalSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.confirmModal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg,
+            var(--admin-accent) 0%,
+            var(--admin-accent-2) 50%,
+            var(--admin-accent) 100%);
+    border-radius: 24px 24px 0 0;
+}
+
+@keyframes adminModalSlide {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+        filter: blur(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: blur(0px);
+    }
+}
+
+.confirmIcon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto var(--space-lg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    position: relative;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.confirmIcon::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    padding: 2px;
+    background: linear-gradient(135deg, var(--admin-accent), var(--admin-accent-2));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    -webkit-mask-composite: xor;
+}
+
+.confirmIcon.warning {
+    background: linear-gradient(135deg, var(--admin-accent-2) 0%, #f59e0b 100%);
+    color: white;
+}
+
+.confirmIcon.danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+}
+
+.confirmIcon.info {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    color: white;
+}
+
+.confirmTitle {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: var(--admin-ink);
+    margin: 0 0 var(--space-sm);
+    font-family: var(--font-admin-display), "Fraunces", serif, system-ui, -apple-system, BlinkMacSystemFont;
+    letter-spacing: -0.02em;
+    /* Enhanced font rendering for better clarity */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Ensure crisp text rendering */
+    font-feature-settings: "kern" 1, "liga" 1;
+}
+
+.confirmMessage {
+    font-size: 1rem;
+    color: var(--admin-ink-soft);
+    margin: 0 0 var(--space-2xl);
+    line-height: 1.6;
+    font-family: var(--font-admin-body), "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+    /* Enhanced font rendering for better clarity */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern" 1, "liga" 1;
+}
+
+.confirmActions {
+    display: flex;
+    gap: var(--space-lg);
+    justify-content: center;
+}
+
+.confirmCancelBtn {
+    flex: 0 0 auto;
+    min-width: 120px;
+    padding: var(--space-md) var(--space-xl);
+    border: 2px solid var(--admin-border);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--admin-ink-soft);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: var(--font-admin-body), "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    box-shadow: 0 2px 8px rgba(32, 35, 36, 0.06);
+    /* Enhanced font rendering for better clarity */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "kern" 1, "liga" 1;
+    text-rendering: optimizeLegibility;
+    /* Ensure text doesn't get blurred by backdrop filters */
+    will-change: auto;
+}
+
+.confirmCancelBtn:hover {
+    border-color: var(--admin-accent);
+    color: var(--admin-accent);
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(32, 35, 36, 0.1);
+}
+
+.confirmBtn {
+    flex: 0 0 auto;
+    min-width: 140px;
+    padding: var(--space-md) var(--space-xl);
+    border: none;
+    border-radius: 16px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: var(--font-admin-body), "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    position: relative;
+    overflow: hidden;
+    /* Enhanced font rendering for better clarity */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "kern" 1, "liga" 1;
+    text-rendering: optimizeLegibility;
+    /* Ensure text doesn't get blurred by backdrop filters */
+    will-change: auto;
+}
+
+.confirmBtn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, currentColor 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.confirmBtn:hover::before {
+    opacity: 0.1;
+}
+
+.confirmBtn.warning {
+    background: linear-gradient(135deg, var(--admin-accent-2) 0%, #f59e0b 100%);
+    color: white;
+    box-shadow: 0 4px 16px rgba(240, 180, 41, 0.3);
+}
+
+.confirmBtn.danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+}
+
+.confirmBtn.info {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    color: white;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+}
+
+.confirmBtn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+.confirmBtn:active {
+    transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .toastContainer {
+        top: auto;
+        bottom: var(--space-lg);
+        right: var(--space-md);
+        left: var(--space-md);
+    }
+
+    .toast {
+        min-width: auto;
+        max-width: 100%;
+    }
+
+    .confirmModal {
+        padding: var(--space-xl);
+        max-width: 360px;
+        margin: var(--space-md);
+    }
+
+    .confirmIcon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.75rem;
+        margin-bottom: var(--space-md);
+    }
+
+    .confirmTitle {
+        font-size: 1.25rem;
+    }
+
+    .confirmMessage {
+        font-size: 0.9375rem;
+        margin-bottom: var(--space-xl);
+    }
+
+    .confirmActions {
+        gap: var(--space-md);
+    }
+
+    .confirmCancelBtn,
+    .confirmBtn {
+        min-width: 100px;
+        padding: var(--space-sm) var(--space-lg);
+        font-size: 0.875rem;
+    }
+}

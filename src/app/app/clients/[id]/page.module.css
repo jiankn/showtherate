@@ -1,0 +1,431 @@
+/* ===================================
+   Client Detail Page
+   =================================== */
+
+.page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    max-width: 1000px;
+}
+
+/* ================================
+   Header
+   ================================ */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.headerLeft {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.backBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color var(--transition-fast);
+}
+
+.backBtn:hover {
+    color: var(--color-primary);
+}
+
+.backBtn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.titleSection h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.clientHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.unknownAvatar {
+    background: linear-gradient(135deg, rgba(156, 163, 175, 0.2) 0%, rgba(107, 114, 128, 0.2) 100%);
+    color: #6b7280;
+}
+
+.statusBadge {
+    font-size: 0.75rem;
+    color: var(--color-positive);
+    font-weight: 500;
+}
+
+/* ================================
+   Contact Card
+   ================================ */
+.contactCard {
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+}
+
+.contactCard h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 var(--space-lg);
+    color: var(--color-text);
+}
+
+.contactGrid {
+    display: flex;
+    gap: var(--space-xl);
+    flex-wrap: wrap;
+}
+
+.contactItem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.contactItem svg {
+    width: 20px;
+    height: 20px;
+    color: var(--color-text-muted);
+}
+
+.contactLabel {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-bottom: 2px;
+}
+
+.contactValue {
+    font-size: 0.9375rem;
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.contactValue:hover {
+    text-decoration: underline;
+}
+
+/* ================================
+   Comparisons Section
+   ================================ */
+.comparisonsSection {
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+}
+
+.comparisonsSection h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 var(--space-lg);
+    color: var(--color-text);
+}
+
+.comparisonsList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.comparisonItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-md);
+    background: var(--color-bg);
+    border-radius: var(--radius-lg);
+    transition: background var(--transition-fast);
+}
+
+.comparisonItem:hover {
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.comparisonInfo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.comparisonIcon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: var(--radius-md);
+    font-size: 1.25rem;
+}
+
+.comparisonInfo h3 {
+    margin: 0 0 4px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.comparisonMeta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+.sharedBadge {
+    color: #059669;
+}
+
+.viewBtn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.viewBtn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.viewBtn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.emptyComparisons {
+    text-align: center;
+    padding: var(--space-xl);
+    color: var(--color-text-secondary);
+}
+
+/* ================================
+   Loading & Error States
+   ================================ */
+.loadingState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3xl);
+    gap: var(--space-md);
+    color: var(--color-text-secondary);
+}
+
+.spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.errorState {
+    text-align: center;
+    padding: var(--space-3xl);
+}
+
+.errorState h2 {
+    font-size: 1.5rem;
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+}
+
+/* ================================
+   Responsive
+   ================================ */
+@media (max-width: 768px) {
+    .contactGrid {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+}
+
+/* ================================
+   Header Actions
+   ================================ */
+.headerActions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.editBtn,
+.cancelBtn {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--color-border);
+    background: white;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.editBtn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.cancelBtn:hover {
+    border-color: var(--color-text);
+}
+
+.saveBtn {
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    background: var(--gradient-primary);
+    color: white;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.saveBtn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--card-shadow-glow-blue);
+}
+
+.saveBtn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.deleteClientBtn {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid #DC2626;
+    background: rgba(220, 38, 38, 0.1);
+    color: #DC2626;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.deleteClientBtn:hover:not(:disabled) {
+    background: #DC2626;
+    color: white;
+}
+
+.deleteClientBtn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* ================================
+   Edit Form
+   ================================ */
+.editForm {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.formGroup label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    transition: all var(--transition-fast);
+    font-family: inherit;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.formGroup textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* ================================
+   Notes Section
+   ================================ */
+.notesSection {
+    margin-top: var(--space-lg);
+    padding-top: var(--space-lg);
+    border-top: 1px dashed var(--color-border);
+}
+
+.notesLabel {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-xs);
+}
+
+.notesText {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    white-space: pre-wrap;
+}

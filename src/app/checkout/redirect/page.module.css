@@ -1,0 +1,79 @@
+.page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: var(--space-xl);
+}
+
+.container {
+    text-align: center;
+    max-width: 400px;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--color-primary-100);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto var(--space-lg);
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-lg);
+}
+
+.errorIcon {
+    font-size: 3rem;
+    margin-bottom: var(--space-md);
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    align-items: center;
+}
+
+.retryBtn {
+    background: var(--color-primary);
+    color: white;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-md);
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.retryBtn:hover {
+    background: var(--color-primary-dark);
+}
+
+.backLink {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    text-decoration: underline;
+}
+
+.backLink:hover {
+    color: var(--color-primary);
+}
