@@ -30,9 +30,7 @@ export async function GET(request) {
         const { getSLAStatus, calculateSLARemaining, formatRemaining } = await import('@/lib/sla');
 
         // 更新SLA状态
-        console.log('Checking SLA statuses...');
         const updateResult = await updateSLAStatuses();
-        console.log(`Updated ${updateResult.updated} ticket SLA statuses`);
 
         // 获取需要提醒的工单
         const slaConfig = await getSLAConfig();

@@ -5,17 +5,29 @@ import { supabaseAdmin } from './server';
  * @returns {Promise<Array>} List of posts
  */
 export async function getAllPosts() {
-  const { data, error } = await supabaseAdmin
-    .from('posts')
-    .select('id, title, slug, excerpt, cover_image, published_at, tags')
-    .eq('published', true)
-    .order('published_at', { ascending: false });
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('posts')
+      .select('id, title, slug, excerpt, cover_image, published_at, tags')
+      .eq('published', true)
+      .order('published_at', { ascending: false });
 
-  if (error) {
-    console.error('Error fetching posts:', error);
+    if (error) {
+      console.error('Error fetching posts:', error);
+      console.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
+      return [];
+    }
+
+    return data || [];
+  } catch (err) {
+    console.error('Unexpected error in getAllPosts:', err);
     return [];
   }
-  return data;
 }
 
 /**

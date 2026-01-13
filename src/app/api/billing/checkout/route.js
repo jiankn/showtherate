@@ -40,6 +40,23 @@ export async function POST(request) {
             );
         }
 
+        // Check if product requires active subscription (e.g., Boost Pack)
+        if (product.requiresSubscription) {
+            const { supabaseAdmin } = await import('@/lib/supabase/server');
+            const { data: subscription } = await supabaseAdmin
+                .from('subscriptions')
+                .select('status')
+                .eq('user_id', session.user.id)
+                .single();
+
+            if (subscription?.status !== 'active') {
+                return NextResponse.json(
+                    { error: 'Active subscription required to purchase this product' },
+                    { status: 403 }
+                );
+            }
+        }
+
         // Get or create Stripe customer
         const customerId = await getOrCreateCustomer(
             session.user.id,

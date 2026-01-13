@@ -24,12 +24,19 @@ const formatNumberInput = (value) => {
 };
 
 // ===== SCENARIO CARD COMPONENT =====
-function ScenarioCard({ scenario, index, onUpdate, onDuplicate, onRemove, canRemove }) {
+function ScenarioCard({ scenario, index, onUpdate, onDuplicate, onRemove, canRemove, forceShowAdvanced }) {
     const colors = ['a', 'b', 'c', 'd'];
     const colorClass = colors[index % colors.length];
     const labels = ['Option A', 'Option B', 'Option C', 'Option D'];
 
-    const [showAdvanced, setShowAdvanced] = useState(false);
+    const [showAdvanced, setShowAdvanced] = useState(forceShowAdvanced || false);
+
+    // 当 forceShowAdvanced 变为 true 时自动展开 Advanced 区域
+    useEffect(() => {
+        if (forceShowAdvanced) {
+            setShowAdvanced(true);
+        }
+    }, [forceShowAdvanced]);
 
     const handleInputChange = (field, value) => {
         onUpdate({
@@ -321,6 +328,8 @@ function ScenarioBuilderPageInner() {
     const [aiMeta, setAiMeta] = useState(null);
     const [isGeneratingAI, setIsGeneratingAI] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    // RentCast 数据获取后自动展开 Advanced
+    const [expandAdvanced, setExpandAdvanced] = useState(false);
     // AI script tracking
     const [hasUsedAI, setHasUsedAI] = useState(false);
     const [isAIGenerated, setIsAIGenerated] = useState(false);
@@ -453,19 +462,31 @@ function ScenarioBuilderPageInner() {
 
             const annualPropertyTax = typeof data?.annualPropertyTax === 'number' ? data.annualPropertyTax : null;
             const hoaMonthly = typeof data?.hoaMonthly === 'number' ? data.hoaMonthly : null;
+            const lastSalePrice = typeof data?.lastSalePrice === 'number' ? data.lastSalePrice : null;
+
+            let homePriceAutoFilled = false;
 
             setScenarios((prev) =>
                 prev.map((scenario) => {
                     const nextInputs = { ...scenario.inputs };
 
+                    // 无条件覆盖 Home Price（如果有数据）
+                    if (lastSalePrice !== null) {
+                        nextInputs.homePrice = lastSalePrice;
+                        homePriceAutoFilled = true;
+                    }
+
+                    // 无条件覆盖 Property Tax（如果有数据）
                     if (annualPropertyTax !== null) {
                         nextInputs.propertyTax = annualPropertyTax;
+                        // 重新计算 Tax Rate 基于当前 Home Price
                         if (typeof nextInputs.homePrice === 'number' && nextInputs.homePrice > 0) {
                             nextInputs.propertyTaxRate = Number(((annualPropertyTax / nextInputs.homePrice) * 100).toFixed(2));
                         }
                     }
 
-                    if (hoaMonthly !== null && Number(nextInputs.hoa) === 0) {
+                    // 无条件覆盖 HOA（如果有数据）
+                    if (hoaMonthly !== null) {
                         nextInputs.hoa = hoaMonthly;
                     }
 
@@ -477,7 +498,22 @@ function ScenarioBuilderPageInner() {
                 })
             );
 
-            toast.success('Tax & details fetched');
+            // 如果有数据填充到 Advanced 字段，自动展开
+            if (annualPropertyTax !== null || hoaMonthly !== null) {
+                setExpandAdvanced(true);
+            }
+
+            // 组合成功提示
+            const filledFields = [];
+            if (homePriceAutoFilled) filledFields.push('Home Price');
+            if (annualPropertyTax !== null) filledFields.push('Tax');
+            if (hoaMonthly !== null) filledFields.push('HOA');
+
+            if (filledFields.length > 0) {
+                toast.success(`Auto-filled: ${filledFields.join(', ')}`);
+            } else {
+                toast.success('Property fetched (no auto-fill data)');
+            }
         } catch (err) {
             toast.error('Failed to fetch property details');
         } finally {
@@ -699,6 +735,7 @@ function ScenarioBuilderPageInner() {
                 body: JSON.stringify({
                     title: comparisonTitle,
                     clientId: selectedClient?.id || null,
+                    aiScript: aiText || null,
                     scenarios: calculatedScenarios.map(s => ({
                         name: s.name,
                         inputs: s.inputs,
@@ -806,17 +843,34 @@ function ScenarioBuilderPageInner() {
 
                     {propertyDetails && (
                         <div className={styles.propertyMeta}>
+                            {/* 房产属性 */}
+                            {(propertyDetails.bedrooms || propertyDetails.bathrooms || propertyDetails.squareFootage) && (
+                                <span className={styles.propertyAttr}>
+                                    🏠 {propertyDetails.bedrooms ? `${propertyDetails.bedrooms} bed` : ''}
+                                    {propertyDetails.bathrooms ? ` • ${propertyDetails.bathrooms} bath` : ''}
+                                    {propertyDetails.squareFootage ? ` • ${propertyDetails.squareFootage.toLocaleString()} sqft` : ''}
+                                    {propertyDetails.yearBuilt ? ` • Built ${propertyDetails.yearBuilt}` : ''}
+                                </span>
+                            )}
+                            {/* 成交价 */}
+                            {typeof propertyDetails.lastSalePrice === 'number' && (
+                                <span>
+                                    💰 Last Sale: {formatCurrency(propertyDetails.lastSalePrice)}
+                                    {propertyDetails.lastSaleDate ? ` (${propertyDetails.lastSaleDate.slice(0, 10)})` : ''}
+                                </span>
+                            )}
+                            {/* 税费与 HOA */}
                             <span>
-                                Tax: {typeof propertyDetails.annualPropertyTax === 'number' ? formatCurrency(propertyDetails.annualPropertyTax) : '—'}
+                                📋 Tax: {typeof propertyDetails.annualPropertyTax === 'number' ? formatCurrency(propertyDetails.annualPropertyTax) : '—'}
                                 {propertyDetails.taxYear ? ` (${propertyDetails.taxYear})` : ''}
                             </span>
                             <span>
                                 HOA: {typeof propertyDetails.hoaMonthly === 'number' ? `${formatCurrency(propertyDetails.hoaMonthly)}/mo` : '—'}
                             </span>
                             {typeof propertyDetails.remaining === 'number' && (
-                                <span>Remaining: {propertyDetails.remaining === -1 ? '∞' : propertyDetails.remaining}</span>
+                                <span>Quota: {propertyDetails.remaining === -1 ? '∞' : propertyDetails.remaining}</span>
                             )}
-                            <span>{propertyDetails.cached ? 'Cached' : 'Live'}</span>
+                            <span className={styles.cacheTag}>{propertyDetails.cached ? '📦 Cached' : '🔴 Live'}</span>
                         </div>
                     )}
                 </div>
@@ -833,6 +887,7 @@ function ScenarioBuilderPageInner() {
                         onDuplicate={handleDuplicateScenario}
                         onRemove={handleRemoveScenario}
                         canRemove={scenarios.length > 1}
+                        forceShowAdvanced={expandAdvanced}
                     />
                 ))}
 
@@ -881,46 +936,47 @@ function ScenarioBuilderPageInner() {
                         </div>
                     </div>
 
-                    {aiText ? (
-                        <div className={styles.aiBody}>
-                            <textarea
-                                className={styles.aiTextarea}
-                                value={aiText}
-                                onChange={(e) => setAiText(e.target.value)}
-                                placeholder="Edit your script here..."
-                                rows={8}
-                            />
-                            <div className={styles.aiFooter}>
-                                <div className={styles.aiActions}>
-                                    <button className={styles.aiCopyBtn} onClick={handleCopyAIScript}>
-                                        <CopyIcon className={styles.aiCopyIcon} />
-                                        Copy
+                    <div className={styles.aiBody}>
+                        <textarea
+                            className={styles.aiTextarea}
+                            value={aiText}
+                            onChange={(e) => setAiText(e.target.value)}
+                            placeholder={aiText ? "Edit your script here..." : "Draft a short script you can read to the borrower while comparing options, or click Generate Script to get AI assistance."}
+                            rows={8}
+                        />
+                        <div className={styles.aiFooter}>
+                            <div className={styles.aiActions}>
+                                <button
+                                    className={styles.aiCopyBtn}
+                                    onClick={handleCopyAIScript}
+                                    disabled={!aiText}
+                                >
+                                    <CopyIcon className={styles.aiCopyIcon} />
+                                    Copy
+                                </button>
+                                {/* Show Try AI button for subscribers who haven't used AI yet */}
+                                {isSubscriber && canUseAI && !hasUsedAI && (
+                                    <button
+                                        className={styles.aiTryAIBtn}
+                                        onClick={handleGenerateAIScript}
+                                        disabled={isGeneratingAI}
+                                    >
+                                        ✨ Try AI
                                     </button>
-                                    {/* Show Try AI button for subscribers who haven't used AI yet */}
-                                    {isSubscriber && canUseAI && !hasUsedAI && (
-                                        <button
-                                            className={styles.aiTryAIBtn}
-                                            onClick={handleGenerateAIScript}
-                                            disabled={isGeneratingAI}
-                                        >
-                                            ✨ Try AI
-                                        </button>
-                                    )}
-                                </div>
-                                <div className={styles.aiMeta}>
-                                    {isAIGenerated && <span className={styles.aiTag}>AI Generated</span>}
-                                    {aiMeta?.isAI === false && <span>Template</span>}
-                                    {typeof aiMeta?.remaining === 'number' && isSubscriber && (
-                                        <span>AI remaining: {aiMeta.remaining === -1 ? '∞' : aiMeta.remaining}</span>
-                                    )}
-                                </div>
+                                )}
+                            </div>
+                            <div className={styles.aiMeta}>
+                                {isAIGenerated && <span className={styles.aiTag}>AI Generated</span>}
+                                {aiMeta?.isAI === false && <span>Template</span>}
+                                {typeof aiMeta?.remaining === 'number' && isSubscriber && (
+                                    <span>AI remaining: {aiMeta.remaining === -1 ? '∞' : aiMeta.remaining}</span>
+                                )}
+                                {!aiText && (
+                                    <span className={styles.aiHint}>💡 Start typing or generate with AI</span>
+                                )}
                             </div>
                         </div>
-                    ) : (
-                        <div className={styles.aiEmpty}>
-                            Draft a short script you can read to the borrower while comparing options.
-                        </div>
-                    )}
+                    </div>
                 </div>
             </section>
 

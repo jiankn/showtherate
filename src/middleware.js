@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
-import { isAdminEmail } from '@/lib/adminAuth';
+
+// Inline admin auth to avoid Edge Runtime module resolution issues
+const ADMIN_EMAIL = 'jiankn@gmail.com';
+function isAdminEmail(email) {
+    return (email || '').trim().toLowerCase() === ADMIN_EMAIL.toLowerCase();
+}
 
 /**
  * Middleware to protect /app/* routes

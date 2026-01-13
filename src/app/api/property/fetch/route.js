@@ -39,21 +39,13 @@ function extractLatestTax(propertyRecord) {
 }
 
 async function fetchRentCastProperty(address) {
-    const apiKey = process.env.RENTCAST_API_KEY;
-    if (!apiKey) {
-        throw new Error('Missing RENTCAST_API_KEY');
-    }
+    const { callRentCast } = await import('@/lib/rentcast');
 
     const url = new URL('https://api.rentcast.io/v1/properties');
     url.searchParams.set('address', address);
     url.searchParams.set('limit', '1');
 
-    const res = await fetch(url.toString(), {
-        headers: {
-            Accept: 'application/json',
-            'X-Api-Key': apiKey,
-        },
-    });
+    const res = await callRentCast(url.toString());
 
     if (!res.ok) {
         const text = await res.text().catch(() => '');
@@ -134,6 +126,14 @@ export async function POST(request) {
         const hoaMonthly = typeof record?.hoa?.fee === 'number' ? record.hoa.fee : null;
         const formattedAddress = typeof record?.formattedAddress === 'string' ? record.formattedAddress : rawAddress.trim();
 
+        // 提取更多 RentCast 数据以充分利用 API 价值
+        const lastSalePrice = typeof record?.lastSalePrice === 'number' ? record.lastSalePrice : null;
+        const lastSaleDate = typeof record?.lastSaleDate === 'string' ? record.lastSaleDate : null;
+        const bedrooms = typeof record?.bedrooms === 'number' ? record.bedrooms : null;
+        const bathrooms = typeof record?.bathrooms === 'number' ? record.bathrooms : null;
+        const squareFootage = typeof record?.squareFootage === 'number' ? record.squareFootage : null;
+        const yearBuilt = typeof record?.yearBuilt === 'number' ? record.yearBuilt : null;
+
         const expiresAt = addDaysUtcMidnight(now, CACHE_TTL_DAYS).toISOString();
 
         const payload = {
@@ -141,6 +141,12 @@ export async function POST(request) {
             annualPropertyTax,
             taxYear,
             hoaMonthly,
+            lastSalePrice,
+            lastSaleDate,
+            bedrooms,
+            bathrooms,
+            squareFootage,
+            yearBuilt,
         };
 
         const { error: cacheError } = await supabaseAdmin

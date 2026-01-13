@@ -29,6 +29,19 @@ export default function SharePage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [hasTrackedView, setHasTrackedView] = useState(false);
+    const [copyToast, setCopyToast] = useState(null);
+
+    // Copy to clipboard helper
+    const copyToClipboard = useCallback(async (text, label) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopyToast(`${label} copied!`);
+            setTimeout(() => setCopyToast(null), 2000);
+        } catch {
+            setCopyToast('Copy failed');
+            setTimeout(() => setCopyToast(null), 2000);
+        }
+    }, []);
 
     // Track event helper
     const trackEvent = useCallback(async (eventType, ctaType = null) => {
@@ -70,7 +83,7 @@ export default function SharePage() {
                 if (res.ok && json?.snapshot) {
                     const snapshot = json.snapshot;
                     const lo = snapshot?.lo && typeof snapshot.lo === 'object' ? snapshot.lo : {};
-                    const loName = [lo?.name, lo?.lastName].filter(Boolean).join(' ') || null;
+                    const loName = lo?.name || null;
 
                     const normalizedScenarios = Array.isArray(snapshot?.scenarios)
                         ? snapshot.scenarios.map((s, index) => ({
@@ -82,20 +95,29 @@ export default function SharePage() {
                         : [];
 
                     if (!cancelled) {
+                        // Extract property address from first scenario
+                        const firstScenario = normalizedScenarios[0];
+                        const propertyAddress = firstScenario?.inputs?.propertyAddress || null;
+                        const homePrice = firstScenario?.inputs?.homePrice || null;
+
                         setData({
                             id: json.shareId,
                             title: snapshot?.title,
+                            aiScript: snapshot?.aiScript || null,
                             scenarios: normalizedScenarios,
                             createdAt: snapshot?.createdAt,
+                            viewCount: json.viewCount || 0,
                             loName: loName || undefined,
                             loNmls: lo?.nmls || undefined,
                             loEmail: lo?.email || undefined,
-                            loPhone: lo?.phone || undefined,
                             loPhone: lo?.phone || undefined,
                             loX: lo?.xHandle || undefined,
                             loFacebook: lo?.facebook || undefined,
                             loTikTok: lo?.tiktok || undefined,
                             loInstagram: lo?.instagram || undefined,
+                            loAvatarUrl: lo?.avatarUrl || undefined,
+                            propertyAddress: propertyAddress,
+                            homePrice: homePrice,
                         });
                         setLoading(false);
                     }
@@ -154,33 +176,6 @@ export default function SharePage() {
 
     if (!data) return null;
 
-    const outputs = Array.isArray(data?.scenarios)
-        ? data.scenarios.map((s) => s?.outputs).filter(Boolean)
-        : [];
-
-    const optionA = outputs[0];
-    const optionB = outputs[1];
-    const canRecommend = !!optionA && !!optionB;
-
-    const monthlyA = optionA?.monthly?.total;
-    const monthlyB = optionB?.monthly?.total;
-    const cashA = optionA?.closing?.cashToClose;
-    const cashB = optionB?.closing?.cashToClose;
-
-    const monthlyDiff = typeof monthlyA === 'number' && typeof monthlyB === 'number'
-        ? Math.abs(monthlyA - monthlyB)
-        : null;
-    const cashDiff = typeof cashA === 'number' && typeof cashB === 'number'
-        ? Math.abs(cashA - cashB)
-        : null;
-
-    const lowerMonthlyLabel = typeof monthlyA === 'number' && typeof monthlyB === 'number'
-        ? (monthlyA <= monthlyB ? 'Option A' : 'Option B')
-        : null;
-    const lowerCashLabel = typeof cashA === 'number' && typeof cashB === 'number'
-        ? (cashA <= cashB ? 'Option A' : 'Option B')
-        : null;
-
     const phoneDigits = typeof data?.loPhone === 'string'
         ? data.loPhone.replace(/[^\d+]/g, '')
         : '';
@@ -219,10 +214,17 @@ export default function SharePage() {
             <header className={styles.header}>
                 <div className={styles.headerContent}>
                     <div className={styles.loBranding}>
-                        <div className={styles.loAvatar}>👤</div>
+                        <div className={styles.loAvatar}>
+                            {data.loAvatarUrl ? (
+                                <img src={data.loAvatarUrl} alt={data.loName || 'LO'} className={styles.loAvatarImg} />
+                            ) : '👤'}
+                        </div>
                         <div className={styles.loInfo}>
                             <div className={styles.loName}>{data.loName || 'Your Loan Officer'}</div>
-                            <div className={styles.loNmls}>NMLS# {data.loNmls || '------'}</div>
+                            <div className={styles.loMeta}>
+                                <span className={styles.loNmls}>NMLS# {data.loNmls || '------'}</span>
+                                <span className={styles.shareViews}>👁 {data.viewCount || 0} views</span>
+                            </div>
                         </div>
                     </div>
 
@@ -239,6 +241,20 @@ export default function SharePage() {
                 <p className={styles.subtitle}>
                     Compare your options and find the best fit for your situation
                 </p>
+
+                {/* Property Address */}
+                {data.propertyAddress && (
+                    <div className={styles.propertyAddress}>
+                        <span className={styles.propertyIcon}>📍</span>
+                        <span className={styles.propertyText}>{data.propertyAddress}</span>
+                        {data.homePrice && (
+                            <span className={styles.propertyMeta}>
+                                <span>•</span>
+                                <span>{formatCurrency(data.homePrice)}</span>
+                            </span>
+                        )}
+                    </div>
+                )}
             </section>
 
             {/* Scenario Cards */}
@@ -260,40 +276,42 @@ export default function SharePage() {
                 <LongTermComparison scenarios={data.scenarios} />
             </section>
 
-            {/* LO Notes */}
-            <section className={styles.aiSection}>
-                <div className={styles.aiCard}>
-                    <div className={styles.aiHeader}>
-                        <h3>Recommendation from {data.loName || 'your loan officer'}</h3>
+            {/* LO Recommendation - Card Highlight Design */}
+            {data.aiScript && (
+                <section className={styles.recommendSection}>
+                    <div className={styles.recommendCard}>
+                        {/* Decorative Elements */}
+                        <div className={styles.recommendGlow}></div>
+
+                        {/* Header */}
+                        <div className={styles.recommendHeader}>
+                            <span className={styles.recommendIcon}>✨</span>
+                            <h3>My Recommendation</h3>
+                        </div>
+
+                        {/* Content Quote */}
+                        <div className={styles.recommendQuote}>
+                            <div className={styles.quoteAvatar}>
+                                {data.loAvatarUrl ? (
+                                    <img src={data.loAvatarUrl} alt={data.loName || 'LO'} />
+                                ) : (
+                                    <span>{(data.loName || 'LO').charAt(0).toUpperCase()}</span>
+                                )}
+                            </div>
+                            <div className={styles.quoteContent}>
+                                <p>{data.aiScript}</p>
+                            </div>
+                        </div>
+
+                        {/* Signature */}
+                        <div className={styles.recommendSignature}>
+                            <span>—</span>
+                            <span className={styles.signatureName}>{data.loName || 'Your Loan Officer'}</span>
+                            {data.loNmls && <span className={styles.signatureNmls}>NMLS# {data.loNmls}</span>}
+                        </div>
                     </div>
-                    <div className={styles.aiContent}>
-                        {canRecommend ? (
-                            <>
-                                <p>
-                                    If your priority is the lowest monthly payment, I’d lean toward <strong>{lowerMonthlyLabel}</strong>
-                                    {monthlyDiff !== null ? ` (about ${formatCurrency(monthlyDiff)}/month difference).` : '.'}
-                                </p>
-                                <p>
-                                    If keeping upfront cash lower matters more, <strong>{lowerCashLabel}</strong>
-                                    {cashDiff !== null ? ` is about ${formatCurrency(cashDiff)} different at closing.` : ' may be the better fit.'}
-                                </p>
-                                <p className={styles.aiDisclaimer}>
-                                    If you expect to keep this home for at least 3–5 years, the monthly payment usually has the biggest impact.
-                                </p>
-                            </>
-                        ) : (
-                            <>
-                                <p>
-                                    I’ll help you pick the best fit based on what matters most to you (payment vs. cash to close).
-                                </p>
-                                <p className={styles.aiDisclaimer}>
-                                    Ask me what you’re optimizing for and I’ll walk you through the tradeoffs.
-                                </p>
-                            </>
-                        )}
-                    </div>
-                </div>
-            </section>
+                </section>
+            )}
 
             {/* CTA Section */}
             {isDemoUser ? (
@@ -302,57 +320,99 @@ export default function SharePage() {
                 <section className={styles.ctaSection}>
                     <div className={styles.ctaContent}>
                         <h2>Ready to Move Forward?</h2>
-                        <p>Pick the easiest way to reach <strong>{data.loName || 'your loan officer'}</strong></p>
 
-                        <div className={styles.contactGrid}>
-                            {/* Primary Contact Methods */}
-                            <div className={styles.primaryContacts}>
-                                {telHref && (
-                                    <a className={`${styles.contactBtn} ${styles.btnPhone}`} href={telHref} onClick={() => trackEvent('cta_click', 'call')}>
-                                        <PhoneIcon className={styles.contactIcon} />
-                                        <span>Call</span>
-                                    </a>
-                                )}
-                                {smsHref && (
-                                    <a className={`${styles.contactBtn} ${styles.btnSms}`} href={smsHref} onClick={() => trackEvent('cta_click', 'text')}>
-                                        <PhoneIcon className={styles.contactIcon} />
-                                        <span>Text</span>
-                                    </a>
-                                )}
-                                {emailHref && (
-                                    <a className={`${styles.contactBtn} ${styles.btnEmail}`} href={emailHref} onClick={() => trackEvent('cta_click', 'email')}>
-                                        <EmailIcon className={styles.contactIcon} />
-                                        <span>Email</span>
-                                    </a>
-                                )}
+                        {/* LO Business Card */}
+                        <div className={styles.loCard}>
+                            {/* LO Avatar & Info */}
+                            <div className={styles.loCardHeader}>
+                                <div className={styles.loCardAvatar}>
+                                    {data.loAvatarUrl ? (
+                                        <img src={data.loAvatarUrl} alt={data.loName || 'LO'} />
+                                    ) : (
+                                        <span>{(data.loName || 'LO').charAt(0).toUpperCase()}</span>
+                                    )}
+                                </div>
+                                <div className={styles.loCardInfo}>
+                                    <h3 className={styles.loCardName}>{data.loName || 'Your Loan Officer'}</h3>
+                                    {data.loNmls && (
+                                        <span className={styles.loCardNmls}>NMLS# {data.loNmls}</span>
+                                    )}
+                                </div>
                             </div>
 
-                            {/* Social Media Row */}
+                            {/* Contact Details */}
+                            {(data.loPhone || data.loEmail) && (
+                                <div className={styles.loCardContact}>
+                                    {data.loPhone && (
+                                        <button
+                                            className={styles.loCardContactItem}
+                                            onClick={() => copyToClipboard(data.loPhone, 'Phone number')}
+                                        >
+                                            <PhoneIcon className={styles.loCardIcon} />
+                                            <span>{data.loPhone}</span>
+                                            <span className={styles.copyHint}>📋</span>
+                                        </button>
+                                    )}
+                                    {data.loEmail && (
+                                        <button
+                                            className={styles.loCardContactItem}
+                                            onClick={() => copyToClipboard(data.loEmail, 'Email')}
+                                        >
+                                            <EmailIcon className={styles.loCardIcon} />
+                                            <span>{data.loEmail}</span>
+                                            <span className={styles.copyHint}>📋</span>
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Action Buttons */}
+                            {(telHref || smsHref || emailHref) && (
+                                <div className={styles.loCardActions}>
+                                    {telHref && (
+                                        <a className={styles.loCardBtn} href={telHref} onClick={() => trackEvent('cta_click', 'call')}>
+                                            <PhoneIcon />
+                                            <span>Call</span>
+                                        </a>
+                                    )}
+                                    {smsHref && (
+                                        <a className={styles.loCardBtn} href={smsHref} onClick={() => trackEvent('cta_click', 'text')}>
+                                            <span>💬</span>
+                                            <span>Text</span>
+                                        </a>
+                                    )}
+                                    {emailHref && (
+                                        <a className={styles.loCardBtn} href={emailHref} onClick={() => trackEvent('cta_click', 'email')}>
+                                            <EmailIcon />
+                                            <span>Email</span>
+                                        </a>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Social Media */}
                             {(xUrl || instagramUrl || tiktokUrl || facebookUrl) && (
-                                <div className={styles.socialContacts}>
-                                    <div className={styles.socialLabel}>Connect on Social</div>
-                                    <div className={styles.socialRow}>
-                                        {xUrl && (
-                                            <a className={`${styles.socialBtn} ${styles.btnX}`} href={xUrl} target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" onClick={() => trackEvent('cta_click', 'x')}>
-                                                <XIcon className={styles.socialIcon} />
-                                            </a>
-                                        )}
-                                        {instagramUrl && (
-                                            <a className={`${styles.socialBtn} ${styles.btnInstagram}`} href={instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram" onClick={() => trackEvent('cta_click', 'instagram')}>
-                                                <InstagramIcon className={styles.socialIcon} />
-                                            </a>
-                                        )}
-                                        {tiktokUrl && (
-                                            <a className={`${styles.socialBtn} ${styles.btnTikTok}`} href={tiktokUrl} target="_blank" rel="noopener noreferrer" aria-label="TikTok" onClick={() => trackEvent('cta_click', 'tiktok')}>
-                                                <TikTokIcon className={styles.socialIcon} />
-                                            </a>
-                                        )}
-                                        {facebookUrl && (
-                                            <a className={`${styles.socialBtn} ${styles.btnFacebook}`} href={facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook" onClick={() => trackEvent('cta_click', 'facebook')}>
-                                                <FacebookIcon className={styles.socialIcon} />
-                                            </a>
-                                        )}
-                                    </div>
+                                <div className={styles.loCardSocial}>
+                                    {xUrl && (
+                                        <a className={`${styles.loCardSocialBtn} ${styles.socialX}`} href={xUrl} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('cta_click', 'x')}>
+                                            <XIcon />
+                                        </a>
+                                    )}
+                                    {instagramUrl && (
+                                        <a className={`${styles.loCardSocialBtn} ${styles.socialInstagram}`} href={instagramUrl} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('cta_click', 'instagram')}>
+                                            <InstagramIcon />
+                                        </a>
+                                    )}
+                                    {tiktokUrl && (
+                                        <a className={`${styles.loCardSocialBtn} ${styles.socialTiktok}`} href={tiktokUrl} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('cta_click', 'tiktok')}>
+                                            <TikTokIcon />
+                                        </a>
+                                    )}
+                                    {facebookUrl && (
+                                        <a className={`${styles.loCardSocialBtn} ${styles.socialFacebook}`} href={facebookUrl} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('cta_click', 'facebook')}>
+                                            <FacebookIcon />
+                                        </a>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -376,6 +436,13 @@ export default function SharePage() {
                     </Link>
                 </div>
             </footer>
+
+            {/* Copy Toast */}
+            {copyToast && (
+                <div className={styles.copyToast}>
+                    ✓ {copyToast}
+                </div>
+            )}
         </div>
     );
 }

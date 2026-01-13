@@ -1,34 +1,31 @@
-/**
- * Shares API
- * POST /api/shares - Generate share link for a comparison
- */
-
 import { NextResponse } from 'next/server';
 import { nanoid } from 'nanoid';
 
-// Force dynamic to avoid static page generation errors
 export const dynamic = 'force-dynamic';
 
 async function readLoProfile(supabaseAdmin, userId, sessionUser) {
-    const [{ data: userRow }, { data: profileRow }] = await Promise.all([
-        supabaseAdmin.from('users').select('id, email, name').eq('id', userId).maybeSingle(),
-        supabaseAdmin.from('user_profiles').select('*').eq('user_id', userId).maybeSingle(),
-    ]);
+    // Read profile data from users table (same source as /api/user/profile)
+    const { data: userRow } = await supabaseAdmin
+        .from('users')
+        .select('id, email, name, first_name, last_name, contact_email, nmls, phone, x_handle, facebook, tiktok, instagram, avatar_url')
+        .eq('id', userId)
+        .maybeSingle();
 
-    const firstName = profileRow?.first_name || null;
-    const lastName = profileRow?.last_name || null;
+    const firstName = userRow?.first_name || null;
+    const lastName = userRow?.last_name || null;
     const name = [firstName, lastName].filter(Boolean).join(' ').trim() || userRow?.name || sessionUser?.name || null;
 
     return {
         name,
         lastName,
-        email: profileRow?.contact_email || userRow?.email || sessionUser?.email || null,
-        nmls: profileRow?.nmls || null,
-        phone: profileRow?.phone || null,
-        xHandle: profileRow?.x_handle || null,
-        facebook: profileRow?.facebook || null,
-        tiktok: profileRow?.tiktok || null,
-        instagram: profileRow?.instagram || null,
+        email: userRow?.contact_email || userRow?.email || sessionUser?.email || null,
+        nmls: userRow?.nmls || null,
+        phone: userRow?.phone || null,
+        xHandle: userRow?.x_handle || null,
+        facebook: userRow?.facebook || null,
+        tiktok: userRow?.tiktok || null,
+        instagram: userRow?.instagram || null,
+        avatarUrl: userRow?.avatar_url || null,
     };
 }
 
@@ -62,6 +59,7 @@ export async function POST(request) {
                 id,
                 title,
                 user_id,
+                ai_script,
                 scenarios (id, name, inputs_json, outputs_json, sort_order)
             `)
             .eq('id', comparisonId)
@@ -114,6 +112,7 @@ export async function POST(request) {
         // Create snapshot of current comparison state
         const snapshot = {
             title: comparison.title,
+            aiScript: comparison.ai_script || null,
             scenarios: comparison.scenarios.map(s => ({
                 name: s.name,
                 inputs: s.inputs_json,

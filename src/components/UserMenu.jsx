@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { signOut } from 'next-auth/react';
 import styles from './UserMenu.module.css';
+import { HomeIcon, SettingsIcon, DiamondIcon, LogoutIcon } from './Icons';
 
 /**
  * Reusable User Menu Component
@@ -82,28 +83,32 @@ export default function UserMenu({ session, variant = 'header' }) {
                         className={styles.dropdownItem}
                         onClick={() => setShowMenu(false)}
                     >
-                        📊 Dashboard
+                        <HomeIcon className={styles.dropdownIcon} />
+                        Dashboard
                     </Link>
                     <Link
                         href="/app/settings"
                         className={styles.dropdownItem}
                         onClick={() => setShowMenu(false)}
                     >
-                        ⚙️ Settings
+                        <SettingsIcon className={styles.dropdownIcon} />
+                        Settings
                     </Link>
                     <Link
                         href="/app/upgrade"
                         className={styles.dropdownItem}
                         onClick={() => setShowMenu(false)}
                     >
-                        💎 Upgrade Plan
+                        <DiamondIcon className={styles.dropdownIcon} />
+                        Upgrade Plan
                     </Link>
                     <div className={styles.dropdownDivider} />
                     <button
                         className={styles.dropdownItem}
                         onClick={() => signOut({ callbackUrl: '/' })}
                     >
-                        🚪 Sign Out
+                        <LogoutIcon className={styles.dropdownIcon} />
+                        Sign Out
                     </button>
                 </div>
             )}

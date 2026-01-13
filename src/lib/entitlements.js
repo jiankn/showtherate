@@ -38,6 +38,7 @@ export async function getActiveEntitlement(userId) {
 
 /**
  * Check if user has quota for a specific action
+ * Supports base quota + bonus quota (bonus is consumed after base is exhausted)
  */
 export async function checkQuota(userId, quotaType) {
     const entitlement = await getActiveEntitlement(userId);
@@ -46,51 +47,71 @@ export async function checkQuota(userId, quotaType) {
         return { hasQuota: false, remaining: 0, reason: 'No active subscription or pass' };
     }
 
-    let quota, used;
+    // Check if bonus quota is still valid
+    const bonusValid = entitlement.bonus_expires_at &&
+        new Date(entitlement.bonus_expires_at) > new Date();
+
+    let baseQuota, baseUsed, bonusQuota;
     switch (quotaType) {
         case QUOTA_TYPES.SHARE:
-            quota = entitlement.share_quota;
-            used = entitlement.share_used;
+            baseQuota = entitlement.share_quota;
+            baseUsed = entitlement.share_used;
+            bonusQuota = 0; // No bonus for share
             break;
         case QUOTA_TYPES.PROPERTY:
-            quota = entitlement.property_quota;
-            used = entitlement.property_used;
+            baseQuota = entitlement.property_quota;
+            baseUsed = entitlement.property_used;
+            bonusQuota = bonusValid ? (entitlement.bonus_property_quota || 0) : 0;
             break;
         case QUOTA_TYPES.AI:
-            quota = entitlement.ai_quota;
-            used = entitlement.ai_used;
+            baseQuota = entitlement.ai_quota;
+            baseUsed = entitlement.ai_used;
+            bonusQuota = bonusValid ? (entitlement.bonus_ai_quota || 0) : 0;
             break;
         case QUOTA_TYPES.CLOSING_SCRIPT:
             // Closing Script is subscription-only
             if (entitlement.type !== 'subscription') {
                 return { hasQuota: false, remaining: 0, reason: 'Subscription required' };
             }
-            // Reuse ai_quota/ai_used as the Closing Script quota bucket (no AI generation).
-            quota = entitlement.ai_quota;
-            used = entitlement.ai_used;
+            baseQuota = entitlement.ai_quota;
+            baseUsed = entitlement.ai_used;
+            bonusQuota = bonusValid ? (entitlement.bonus_ai_quota || 0) : 0;
             break;
         default:
             return { hasQuota: false, remaining: 0, reason: 'Invalid quota type' };
     }
 
-    // -1 means unlimited
-    if (quota === -1) {
-        return { hasQuota: true, remaining: -1, entitlementId: entitlement.id };
+    // -1 means unlimited base quota
+    if (baseQuota === -1) {
+        return {
+            hasQuota: true,
+            remaining: -1,
+            quota: baseQuota,
+            used: baseUsed,
+            bonusQuota,
+            entitlementId: entitlement.id
+        };
     }
 
-    const remaining = quota - used;
+    // Calculate remaining: base remaining + bonus remaining
+    const baseRemaining = Math.max(0, baseQuota - baseUsed);
+    const totalRemaining = baseRemaining + bonusQuota;
+
     return {
-        hasQuota: remaining > 0,
-        remaining,
-        quota,
-        used,
+        hasQuota: totalRemaining > 0,
+        remaining: totalRemaining,
+        quota: baseQuota,
+        used: baseUsed,
+        baseRemaining,
+        bonusQuota,
         entitlementId: entitlement.id,
-        reason: remaining <= 0 ? 'Quota exhausted' : null,
+        reason: totalRemaining <= 0 ? 'Quota exhausted' : null,
     };
 }
 
 /**
  * Consume quota for an action (with idempotency)
+ * Consumes base quota first, then bonus quota when base is exhausted
  */
 export async function consumeQuota(userId, quotaType, refId, idempotencyKey = null) {
     // Check idempotency first
@@ -113,27 +134,40 @@ export async function consumeQuota(userId, quotaType, refId, idempotencyKey = nu
         return { success: false, error: quotaCheck.reason };
     }
 
-    // Map quota type to ledger kind and column
+    // Map quota type to ledger kind and columns
     const mapping = {
-        [QUOTA_TYPES.SHARE]: { kind: 'share_create', column: 'share_used' },
-        [QUOTA_TYPES.PROPERTY]: { kind: 'property_fetch', column: 'property_used' },
-        [QUOTA_TYPES.AI]: { kind: 'ai_generate', column: 'ai_used' },
-        [QUOTA_TYPES.CLOSING_SCRIPT]: { kind: 'closing_script_generate', column: 'ai_used' },
+        [QUOTA_TYPES.SHARE]: { kind: 'share_create', usedColumn: 'share_used', bonusColumn: null },
+        [QUOTA_TYPES.PROPERTY]: { kind: 'property_fetch', usedColumn: 'property_used', bonusColumn: 'bonus_property_quota' },
+        [QUOTA_TYPES.AI]: { kind: 'ai_generate', usedColumn: 'ai_used', bonusColumn: 'bonus_ai_quota' },
+        [QUOTA_TYPES.CLOSING_SCRIPT]: { kind: 'closing_script_generate', usedColumn: 'ai_used', bonusColumn: 'bonus_ai_quota' },
     };
 
-    const { kind, column } = mapping[quotaType];
+    const { kind, usedColumn, bonusColumn } = mapping[quotaType];
 
-    // Update entitlement usage (only if not unlimited)
-    if (quotaCheck.remaining !== -1) {
-        const { error: updateError } = await supabaseAdmin
-            .from('entitlements')
-            .update({ [column]: quotaCheck.used + 1 })
-            .eq('id', quotaCheck.entitlementId);
+    // Determine whether to consume from base or bonus quota
+    // Base remaining > 0: consume from base (increment used)
+    // Base remaining <= 0 && bonus > 0: consume from bonus (decrement bonus)
+    const baseRemaining = quotaCheck.baseRemaining ?? (quotaCheck.quota - quotaCheck.used);
+    const consumeFromBonus = baseRemaining <= 0 && quotaCheck.bonusQuota > 0;
 
-        if (updateError) {
-            console.error('Failed to update quota:', updateError);
-            return { success: false, error: 'Failed to update quota' };
-        }
+    let updateData;
+    if (consumeFromBonus && bonusColumn) {
+        // Decrement bonus quota
+        updateData = { [bonusColumn]: Math.max(0, (quotaCheck.bonusQuota || 0) - 1) };
+    } else {
+        // Increment used (base quota consumption)
+        updateData = { [usedColumn]: (quotaCheck.used || 0) + 1 };
+    }
+
+    // Update entitlement
+    const { error: updateError } = await supabaseAdmin
+        .from('entitlements')
+        .update(updateData)
+        .eq('id', quotaCheck.entitlementId);
+
+    if (updateError) {
+        console.error('Failed to update quota usage:', updateError);
+        // Continue anyway as ledger is the source of truth for history
     }
 
     // Record in ledger
@@ -149,6 +183,7 @@ export async function consumeQuota(userId, quotaType, refId, idempotencyKey = nu
     return {
         success: true,
         remaining: quotaCheck.remaining === -1 ? -1 : quotaCheck.remaining - 1,
+        consumedFromBonus: consumeFromBonus,
     };
 }
 
@@ -188,10 +223,21 @@ export async function getUserQuotas(userId) {
 
     const comparisonsQuota = entitlement.type === 'subscription' ? -1 : -1;
 
+    // Check if bonus quota is valid
+    const bonusValid = entitlement.bonus_expires_at &&
+        new Date(entitlement.bonus_expires_at) > new Date();
+    const bonusPropertyQuota = bonusValid ? (entitlement.bonus_property_quota || 0) : 0;
+    const bonusAiQuota = bonusValid ? (entitlement.bonus_ai_quota || 0) : 0;
+
+    // Calculate remaining with bonus
+    const propertyBaseRemaining = Math.max(0, entitlement.property_quota - entitlement.property_used);
+    const aiBaseRemaining = Math.max(0, entitlement.ai_quota - entitlement.ai_used);
+
     return {
         hasActiveEntitlement: true,
         type: entitlement.type,
         expiresAt: entitlement.ends_at,
+        bonusExpiresAt: entitlement.bonus_expires_at,
         quotas: {
             comparisons: {
                 quota: comparisonsQuota,
@@ -206,12 +252,14 @@ export async function getUserQuotas(userId) {
             property: {
                 quota: entitlement.property_quota,
                 used: entitlement.property_used,
-                remaining: entitlement.property_quota - entitlement.property_used,
+                bonus: bonusPropertyQuota,
+                remaining: propertyBaseRemaining + bonusPropertyQuota,
             },
             ai: {
                 quota: entitlement.ai_quota,
                 used: entitlement.ai_used,
-                remaining: entitlement.ai_quota - entitlement.ai_used,
+                bonus: bonusAiQuota,
+                remaining: aiBaseRemaining + bonusAiQuota,
             },
             closingScript: entitlement.type !== 'subscription'
                 ? { enabled: false, quota: 0, used: 0, remaining: 0 }
@@ -219,7 +267,8 @@ export async function getUserQuotas(userId) {
                     enabled: true,
                     quota: entitlement.ai_quota,
                     used: entitlement.ai_used,
-                    remaining: entitlement.ai_quota === -1 ? -1 : entitlement.ai_quota - entitlement.ai_used,
+                    bonus: bonusAiQuota,
+                    remaining: entitlement.ai_quota === -1 ? -1 : aiBaseRemaining + bonusAiQuota,
                 },
         },
     };

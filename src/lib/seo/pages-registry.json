@@ -1,0 +1,1839 @@
+{
+    "calculators": {
+        "2-1-buydown-calculator": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "buydown",
+            "component": "BuydownCalculator",
+            "title": "2-1 Buydown Calculator",
+            "metaTitle": "2-1 Buydown Calculator | Free Mortgage Rate Buydown Tool",
+            "metaDescription": "Calculate your 2-1 temporary buydown savings. See how much you can save on monthly payments in the first two years with a 2-1 buydown.",
+            "h1": "2-1 Buydown Calculator",
+            "subtitle": "Calculate the cost and monthly payment savings of a 2-1 temporary buydown",
+            "config": {
+                "buydownType": "2-1",
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "3-2-1-buydown-calculator",
+                "1-0-buydown-calculator",
+                "temporary-buydown-vs-points"
+            ],
+            "faq": [
+                {
+                    "question": "What is a 2-1 buydown?",
+                    "answer": "A 2-1 buydown is a temporary interest rate reduction where the rate is 2% lower than the note rate in year one, 1% lower in year two, and returns to the full note rate from year three onward."
+                },
+                {
+                    "question": "Who pays for a 2-1 buydown?",
+                    "answer": "Typically the seller, builder, or lender pays for the buydown as a concession. The funds are placed in an escrow account and used to subsidize the borrower's payments."
+                },
+                {
+                    "question": "How much does a 2-1 buydown cost?",
+                    "answer": "The cost equals the sum of the payment differences over the first two years. For a $400,000 loan at 7%, a 2-1 buydown typically costs around $8,000-$12,000."
+                },
+                {
+                    "question": "Is a 2-1 buydown worth it?",
+                    "answer": "A 2-1 buydown can be worth it if you expect rates to drop and plan to refinance, or if you need lower initial payments to qualify for the loan."
+                }
+            ]
+        },
+        "3-2-1-buydown-calculator": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "buydown",
+            "component": "BuydownCalculator",
+            "title": "3-2-1 Buydown Calculator",
+            "metaTitle": "3-2-1 Buydown Calculator | Temporary Rate Reduction Tool",
+            "metaDescription": "Calculate a 3-2-1 temporary buydown. See your reduced payments for the first three years and the total buydown cost.",
+            "h1": "3-2-1 Buydown Calculator",
+            "subtitle": "Calculate the cost and savings of a 3-2-1 temporary buydown over three years",
+            "config": {
+                "buydownType": "3-2-1",
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "2-1-buydown-calculator",
+                "1-0-buydown-calculator",
+                "temporary-buydown-cost"
+            ],
+            "faq": [
+                {
+                    "question": "What is a 3-2-1 buydown?",
+                    "answer": "A 3-2-1 buydown reduces your interest rate by 3% in year one, 2% in year two, 1% in year three, then reverts to the full note rate from year four."
+                },
+                {
+                    "question": "How much does a 3-2-1 buydown cost?",
+                    "answer": "A 3-2-1 buydown costs more than a 2-1 because it covers three years of reduced payments. For a $400,000 loan at 7%, expect to pay $15,000-$20,000."
+                }
+            ]
+        },
+        "1-0-buydown-calculator": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "buydown",
+            "component": "BuydownCalculator",
+            "title": "1-0 Buydown Calculator",
+            "metaTitle": "1-0 Buydown Calculator | One Year Rate Reduction Tool",
+            "metaDescription": "Calculate a 1-0 buydown for one year of reduced mortgage payments. Simple and affordable rate buydown option.",
+            "h1": "1-0 Buydown Calculator",
+            "subtitle": "Calculate the cost and first-year savings of a 1-0 temporary buydown",
+            "config": {
+                "buydownType": "1-0",
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "2-1-buydown-calculator",
+                "3-2-1-buydown-calculator",
+                "temporary-buydown-cost"
+            ],
+            "faq": [
+                {
+                    "question": "What is a 1-0 buydown?",
+                    "answer": "A 1-0 buydown reduces your interest rate by 1% for the first year only, then returns to the full note rate from year two onward."
+                },
+                {
+                    "question": "When is a 1-0 buydown a good choice?",
+                    "answer": "A 1-0 buydown is ideal when you want lower initial payments but don't need a large rate reduction. It's the most affordable buydown option."
+                }
+            ]
+        },
+        "temporary-buydown-cost": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "buydown",
+            "component": "BuydownCalculator",
+            "title": "Temporary Buydown Cost Calculator",
+            "metaTitle": "Temporary Buydown Cost Calculator | Calculate Buydown Expense",
+            "metaDescription": "Calculate the exact cost of a temporary buydown (2-1, 3-2-1, or 1-0). See how much money needs to be escrowed.",
+            "h1": "Temporary Buydown Cost Calculator",
+            "subtitle": "Calculate the total cost to fund a temporary buydown",
+            "config": {
+                "buydownType": "all",
+                "showCostFocus": true,
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "2-1-buydown-calculator",
+                "seller-concession-buydown",
+                "2-1-buydown-subsidy"
+            ],
+            "faq": [
+                {
+                    "question": "How is the buydown cost calculated?",
+                    "answer": "The buydown cost is the sum of all payment differences between the reduced rate and the note rate during the buydown period."
+                }
+            ]
+        },
+        "2-1-buydown-subsidy": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "buydown",
+            "component": "BuydownCalculator",
+            "title": "2-1 Buydown Subsidy Calculator",
+            "metaTitle": "2-1 Buydown Subsidy Calculator | Seller Concession Tool",
+            "metaDescription": "Calculate the seller subsidy required to fund a 2-1 buydown. Perfect for negotiating seller concessions.",
+            "h1": "2-1 Buydown Subsidy Calculator",
+            "subtitle": "Calculate how much seller subsidy you need to fund a 2-1 buydown",
+            "config": {
+                "buydownType": "2-1",
+                "showSubsidyFocus": true,
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "seller-concession-buydown",
+                "2-1-buydown-calculator",
+                "temporary-buydown-cost"
+            ],
+            "faq": [
+                {
+                    "question": "What is a buydown subsidy?",
+                    "answer": "A buydown subsidy is the amount of money needed to fund the temporary rate reduction. It's typically paid by the seller or builder as a concession."
+                }
+            ]
+        },
+        "seller-concession-buydown": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "buydown",
+            "component": "BuydownCalculator",
+            "title": "Seller Concession Buydown Calculator",
+            "metaTitle": "Seller Concession Buydown Calculator | Use Credits Wisely",
+            "metaDescription": "Calculate how to use seller concessions for a temporary buydown. Compare buydown vs closing cost credits.",
+            "h1": "Seller Concession Buydown Calculator",
+            "subtitle": "Calculate how to maximize seller concessions with a temporary buydown",
+            "config": {
+                "buydownType": "2-1",
+                "showConcessionFocus": true,
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "termYears": 30,
+                    "sellerConcession": 10000
+                }
+            },
+            "relatedSlugs": [
+                "2-1-buydown-subsidy",
+                "temporary-buydown-cost",
+                "temporary-buydown-vs-points"
+            ],
+            "faq": [
+                {
+                    "question": "Should I use seller concessions for a buydown or closing costs?",
+                    "answer": "It depends on your situation. A buydown lowers your monthly payment for 1-3 years, while closing cost credits reduce your upfront cash needed."
+                }
+            ]
+        },
+        "discount-points-break-even": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "points",
+            "component": "PointsCalculator",
+            "title": "Discount Points Break-Even Calculator",
+            "metaTitle": "Discount Points Break-Even Calculator | When Do Points Pay Off?",
+            "metaDescription": "Calculate how long it takes for discount points to pay off. Find your break-even point and decide if buying points is worth it.",
+            "h1": "Discount Points Break-Even Calculator",
+            "subtitle": "Calculate how many months until your discount points pay for themselves",
+            "config": {
+                "calculationType": "break-even",
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "baseRate": 7.0,
+                    "pointsRate": 6.75,
+                    "pointsCost": 1.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "points-cost-calculator",
+                "points-vs-lender-credits",
+                "points-vs-higher-rate"
+            ],
+            "faq": [
+                {
+                    "question": "What are discount points?",
+                    "answer": "Discount points are upfront fees paid to the lender to reduce your interest rate. One point equals 1% of the loan amount and typically reduces the rate by 0.25%."
+                },
+                {
+                    "question": "How do I calculate the break-even point?",
+                    "answer": "Divide the cost of the points by the monthly savings. The result is the number of months needed to recoup your investment."
+                },
+                {
+                    "question": "Should I buy discount points?",
+                    "answer": "Buy points if you plan to stay in the home longer than the break-even period and have extra cash at closing."
+                }
+            ]
+        },
+        "discount-points-calculator": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "points",
+            "component": "PointsCalculator",
+            "title": "Discount Points Calculator",
+            "metaTitle": "Discount Points Calculator | Free Mortgage Points Tool",
+            "metaDescription": "Calculate mortgage discount points cost, monthly savings, and break-even period. Free calculator to decide if buying points is worth it.",
+            "h1": "Discount Points Calculator",
+            "subtitle": "Calculate the cost and value of mortgage discount points",
+            "config": {
+                "calculationType": "discount-points",
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "baseRate": 7.0,
+                    "pointsPercent": 1.0,
+                    "rateReduction": 0.25,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "discount-points-break-even",
+                "how-to-calculate-discount-points",
+                "points-vs-lender-credits"
+            ],
+            "faq": [
+                {
+                    "question": "What is a discount point?",
+                    "answer": "A discount point is an upfront fee equal to 1% of your loan amount. Paying points reduces your interest rate, typically by 0.25% per point."
+                },
+                {
+                    "question": "How do I calculate discount points?",
+                    "answer": "Multiply your loan amount by the number of points. For example, 1 point on a $400,000 loan costs $4,000."
+                },
+                {
+                    "question": "Are discount points worth buying?",
+                    "answer": "Points are worth it if you'll keep the loan long enough to recoup the upfront cost through monthly savings. Calculate your break-even period to decide."
+                },
+                {
+                    "question": "How many points can I buy?",
+                    "answer": "Most lenders allow up to 3-4 points, though some may offer more. There's typically a point of diminishing returns after 2-3 points."
+                }
+            ]
+        },
+        "points-cost-calculator": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "points",
+            "component": "PointsCalculator",
+            "title": "Points Cost Calculator",
+            "metaTitle": "Mortgage Points Cost Calculator | Calculate Point Costs",
+            "metaDescription": "Calculate the cost of mortgage discount points. See how much you'll pay upfront and how much you'll save monthly.",
+            "h1": "Mortgage Points Cost Calculator",
+            "subtitle": "Calculate the upfront cost of buying discount points",
+            "config": {
+                "calculationType": "cost",
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "pointsCount": 1.0,
+                    "rateReduction": 0.25
+                }
+            },
+            "relatedSlugs": [
+                "discount-points-break-even",
+                "points-vs-lender-credits",
+                "points-vs-higher-rate"
+            ],
+            "faq": [
+                {
+                    "question": "How much does one mortgage point cost?",
+                    "answer": "One mortgage point costs 1% of your loan amount. On a $400,000 loan, one point costs $4,000."
+                }
+            ]
+        },
+        "rate-lock-fee-calculator": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "ratelock",
+            "component": "RateLockCalculator",
+            "title": "Rate Lock Fee Calculator",
+            "metaTitle": "Rate Lock Fee Calculator | Understand Lock Costs",
+            "metaDescription": "Calculate the cost of locking your mortgage rate. Compare different lock periods and understand the fee structure.",
+            "h1": "Rate Lock Fee Calculator",
+            "subtitle": "Calculate the cost of locking your mortgage rate for different periods",
+            "config": {
+                "calculationType": "lock-fee",
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "lockDays": 30
+                }
+            },
+            "relatedSlugs": [
+                "rate-lock-extension-fee",
+                "lock-vs-float",
+                "float-down-worth-it"
+            ],
+            "faq": [
+                {
+                    "question": "What is a rate lock fee?",
+                    "answer": "A rate lock fee is what lenders charge to guarantee your interest rate for a specific period. Longer lock periods typically cost more."
+                },
+                {
+                    "question": "How long should I lock my rate?",
+                    "answer": "Lock for as long as you need to close. Most purchases need 30-45 days, while refinances may need 15-30 days."
+                }
+            ]
+        },
+        "rate-lock-extension-fee": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "ratelock",
+            "component": "RateLockCalculator",
+            "title": "Rate Lock Extension Fee Calculator",
+            "metaTitle": "Rate Lock Extension Fee Calculator | Extension Costs",
+            "metaDescription": "Calculate the cost of extending your rate lock. Understand extension fees and when to request an extension.",
+            "h1": "Rate Lock Extension Fee Calculator",
+            "subtitle": "Calculate the cost of extending your rate lock if closing is delayed",
+            "config": {
+                "calculationType": "extension-fee",
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "extensionDays": 7
+                }
+            },
+            "relatedSlugs": [
+                "rate-lock-fee-calculator",
+                "lock-vs-float",
+                "float-down-worth-it"
+            ],
+            "faq": [
+                {
+                    "question": "How much does a rate lock extension cost?",
+                    "answer": "Extension fees typically range from 0.125% to 0.375% of the loan amount per week, depending on the lender and market conditions."
+                }
+            ]
+        },
+        "float-down-worth-it": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "ratelock",
+            "component": "RateLockCalculator",
+            "title": "Float Down Option Calculator",
+            "metaTitle": "Float Down Option Calculator | Is It Worth the Cost?",
+            "metaDescription": "Calculate if a float down option is worth it. See how much rates need to drop for the float down fee to pay off.",
+            "h1": "Float Down Option Calculator",
+            "subtitle": "Calculate if paying for a float down option makes financial sense",
+            "config": {
+                "calculationType": "float-down",
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "lockedRate": 7.0,
+                    "floatDownFee": 0.25,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "lock-vs-float",
+                "rate-lock-fee-calculator",
+                "rate-lock-extension-fee"
+            ],
+            "faq": [
+                {
+                    "question": "What is a float down option?",
+                    "answer": "A float down option lets you reduce your locked rate if market rates drop before closing. It typically costs 0.25% to 0.50% of the loan amount."
+                },
+                {
+                    "question": "When is a float down worth it?",
+                    "answer": "A float down is worth it if you expect significant rate drops and the savings exceed the upfront fee over your planned ownership period."
+                }
+            ]
+        },
+        "closing-costs-worksheet": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "workflow",
+            "component": "WorkflowCalculator",
+            "title": "Closing Costs Worksheet",
+            "metaTitle": "Closing Costs Worksheet | Estimate All Closing Fees",
+            "metaDescription": "Estimate your mortgage closing costs with our detailed worksheet. Includes lender fees, title fees, prepaid items, and more.",
+            "h1": "Closing Costs Worksheet",
+            "subtitle": "Estimate all your closing costs with this detailed worksheet",
+            "config": {
+                "calculationType": "closing-costs",
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "homePrice": 500000,
+                    "state": "CA"
+                }
+            },
+            "relatedSlugs": [
+                "cash-to-close-calculator",
+                "discount-points-break-even",
+                "seller-concession-buydown"
+            ],
+            "faq": [
+                {
+                    "question": "What are typical closing costs?",
+                    "answer": "Closing costs typically range from 2% to 5% of the loan amount. They include lender fees, title insurance, appraisal, and prepaid items like taxes and insurance."
+                },
+                {
+                    "question": "Who pays closing costs?",
+                    "answer": "Buyers typically pay most closing costs, but sellers often contribute through concessions. Some costs can be rolled into the loan."
+                }
+            ]
+        },
+        "cash-to-close-calculator": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "workflow",
+            "component": "WorkflowCalculator",
+            "title": "Cash to Close Calculator",
+            "metaTitle": "Cash to Close Calculator | How Much Money Do You Need?",
+            "metaDescription": "Calculate your total cash to close including down payment, closing costs, and prepaid items. Know exactly what you need to bring.",
+            "h1": "Cash to Close Calculator",
+            "subtitle": "Calculate the total cash you need to bring to closing",
+            "config": {
+                "calculationType": "cash-to-close",
+                "defaultInputs": {
+                    "homePrice": 500000,
+                    "downPaymentPercent": 20,
+                    "closingCostPercent": 3
+                }
+            },
+            "relatedSlugs": [
+                "closing-costs-worksheet",
+                "seller-concession-buydown",
+                "discount-points-break-even"
+            ],
+            "faq": [
+                {
+                    "question": "What is cash to close?",
+                    "answer": "Cash to close is the total amount you need to bring to the closing table. It includes your down payment, closing costs, prepaid items, minus any credits."
+                },
+                {
+                    "question": "Can I reduce my cash to close?",
+                    "answer": "Yes, through seller concessions, lender credits, gift funds, or by choosing a low or no down payment loan program."
+                }
+            ]
+        },
+        "builder-incentive-buydown": {
+            "type": "calculator",
+            "priority": "P1",
+            "cluster": "buydown",
+            "component": "BuydownCalculator",
+            "title": "Builder Incentive Buydown Calculator",
+            "metaTitle": "Builder Incentive Buydown Calculator | New Construction Savings",
+            "metaDescription": "Calculate how builder incentives can fund a temporary buydown. See your savings on new construction and move-in ready homes.",
+            "h1": "Builder Incentive Buydown Calculator",
+            "subtitle": "Calculate how to maximize builder incentives with a temporary buydown",
+            "config": {
+                "buydownType": "2-1",
+                "showBuilderIncentive": true,
+                "defaultInputs": {
+                    "loanAmount": 450000,
+                    "noteRate": 7.0,
+                    "termYears": 30,
+                    "builderIncentive": 15000
+                }
+            },
+            "relatedSlugs": [
+                "2-1-buydown-calculator",
+                "seller-concession-buydown",
+                "temporary-buydown-cost"
+            ],
+            "faq": [
+                {
+                    "question": "What are common builder incentives?",
+                    "answer": "Builders often offer incentives like closing cost credits, rate buydowns, free upgrades, or HOA fee coverage to move inventory. These can range from 2-6% of the purchase price."
+                },
+                {
+                    "question": "Can I use builder incentives for a buydown?",
+                    "answer": "Yes! Builder incentives can fund a 2-1 or 3-2-1 buydown, giving you lower payments for the first few years of homeownership."
+                }
+            ]
+        },
+        "rate-buydown-calculator": {
+            "type": "calculator",
+            "priority": "P1",
+            "cluster": "buydown",
+            "component": "BuydownCalculator",
+            "title": "Rate Buydown Calculator",
+            "metaTitle": "Rate Buydown Calculator | Compare Permanent vs Temporary Buydowns",
+            "metaDescription": "Calculate both temporary and permanent rate buydown options. See how much you can reduce your rate with points or a seller-funded buydown.",
+            "h1": "Rate Buydown Calculator",
+            "subtitle": "Compare temporary buydowns vs permanent rate reductions with points",
+            "config": {
+                "buydownType": "all",
+                "showPointsComparison": true,
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "termYears": 30,
+                    "pointsCount": 1.0
+                }
+            },
+            "relatedSlugs": [
+                "temporary-buydown-vs-points",
+                "discount-points-break-even",
+                "2-1-buydown-calculator"
+            ],
+            "faq": [
+                {
+                    "question": "What's the difference between temporary and permanent buydowns?",
+                    "answer": "Temporary buydowns reduce your rate for 1-3 years, then revert to the note rate. Permanent buydowns (discount points) reduce your rate for the entire loan term."
+                }
+            ]
+        },
+        "mortgage-insurance-estimate": {
+            "type": "calculator",
+            "priority": "P1",
+            "cluster": "workflow",
+            "component": "WorkflowCalculator",
+            "title": "Mortgage Insurance (MI/PMI) Estimate",
+            "metaTitle": "Mortgage Insurance Calculator | Estimate PMI & MIP Costs",
+            "metaDescription": "Estimate your monthly mortgage insurance cost. Compare PMI for conventional loans and MIP for FHA loans to find the best option.",
+            "h1": "Mortgage Insurance Estimate Worksheet",
+            "subtitle": "Calculate your monthly PMI or MIP cost based on loan type and LTV",
+            "config": {
+                "calculationType": "mortgage-insurance",
+                "defaultInputs": {
+                    "homePrice": 400000,
+                    "downPaymentPercent": 5,
+                    "creditScore": 700,
+                    "loanType": "conventional"
+                }
+            },
+            "relatedSlugs": [
+                "fha-vs-conventional",
+                "cash-to-close-calculator",
+                "closing-costs-worksheet"
+            ],
+            "faq": [
+                {
+                    "question": "What's the difference between PMI and MIP?",
+                    "answer": "PMI (Private Mortgage Insurance) is for conventional loans with less than 20% down. MIP (Mortgage Insurance Premium) is required on all FHA loans regardless of down payment."
+                },
+                {
+                    "question": "How can I remove mortgage insurance?",
+                    "answer": "For conventional loans, PMI can be removed at 80% LTV. For FHA loans taken after 2013, MIP stays for the life of the loan unless you put 10%+ down (then it drops off after 11 years)."
+                }
+            ]
+        },
+        "payment-shock-calculator": {
+            "type": "calculator",
+            "priority": "P1",
+            "cluster": "ratelock",
+            "component": "RateLockCalculator",
+            "title": "Payment Shock Calculator",
+            "metaTitle": "Payment Shock Calculator | ARM Rate Adjustment Impact",
+            "metaDescription": "Calculate the payment shock when your ARM adjusts. See how much your payment could increase and plan for rate changes.",
+            "h1": "Payment Shock Calculator",
+            "subtitle": "Calculate how rate changes affect your monthly mortgage payment",
+            "config": {
+                "calculationType": "payment-shock",
+                "defaultInputs": {
+                    "currentBalance": 350000,
+                    "currentRate": 5.5,
+                    "adjustedRate": 7.5,
+                    "remainingTerm": 27
+                }
+            },
+            "relatedSlugs": [
+                "arm-vs-fixed",
+                "lock-vs-float",
+                "refinance-vs-stay"
+            ],
+            "faq": [
+                {
+                    "question": "What is payment shock?",
+                    "answer": "Payment shock is the sudden increase in your monthly payment when an adjustable-rate mortgage (ARM) resets to a higher rate after the initial fixed period."
+                },
+                {
+                    "question": "How can I avoid payment shock?",
+                    "answer": "You can refinance to a fixed-rate loan before your ARM adjusts, make extra principal payments to reduce the balance, or budget for the higher payment."
+                }
+            ]
+        },
+        "mortgage-points-break-even-months": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "points",
+            "component": "PointsCalculator",
+            "title": "Mortgage Points Break-Even Months Calculator",
+            "metaTitle": "Mortgage Points Break-Even Calculator | How Long Until Points Pay Off?",
+            "metaDescription": "Calculate exactly how many months until your discount points pay for themselves. Find your break-even point and make an informed decision.",
+            "h1": "Mortgage Points Break-Even Months",
+            "subtitle": "Calculate the exact month when your points investment pays off",
+            "config": {
+                "calculationType": "break-even-months",
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "baseRate": 7.0,
+                    "pointsRate": 6.75,
+                    "pointsCost": 1.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "discount-points-break-even",
+                "points-cost-calculator",
+                "points-vs-higher-rate"
+            ],
+            "faq": [
+                {
+                    "question": "What is a good break-even period for mortgage points?",
+                    "answer": "Generally, a break-even period of 3-5 years is considered good. If you plan to stay in the home longer than the break-even period, buying points is likely worth it."
+                }
+            ]
+        },
+        "how-to-calculate-discount-points": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "points",
+            "component": "PointsCalculator",
+            "title": "How to Calculate Discount Points on a Mortgage",
+            "metaTitle": "How to Calculate Discount Points | Mortgage Points Formula & Calculator",
+            "metaDescription": "Learn how to calculate discount points on a mortgage with our free calculator. See the formula, examples, and break-even analysis.",
+            "h1": "How to Calculate Discount Points on a Mortgage",
+            "subtitle": "Formula, examples, and calculator for mortgage discount points",
+            "config": {
+                "calculationType": "points-with-formula",
+                "showFormula": true,
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "pointsPercent": 1.0,
+                    "baseRate": 7.0,
+                    "pointsRate": 6.75,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "discount-points-break-even",
+                "points-cost-calculator",
+                "discount-points-formula"
+            ],
+            "faq": [
+                {
+                    "question": "What is the formula for discount points?",
+                    "answer": "Discount Points Cost = Loan Amount × Points Percentage. For example, 1 point on a $400,000 loan = $400,000 × 1% = $4,000."
+                },
+                {
+                    "question": "How much does 1 discount point reduce the rate?",
+                    "answer": "Typically, 1 discount point reduces your interest rate by 0.25%, though this varies by lender and market conditions."
+                }
+            ]
+        },
+        "how-much-is-3-points": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "points",
+            "component": "PointsCalculator",
+            "title": "How Much is 3 Points on a Mortgage?",
+            "metaTitle": "How Much is 3 Points on a Mortgage? | Quick Points Cost Calculator",
+            "metaDescription": "Calculate how much 3 discount points cost on your mortgage. See the exact cost and monthly payment savings for any loan amount.",
+            "h1": "How Much is 3 Points on a Mortgage?",
+            "subtitle": "Quick calculator for 3-point mortgage costs and savings",
+            "config": {
+                "calculationType": "quick-points",
+                "presetPoints": 3.0,
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "pointsPercent": 3.0,
+                    "baseRate": 7.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "how-to-calculate-discount-points",
+                "how-much-is-25-points",
+                "discount-points-break-even"
+            ],
+            "faq": [
+                {
+                    "question": "How much do 3 points cost on a $400,000 mortgage?",
+                    "answer": "3 points on a $400,000 mortgage costs $12,000 ($400,000 × 3%). This typically reduces your rate by about 0.75%."
+                },
+                {
+                    "question": "Is buying 3 points worth it?",
+                    "answer": "It depends on how long you plan to keep the loan. With 3 points, your break-even period is longer, but lifetime savings are greater if you stay 7+ years."
+                }
+            ]
+        },
+        "how-much-3-2-1-buydown-cost": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "buydown",
+            "component": "BuydownCalculator",
+            "title": "How Much Does a 3-2-1 Buydown Cost?",
+            "metaTitle": "How Much Does a 3-2-1 Buydown Cost? | Free Buydown Calculator",
+            "metaDescription": "Calculate the exact cost of a 3-2-1 temporary buydown. See year-by-year payments and total subsidy needed for your loan.",
+            "h1": "How Much Does a 3-2-1 Buydown Cost?",
+            "subtitle": "Calculate the total cost and monthly payments for a 3-2-1 buydown",
+            "config": {
+                "buydownType": "3-2-1",
+                "showCostBreakdown": true,
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "3-2-1-buydown-calculator",
+                "2-1-vs-3-2-1-buydown",
+                "temporary-buydown-cost"
+            ],
+            "faq": [
+                {
+                    "question": "What is the average cost of a 3-2-1 buydown?",
+                    "answer": "For a $400,000 loan at 7%, a 3-2-1 buydown typically costs $15,000-$20,000. The exact cost depends on your loan amount and interest rate."
+                },
+                {
+                    "question": "Who typically pays for a 3-2-1 buydown?",
+                    "answer": "Usually the seller, builder, or lender pays as a concession. The funds are placed in escrow to subsidize payments for three years."
+                }
+            ]
+        },
+        "2-1-buydown-amortization-schedule": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "buydown",
+            "component": "BuydownAmortizationCalculator",
+            "title": "2-1 Buydown Amortization Schedule",
+            "metaTitle": "2-1 Buydown Amortization Schedule | Monthly Payment Breakdown",
+            "metaDescription": "Generate a detailed 36-month amortization schedule for a 2-1 buydown. See payment, interest, and principal for each month.",
+            "h1": "2-1 Buydown Amortization Schedule",
+            "subtitle": "View month-by-month payment breakdown for a 2-1 temporary buydown",
+            "config": {
+                "calculationType": "amortization-schedule",
+                "buydownType": "2-1",
+                "showScheduleTable": true,
+                "exportCSV": true,
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "2-1-buydown-calculator",
+                "2-1-buydown-cost",
+                "temporary-buydown-cost"
+            ],
+            "faq": [
+                {
+                    "question": "What does a 2-1 buydown amortization schedule show?",
+                    "answer": "It shows month-by-month breakdown of payment, interest paid, principal paid, and remaining balance for the first 36 months of a 2-1 buydown."
+                },
+                {
+                    "question": "Can I export the amortization schedule?",
+                    "answer": "Yes, you can export the schedule as a CSV file to open in Excel or Google Sheets for further analysis."
+                }
+            ]
+        },
+        "discount-points-formula": {
+            "type": "calculator",
+            "priority": "P1",
+            "cluster": "points",
+            "component": "PointsCalculator",
+            "title": "Discount Points Formula",
+            "metaTitle": "Discount Points Formula | How to Calculate Mortgage Points",
+            "metaDescription": "Learn the discount points formula and calculate your costs. Understand how points affect your rate and monthly payment.",
+            "h1": "Discount Points Formula Explained",
+            "subtitle": "The formula, calculation, and examples for mortgage discount points",
+            "config": {
+                "calculationType": "formula-focused",
+                "showFormula": true,
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "pointsPercent": 1.0,
+                    "baseRate": 7.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "how-to-calculate-discount-points",
+                "discount-points-break-even",
+                "discount-points-example"
+            ],
+            "faq": [
+                {
+                    "question": "What is the discount points formula?",
+                    "answer": "Points Cost = Loan Amount × (Points ÷ 100). The break-even formula is: Points Cost ÷ Monthly Savings = Break-Even Months."
+                }
+            ]
+        },
+        "discount-points-example": {
+            "type": "calculator",
+            "priority": "P1",
+            "cluster": "points",
+            "component": "PointsCalculator",
+            "title": "Discount Points Mortgage Example",
+            "metaTitle": "Discount Points Mortgage Example | See Real Calculations",
+            "metaDescription": "See real discount points examples for $300K, $400K, and $500K mortgages. Compare costs, savings, and break-even periods.",
+            "h1": "Discount Points Mortgage Example",
+            "subtitle": "Real-world examples showing discount points costs and savings",
+            "config": {
+                "calculationType": "examples",
+                "presetExamples": true,
+                "defaultInputs": {
+                    "examples": [
+                        {
+                            "loanAmount": 300000,
+                            "points": 1
+                        },
+                        {
+                            "loanAmount": 400000,
+                            "points": 1
+                        },
+                        {
+                            "loanAmount": 500000,
+                            "points": 1
+                        }
+                    ]
+                }
+            },
+            "relatedSlugs": [
+                "how-to-calculate-discount-points",
+                "discount-points-formula",
+                "discount-points-break-even"
+            ],
+            "faq": [
+                {
+                    "question": "How much do points cost on a $500,000 mortgage?",
+                    "answer": "1 point on a $500,000 mortgage costs $5,000. This typically saves about $80/month, with a break-even around 62 months."
+                }
+            ]
+        },
+        "how-much-is-25-points": {
+            "type": "calculator",
+            "priority": "P1",
+            "cluster": "points",
+            "component": "PointsCalculator",
+            "title": "How Much is 2.5 Points on a Mortgage?",
+            "metaTitle": "How Much is 2.5 Points on a Mortgage? | Points Cost Calculator",
+            "metaDescription": "Calculate how much 2.5 discount points cost on your mortgage. Also covers common searches for '25 points' - likely meaning 2.5 points.",
+            "h1": "How Much is 2.5 Points on a Mortgage?",
+            "subtitle": "Calculate 2.5 points cost and comparison to other point amounts",
+            "config": {
+                "calculationType": "quick-points",
+                "presetPoints": 2.5,
+                "note": "Searches for '25 points' typically mean 2.5 points",
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "pointsPercent": 2.5,
+                    "baseRate": 7.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "how-much-is-3-points",
+                "how-to-calculate-discount-points",
+                "discount-points-break-even"
+            ],
+            "faq": [
+                {
+                    "question": "How much do 2.5 points cost on a $400,000 mortgage?",
+                    "answer": "2.5 points on a $400,000 mortgage costs $10,000 ($400,000 × 2.5%). This typically reduces your rate by about 0.625%."
+                }
+            ]
+        },
+        "free-2-1-buydown-calculator": {
+            "type": "calculator",
+            "priority": "P1",
+            "cluster": "buydown",
+            "component": "BuydownCalculator",
+            "title": "Free 2-1 Buydown Calculator",
+            "metaTitle": "Free 2-1 Buydown Calculator | No Sign-Up Required",
+            "metaDescription": "Use our free 2-1 buydown calculator - no sign-up required. Calculate monthly payments, total savings, and buydown cost instantly.",
+            "h1": "Free 2-1 Buydown Calculator",
+            "subtitle": "Calculate 2-1 buydown costs and savings - 100% free, no sign-up",
+            "config": {
+                "buydownType": "2-1",
+                "isFreeVersion": true,
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "2-1-buydown-calculator",
+                "2-1-buydown-calculator-excel",
+                "2-1-buydown-cost"
+            ],
+            "faq": [
+                {
+                    "question": "Is this calculator really free?",
+                    "answer": "Yes! All calculations run locally in your browser - no sign-up or payment required. Premium features like sharing and PDF export are available with a subscription."
+                }
+            ]
+        },
+        "2-1-buydown-calculator-excel": {
+            "type": "calculator",
+            "priority": "P1",
+            "cluster": "buydown",
+            "component": "BuydownCalculator",
+            "title": "2-1 Buydown Calculator Excel",
+            "metaTitle": "2-1 Buydown Calculator Excel | Download Spreadsheet Template",
+            "metaDescription": "Calculate 2-1 buydown online and export to Excel/CSV. Get a downloadable spreadsheet template for your mortgage analysis.",
+            "h1": "2-1 Buydown Calculator with Excel Export",
+            "subtitle": "Calculate online and download results as Excel/CSV file",
+            "config": {
+                "buydownType": "2-1",
+                "exportCSV": true,
+                "exportExcel": true,
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "2-1-buydown-calculator",
+                "2-1-buydown-amortization-schedule",
+                "3-2-1-buydown-calculator-excel"
+            ],
+            "faq": [
+                {
+                    "question": "Can I download the results to Excel?",
+                    "answer": "Yes! Click the 'Export CSV' button to download results that open directly in Excel, Google Sheets, or Numbers."
+                }
+            ]
+        },
+        "3-2-1-buydown-calculator-excel": {
+            "type": "calculator",
+            "priority": "P1",
+            "cluster": "buydown",
+            "component": "BuydownCalculator",
+            "title": "3-2-1 Buydown Calculator Excel",
+            "metaTitle": "3-2-1 Buydown Calculator Excel | Download Spreadsheet Template",
+            "metaDescription": "Calculate 3-2-1 buydown online and export to Excel/CSV. Get a downloadable spreadsheet with 3-year payment breakdown.",
+            "h1": "3-2-1 Buydown Calculator with Excel Export",
+            "subtitle": "Calculate online and download 3-year payment schedule as Excel/CSV",
+            "config": {
+                "buydownType": "3-2-1",
+                "exportCSV": true,
+                "exportExcel": true,
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "3-2-1-buydown-calculator",
+                "how-much-3-2-1-buydown-cost",
+                "2-1-buydown-calculator-excel"
+            ],
+            "faq": [
+                {
+                    "question": "What's included in the Excel export?",
+                    "answer": "The export includes loan details, year-by-year payments, total subsidy cost, and monthly savings breakdown for all three buydown years."
+                }
+            ]
+        },
+        "2-1-buydown-cost": {
+            "type": "calculator",
+            "priority": "P0",
+            "cluster": "buydown",
+            "component": "BuydownCalculator",
+            "title": "2-1 Buydown Cost Calculator",
+            "metaTitle": "2-1 Buydown Cost | How Much Does a 2-1 Buydown Cost?",
+            "metaDescription": "Calculate the exact cost of a 2-1 buydown for your mortgage. See the total subsidy needed and year-by-year payment breakdown.",
+            "h1": "2-1 Buydown Cost Calculator",
+            "subtitle": "Calculate exactly how much a 2-1 buydown costs for your loan",
+            "config": {
+                "buydownType": "2-1",
+                "showCostBreakdown": true,
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "2-1-buydown-calculator",
+                "how-much-3-2-1-buydown-cost",
+                "temporary-buydown-cost"
+            ],
+            "faq": [
+                {
+                    "question": "What is the average cost of a 2-1 buydown?",
+                    "answer": "For a $400,000 loan at 7%, a 2-1 buydown typically costs $8,000-$12,000. The exact cost is the sum of payment differences over 24 months."
+                }
+            ]
+        }
+    },
+    "compares": {
+        "temporary-buydown-vs-points": {
+            "type": "compare",
+            "priority": "P0",
+            "cluster": "buydown",
+            "component": "CompareLayout",
+            "title": "Temporary Buydown vs Points",
+            "metaTitle": "Temporary Buydown vs Points | Which Saves You More?",
+            "metaDescription": "Compare a temporary buydown vs buying discount points. See which option saves you more based on how long you plan to stay.",
+            "h1": "Temporary Buydown vs Discount Points",
+            "subtitle": "Compare short-term savings vs long-term rate reduction",
+            "config": {
+                "optionA": {
+                    "name": "Temporary Buydown",
+                    "type": "buydown"
+                },
+                "optionB": {
+                    "name": "Discount Points",
+                    "type": "points"
+                },
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "termYears": 30,
+                    "buydownType": "2-1",
+                    "pointsCount": 1.0
+                }
+            },
+            "relatedSlugs": [
+                "2-1-buydown-calculator",
+                "discount-points-break-even",
+                "points-vs-lender-credits"
+            ],
+            "faq": [
+                {
+                    "question": "What's the difference between a buydown and points?",
+                    "answer": "A buydown temporarily reduces your rate for 1-3 years, then reverts to the note rate. Points permanently reduce your rate for the life of the loan."
+                },
+                {
+                    "question": "Which is better: buydown or points?",
+                    "answer": "Buydowns are better if you expect to refinance soon. Points are better if you'll keep the loan long-term (past the break-even point)."
+                }
+            ]
+        },
+        "points-vs-lender-credits": {
+            "type": "compare",
+            "priority": "P0",
+            "cluster": "points",
+            "component": "CompareLayout",
+            "title": "Points vs Lender Credits",
+            "metaTitle": "Points vs Lender Credits | Pay Now or Save Later?",
+            "metaDescription": "Compare paying discount points vs accepting lender credits for a higher rate. Find the right balance for your situation.",
+            "h1": "Points vs Lender Credits",
+            "subtitle": "Compare paying upfront for a lower rate vs getting credits for a higher rate",
+            "config": {
+                "optionA": {
+                    "name": "Buy Points (Lower Rate)",
+                    "type": "points"
+                },
+                "optionB": {
+                    "name": "Lender Credits (Higher Rate)",
+                    "type": "credits"
+                },
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "termYears": 30,
+                    "pointsRate": 6.75,
+                    "pointsCost": 1.0,
+                    "creditsRate": 7.25,
+                    "creditsAmount": 4000
+                }
+            },
+            "relatedSlugs": [
+                "discount-points-break-even",
+                "points-vs-higher-rate",
+                "closing-costs-worksheet"
+            ],
+            "faq": [
+                {
+                    "question": "What are lender credits?",
+                    "answer": "Lender credits are money the lender gives you toward closing costs in exchange for accepting a higher interest rate."
+                },
+                {
+                    "question": "When should I take lender credits?",
+                    "answer": "Take lender credits if you're short on cash for closing, plan to sell or refinance within a few years, or want to minimize upfront costs."
+                }
+            ]
+        },
+        "points-vs-higher-rate": {
+            "type": "compare",
+            "priority": "P0",
+            "cluster": "points",
+            "component": "CompareLayout",
+            "title": "Points vs Higher Rate",
+            "metaTitle": "Points vs Higher Rate | Is Paying Points Worth It?",
+            "metaDescription": "Compare paying points for a lower rate vs accepting the higher rate. Calculate your savings over time.",
+            "h1": "Paying Points vs Accepting a Higher Rate",
+            "subtitle": "Compare the long-term cost of paying points vs a higher interest rate",
+            "config": {
+                "optionA": {
+                    "name": "Pay Points",
+                    "type": "points"
+                },
+                "optionB": {
+                    "name": "Higher Rate (No Points)",
+                    "type": "no-points"
+                },
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "termYears": 30,
+                    "pointsRate": 6.75,
+                    "pointsCost": 1.0,
+                    "noPointsRate": 7.0
+                }
+            },
+            "relatedSlugs": [
+                "discount-points-break-even",
+                "points-vs-lender-credits",
+                "points-cost-calculator"
+            ],
+            "faq": [
+                {
+                    "question": "How do I decide whether to pay points?",
+                    "answer": "Calculate your break-even point. If you'll keep the loan longer than the break-even period, points are worth it."
+                }
+            ]
+        },
+        "points-vs-temporary-buydown": {
+            "type": "compare",
+            "priority": "P0",
+            "cluster": "points",
+            "component": "CompareLayout",
+            "title": "Points vs Temporary Buydown",
+            "metaTitle": "Points vs Temporary Buydown | Permanent vs Short-Term Savings",
+            "metaDescription": "Compare permanent rate reduction with points vs temporary savings with a buydown. See which strategy fits your plans.",
+            "h1": "Discount Points vs Temporary Buydown",
+            "subtitle": "Compare permanent rate reduction vs short-term payment relief",
+            "config": {
+                "optionA": {
+                    "name": "Discount Points",
+                    "type": "points"
+                },
+                "optionB": {
+                    "name": "Temporary Buydown",
+                    "type": "buydown"
+                },
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "termYears": 30,
+                    "noteRate": 7.0,
+                    "pointsCount": 1.0,
+                    "buydownType": "2-1"
+                }
+            },
+            "relatedSlugs": [
+                "temporary-buydown-vs-points",
+                "2-1-buydown-calculator",
+                "discount-points-break-even"
+            ],
+            "faq": []
+        },
+        "lock-vs-float": {
+            "type": "compare",
+            "priority": "P0",
+            "cluster": "ratelock",
+            "component": "CompareLayout",
+            "title": "Lock vs Float Calculator",
+            "metaTitle": "Lock vs Float | Should You Lock Your Mortgage Rate?",
+            "metaDescription": "Compare locking your rate now vs floating and waiting. Understand the risks and potential rewards of each strategy.",
+            "h1": "Lock vs Float: Should You Lock Your Rate?",
+            "subtitle": "Compare the risks and rewards of locking your rate now vs floating",
+            "config": {
+                "optionA": {
+                    "name": "Lock Now",
+                    "type": "lock"
+                },
+                "optionB": {
+                    "name": "Float",
+                    "type": "float"
+                },
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "termYears": 30,
+                    "currentRate": 7.0,
+                    "lockDays": 30
+                }
+            },
+            "relatedSlugs": [
+                "rate-lock-fee-calculator",
+                "float-down-worth-it",
+                "rate-lock-extension-fee"
+            ],
+            "faq": [
+                {
+                    "question": "What does it mean to float your rate?",
+                    "answer": "Floating means not locking your rate, betting that rates will drop before you close. If rates rise instead, you'll pay more."
+                },
+                {
+                    "question": "When should I lock my rate?",
+                    "answer": "Lock when you're comfortable with the rate and can close within the lock period. In volatile markets, locking provides certainty."
+                },
+                {
+                    "question": "What if rates drop after I lock?",
+                    "answer": "Some lenders offer float-down options or will renegotiate. Otherwise, you're locked at your original rate."
+                }
+            ]
+        },
+        "fha-vs-conventional": {
+            "type": "compare",
+            "priority": "P1",
+            "cluster": "workflow",
+            "component": "CompareLayout",
+            "title": "FHA vs Conventional Loan",
+            "metaTitle": "FHA vs Conventional Loan | Which Mortgage is Right for You?",
+            "metaDescription": "Compare FHA and conventional loans side by side. See differences in down payment, mortgage insurance, and qualification requirements.",
+            "h1": "FHA vs Conventional Loan Comparison",
+            "subtitle": "Compare down payment, MI costs, and requirements for each loan type",
+            "config": {
+                "optionA": {
+                    "name": "FHA Loan",
+                    "type": "fha"
+                },
+                "optionB": {
+                    "name": "Conventional Loan",
+                    "type": "conventional"
+                },
+                "defaultInputs": {
+                    "homePrice": 400000,
+                    "creditScore": 680,
+                    "downPaymentPercent": 5
+                }
+            },
+            "relatedSlugs": [
+                "pmi-calculator",
+                "cash-to-close-calculator",
+                "closing-costs-worksheet"
+            ],
+            "faq": [
+                {
+                    "question": "What's the main difference between FHA and conventional loans?",
+                    "answer": "FHA loans have lower credit score requirements and smaller down payments, but require mortgage insurance for the life of the loan. Conventional loans have stricter requirements but PMI can be removed at 80% LTV."
+                }
+            ]
+        },
+        "15-year-vs-30-year": {
+            "type": "compare",
+            "priority": "P1",
+            "cluster": "workflow",
+            "component": "CompareLayout",
+            "title": "15-Year vs 30-Year Mortgage",
+            "metaTitle": "15-Year vs 30-Year Mortgage | Compare Payment & Interest",
+            "metaDescription": "Compare 15-year and 30-year mortgage options. See the difference in monthly payment, total interest, and long-term savings.",
+            "h1": "15-Year vs 30-Year Mortgage Comparison",
+            "subtitle": "Compare monthly payments and total interest for different loan terms",
+            "config": {
+                "optionA": {
+                    "name": "15-Year Fixed",
+                    "type": "15-year"
+                },
+                "optionB": {
+                    "name": "30-Year Fixed",
+                    "type": "30-year"
+                },
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "rate15Year": 6.25,
+                    "rate30Year": 7.0
+                }
+            },
+            "relatedSlugs": [
+                "discount-points-break-even",
+                "cash-to-close-calculator",
+                "closing-costs-worksheet"
+            ],
+            "faq": [
+                {
+                    "question": "Is a 15-year mortgage better than 30-year?",
+                    "answer": "A 15-year mortgage saves significant interest and builds equity faster, but has higher monthly payments. Choose based on your budget and goals."
+                }
+            ]
+        },
+        "arm-vs-fixed": {
+            "type": "compare",
+            "priority": "P1",
+            "cluster": "ratelock",
+            "component": "CompareLayout",
+            "title": "ARM vs Fixed Rate Mortgage",
+            "metaTitle": "ARM vs Fixed Rate | Adjustable vs Fixed Mortgage Comparison",
+            "metaDescription": "Compare adjustable rate mortgages (ARM) with fixed rate loans. Understand the risks and potential savings of each option.",
+            "h1": "ARM vs Fixed Rate Mortgage",
+            "subtitle": "Compare adjustable rate vs fixed rate mortgage options",
+            "config": {
+                "optionA": {
+                    "name": "Adjustable Rate (ARM)",
+                    "type": "arm"
+                },
+                "optionB": {
+                    "name": "Fixed Rate",
+                    "type": "fixed"
+                },
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "armRate": 6.0,
+                    "fixedRate": 7.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "lock-vs-float",
+                "rate-lock-fee-calculator",
+                "discount-points-break-even"
+            ],
+            "faq": [
+                {
+                    "question": "When is an ARM a good choice?",
+                    "answer": "ARMs can be good if you plan to sell or refinance before the rate adjusts, or if you expect rates to drop in the future."
+                }
+            ]
+        },
+        "refinance-vs-stay": {
+            "type": "compare",
+            "priority": "P1",
+            "cluster": "workflow",
+            "component": "CompareLayout",
+            "title": "Refinance vs Keep Current Mortgage",
+            "metaTitle": "Refinance vs Stay | Is Refinancing Worth It?",
+            "metaDescription": "Calculate whether refinancing makes sense. Compare your current mortgage to a new loan and see your break-even point.",
+            "h1": "Should You Refinance? Break-Even Calculator",
+            "subtitle": "Compare refinancing costs vs savings to decide if it's worth it",
+            "config": {
+                "optionA": {
+                    "name": "Refinance",
+                    "type": "refinance"
+                },
+                "optionB": {
+                    "name": "Keep Current Mortgage",
+                    "type": "stay"
+                },
+                "defaultInputs": {
+                    "currentBalance": 350000,
+                    "currentRate": 7.5,
+                    "newRate": 6.5,
+                    "closingCosts": 5000,
+                    "yearsRemaining": 27
+                }
+            },
+            "relatedSlugs": [
+                "closing-costs-worksheet",
+                "discount-points-break-even",
+                "cash-to-close-calculator"
+            ],
+            "faq": [
+                {
+                    "question": "When is refinancing worth it?",
+                    "answer": "Refinancing is typically worth it if you can lower your rate by at least 0.5-1%, plan to stay long enough to recoup costs, and your credit and equity qualify you for good terms."
+                }
+            ]
+        },
+        "2-1-vs-3-2-1-buydown": {
+            "type": "compare",
+            "priority": "P1",
+            "cluster": "buydown",
+            "component": "CompareLayout",
+            "title": "2-1 vs 3-2-1 Buydown",
+            "metaTitle": "2-1 vs 3-2-1 Buydown | Which Temporary Buydown is Right for You?",
+            "metaDescription": "Compare 2-1 and 3-2-1 temporary buydowns side by side. See the cost difference, monthly savings, and which option fits your budget.",
+            "h1": "2-1 Buydown vs 3-2-1 Buydown Comparison",
+            "subtitle": "Compare the cost and savings of each temporary buydown option",
+            "config": {
+                "optionA": {
+                    "name": "2-1 Buydown",
+                    "type": "buydown-2-1"
+                },
+                "optionB": {
+                    "name": "3-2-1 Buydown",
+                    "type": "buydown-3-2-1"
+                },
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "2-1-buydown-calculator",
+                "3-2-1-buydown-calculator",
+                "temporary-buydown-cost"
+            ],
+            "faq": [
+                {
+                    "question": "Which buydown costs more?",
+                    "answer": "A 3-2-1 buydown costs more because it covers three years of reduced payments instead of two. Expect to pay roughly double the cost of a 2-1 buydown."
+                },
+                {
+                    "question": "Which buydown saves more in year one?",
+                    "answer": "The 3-2-1 buydown saves more in year one because the rate is reduced by 3% instead of 2%."
+                }
+            ]
+        },
+        "buydown-vs-price-reduction": {
+            "type": "compare",
+            "priority": "P1",
+            "cluster": "buydown",
+            "component": "CompareLayout",
+            "title": "Temporary Buydown vs Price Reduction",
+            "metaTitle": "Buydown vs Price Reduction | Which Seller Concession is Better?",
+            "metaDescription": "Compare using seller concessions for a temporary buydown vs a price reduction. See which option saves you more over time.",
+            "h1": "Temporary Buydown vs Price Reduction",
+            "subtitle": "Should you use seller credits for a buydown or negotiate a lower price?",
+            "config": {
+                "optionA": {
+                    "name": "Temporary Buydown",
+                    "type": "buydown"
+                },
+                "optionB": {
+                    "name": "Price Reduction",
+                    "type": "price-reduction"
+                },
+                "defaultInputs": {
+                    "homePrice": 500000,
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "concessionAmount": 10000,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "seller-concession-buydown",
+                "2-1-buydown-calculator",
+                "closing-costs-worksheet"
+            ],
+            "faq": [
+                {
+                    "question": "When is a buydown better than a price reduction?",
+                    "answer": "A buydown is often better when you need lower monthly payments to qualify or when you expect to refinance within 2-3 years. The cash flow benefit is immediate."
+                }
+            ]
+        },
+        "buydown-vs-seller-credit": {
+            "type": "compare",
+            "priority": "P1",
+            "cluster": "buydown",
+            "component": "CompareLayout",
+            "title": "Buydown vs Seller Credit for Closing Costs",
+            "metaTitle": "Buydown vs Seller Credit | Best Use of Seller Concessions",
+            "metaDescription": "Compare using seller concessions for a temporary buydown vs closing cost credits. Find the best strategy for your situation.",
+            "h1": "Temporary Buydown vs Closing Cost Credits",
+            "subtitle": "How should you use seller concessions - lower payments or lower cash to close?",
+            "config": {
+                "optionA": {
+                    "name": "Temporary Buydown",
+                    "type": "buydown"
+                },
+                "optionB": {
+                    "name": "Closing Cost Credit",
+                    "type": "closing-credit"
+                },
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "sellerConcession": 10000,
+                    "closingCosts": 12000,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "seller-concession-buydown",
+                "closing-costs-worksheet",
+                "cash-to-close-calculator"
+            ],
+            "faq": [
+                {
+                    "question": "Should I use seller credits for buydown or closing costs?",
+                    "answer": "If you have enough cash for closing but want lower payments, choose a buydown. If you're cash-strapped and need help with upfront costs, use credits for closing costs."
+                }
+            ]
+        },
+        "points-vs-refinance-later": {
+            "type": "compare",
+            "priority": "P1",
+            "cluster": "points",
+            "component": "CompareLayout",
+            "title": "Buy Points Now vs Refinance Later",
+            "metaTitle": "Buy Points vs Refinance Later | Which Strategy Saves More?",
+            "metaDescription": "Compare buying discount points now vs waiting to refinance later. See which strategy works best based on rate expectations.",
+            "h1": "Buy Points Now vs Refinance Later",
+            "subtitle": "Should you pay for a lower rate now or wait for rates to drop?",
+            "config": {
+                "optionA": {
+                    "name": "Buy Points Now",
+                    "type": "points"
+                },
+                "optionB": {
+                    "name": "Refinance Later",
+                    "type": "refinance"
+                },
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "currentRate": 7.0,
+                    "pointsRate": 6.75,
+                    "pointsCost": 1.0,
+                    "expectedFutureRate": 6.0,
+                    "refinanceCosts": 5000,
+                    "yearsUntilRefi": 2,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "discount-points-break-even",
+                "refinance-vs-stay",
+                "points-vs-higher-rate"
+            ],
+            "faq": [
+                {
+                    "question": "When is buying points better than waiting to refinance?",
+                    "answer": "Buying points is better when you're uncertain if rates will drop, want guaranteed savings, or plan to hold the loan long-term beyond the break-even point."
+                }
+            ]
+        },
+        "apr-vs-interest-rate": {
+            "type": "compare",
+            "priority": "P1",
+            "cluster": "workflow",
+            "component": "CompareLayout",
+            "title": "APR vs Interest Rate Explained",
+            "metaTitle": "APR vs Interest Rate | What's the Difference and Which Matters?",
+            "metaDescription": "Understand the difference between APR and interest rate. Learn when to focus on each and how they affect your loan comparison.",
+            "h1": "APR vs Interest Rate: What's the Difference?",
+            "subtitle": "Learn which rate to focus on when comparing mortgage offers",
+            "config": {
+                "optionA": {
+                    "name": "Interest Rate",
+                    "type": "interest-rate"
+                },
+                "optionB": {
+                    "name": "APR",
+                    "type": "apr"
+                },
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "interestRate": 7.0,
+                    "closingCosts": 8000,
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "discount-points-break-even",
+                "closing-costs-worksheet",
+                "points-vs-lender-credits"
+            ],
+            "faq": [
+                {
+                    "question": "Should I compare APR or interest rate?",
+                    "answer": "Use APR when comparing loan offers from different lenders as it includes fees. Use interest rate when calculating your actual monthly payment."
+                },
+                {
+                    "question": "Why is APR higher than interest rate?",
+                    "answer": "APR includes the interest rate plus other loan costs like origination fees, points, and mortgage insurance, spread over the loan term."
+                }
+            ]
+        },
+        "is-2-1-buydown-worth-it": {
+            "type": "compare",
+            "priority": "P1",
+            "cluster": "buydown",
+            "component": "CompareLayout",
+            "title": "Is a 2-1 Buydown Worth It?",
+            "metaTitle": "Is a 2-1 Buydown Worth It? | Decision Calculator & Analysis",
+            "metaDescription": "Find out if a 2-1 buydown makes sense for your situation. Compare scenarios and see when a 2-1 buydown is smart vs when to skip it.",
+            "h1": "Is a 2-1 Buydown Worth It?",
+            "subtitle": "Decision tool to help you determine if a 2-1 buydown fits your situation",
+            "config": {
+                "optionA": {
+                    "name": "With 2-1 Buydown",
+                    "type": "with-buydown"
+                },
+                "optionB": {
+                    "name": "Without Buydown",
+                    "type": "no-buydown"
+                },
+                "showDecisionMatrix": true,
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "noteRate": 7.0,
+                    "termYears": 30,
+                    "expectedHoldYears": 5,
+                    "expectRefinance": true
+                }
+            },
+            "relatedSlugs": [
+                "2-1-buydown-calculator",
+                "2-1-buydown-cost",
+                "temporary-buydown-vs-points"
+            ],
+            "faq": [
+                {
+                    "question": "When is a 2-1 buydown worth it?",
+                    "answer": "A 2-1 buydown is worth it when: (1) the seller/builder pays for it, (2) you expect to refinance in 2-3 years as rates drop, (3) you need lower initial payments to qualify, or (4) you expect income growth."
+                },
+                {
+                    "question": "When should I skip a 2-1 buydown?",
+                    "answer": "Skip the buydown if: (1) you're paying for it yourself and could use that money better elsewhere, (2) you're unsure you can handle the full payment in year 3, or (3) you're getting a better deal on price reduction."
+                }
+            ]
+        },
+        "discount-points-vs-temporary-buydown": {
+            "type": "compare",
+            "priority": "P0",
+            "cluster": "points",
+            "component": "CompareLayout",
+            "title": "Discount Points vs Temporary Buydown",
+            "metaTitle": "Discount Points vs Temporary Buydown | Which is Better?",
+            "metaDescription": "Compare discount points vs temporary buydown strategies. See which option saves more based on your timeline and goals.",
+            "h1": "Discount Points vs Temporary Buydown",
+            "subtitle": "Compare permanent rate reduction vs temporary lower payments",
+            "config": {
+                "optionA": {
+                    "name": "Discount Points",
+                    "type": "points"
+                },
+                "optionB": {
+                    "name": "Temporary Buydown",
+                    "type": "buydown"
+                },
+                "defaultInputs": {
+                    "loanAmount": 400000,
+                    "baseRate": 7.0,
+                    "pointsPercent": 1.0,
+                    "buydownType": "2-1",
+                    "termYears": 30
+                }
+            },
+            "relatedSlugs": [
+                "discount-points-break-even",
+                "2-1-buydown-calculator",
+                "temporary-buydown-vs-points"
+            ],
+            "faq": [
+                {
+                    "question": "What's the difference between points and a buydown?",
+                    "answer": "Discount points permanently reduce your rate for the entire loan term. A temporary buydown reduces your rate only for the first 1-3 years, then reverts to the full rate."
+                },
+                {
+                    "question": "Which is better - points or buydown?",
+                    "answer": "Points are better if you'll keep the loan 5+ years. A buydown is better if you plan to refinance soon or need lower initial payments to qualify."
+                }
+            ]
+        }
+    },
+    "alternatives": {
+        "mortgage-coach-alternative": {
+            "type": "alternative",
+            "priority": "P1",
+            "title": "Mortgage Coach Alternative",
+            "metaTitle": "Mortgage Coach Alternative | ShowTheRate vs Mortgage Coach",
+            "metaDescription": "Looking for a Mortgage Coach alternative? ShowTheRate offers faster, simpler mortgage comparisons for loan officers at a better price.",
+            "h1": "Best Mortgage Coach Alternative for LOs",
+            "subtitle": "Compare ShowTheRate vs Mortgage Coach - simpler, faster, more affordable",
+            "competitor": "Mortgage Coach",
+            "comparisonPoints": [
+                {
+                    "feature": "Comparison Creation Time",
+                    "us": "60 seconds",
+                    "them": "5-10 minutes"
+                },
+                {
+                    "feature": "Mobile-First Design",
+                    "us": "Yes",
+                    "them": "Limited"
+                },
+                {
+                    "feature": "Price",
+                    "us": "$79/month",
+                    "them": "$99+/month"
+                },
+                {
+                    "feature": "Client-Facing View",
+                    "us": "Beautiful, branded",
+                    "them": "Basic"
+                }
+            ],
+            "relatedSlugs": [
+                "2-1-buydown-calculator",
+                "discount-points-break-even",
+                "temporary-buydown-vs-points"
+            ]
+        },
+        "mbs-highway-alternative": {
+            "type": "alternative",
+            "priority": "P1",
+            "title": "MBS Highway Alternative",
+            "metaTitle": "MBS Highway Alternative | ShowTheRate for Rate Comparisons",
+            "metaDescription": "Looking for an MBS Highway alternative for client presentations? ShowTheRate focuses on what matters most - clear mortgage comparisons.",
+            "h1": "MBS Highway Alternative for Loan Officers",
+            "subtitle": "Focus on client presentations, not market data overload",
+            "competitor": "MBS Highway",
+            "comparisonPoints": [
+                {
+                    "feature": "Primary Focus",
+                    "us": "Client Comparisons",
+                    "them": "Market Data"
+                },
+                {
+                    "feature": "Learning Curve",
+                    "us": "Minimal",
+                    "them": "Steep"
+                },
+                {
+                    "feature": "Client Presentations",
+                    "us": "Built-in, shareable",
+                    "them": "Requires export"
+                },
+                {
+                    "feature": "Price",
+                    "us": "$79/month",
+                    "them": "$99+/month"
+                }
+            ],
+            "relatedSlugs": [
+                "lock-vs-float",
+                "rate-lock-fee-calculator",
+                "temporary-buydown-vs-points"
+            ]
+        },
+        "mortgagebot-alternative": {
+            "type": "alternative",
+            "priority": "P1",
+            "title": "MortgageBot Alternative",
+            "metaTitle": "MortgageBot Alternative | Modern Mortgage Comparison Tool",
+            "metaDescription": "Looking for a MortgageBot alternative? ShowTheRate offers modern, mobile-first mortgage comparisons for today's loan officers.",
+            "h1": "Modern MortgageBot Alternative",
+            "subtitle": "Built for today's mobile-first borrowers",
+            "competitor": "MortgageBot",
+            "comparisonPoints": [
+                {
+                    "feature": "Modern UI/UX",
+                    "us": "Yes",
+                    "them": "Outdated"
+                },
+                {
+                    "feature": "Mobile Experience",
+                    "us": "Excellent",
+                    "them": "Poor"
+                },
+                {
+                    "feature": "Setup Time",
+                    "us": "Minutes",
+                    "them": "Days"
+                },
+                {
+                    "feature": "Price",
+                    "us": "$79/month",
+                    "them": "Enterprise pricing"
+                }
+            ],
+            "relatedSlugs": [
+                "2-1-buydown-calculator",
+                "closing-costs-worksheet",
+                "cash-to-close-calculator"
+            ]
+        },
+        "loan-comparison-presentation-tool": {
+            "type": "alternative",
+            "priority": "P1",
+            "title": "Loan Comparison Presentation Tool",
+            "metaTitle": "Loan Comparison Presentation Tool | ShowTheRate for LOs",
+            "metaDescription": "The best loan comparison presentation tool for loan officers. Create beautiful, shareable mortgage comparisons in 60 seconds.",
+            "h1": "Loan Comparison Presentation Tool for LOs",
+            "subtitle": "Create stunning mortgage comparisons your clients will love",
+            "competitor": "Excel Spreadsheets",
+            "comparisonPoints": [
+                {
+                    "feature": "Creation Time",
+                    "us": "60 seconds",
+                    "them": "15-30 minutes"
+                },
+                {
+                    "feature": "Client Experience",
+                    "us": "Beautiful, mobile-friendly",
+                    "them": "Confusing spreadsheet"
+                },
+                {
+                    "feature": "Shareable Link",
+                    "us": "One-click share",
+                    "them": "Email attachment"
+                },
+                {
+                    "feature": "Real-time Updates",
+                    "us": "Yes",
+                    "them": "No"
+                },
+                {
+                    "feature": "Professional Branding",
+                    "us": "Built-in",
+                    "them": "Manual"
+                }
+            ],
+            "relatedSlugs": [
+                "2-1-buydown-calculator",
+                "discount-points-break-even",
+                "closing-costs-worksheet"
+            ]
+        }
+    }
+}

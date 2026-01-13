@@ -33,8 +33,8 @@ function LoginPageInner() {
     const getProductName = (key) => {
         const names = {
             'STARTER_PASS': 'Starter Pass ($9.9)',
-            'MONTHLY': 'Pro Monthly ($59/mo)',
-            'YEARLY': 'Annual Pro ($588/yr)'
+            'MONTHLY': 'Pro Monthly ($99/mo)',
+            'YEARLY': 'Annual Pro ($950/yr)'
         };
         return names[key] || key;
     };

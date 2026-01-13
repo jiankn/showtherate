@@ -84,6 +84,26 @@
     font-size: 0.875rem;
 }
 
+/* Profile Hint */
+.profileHint {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-xl);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+}
+
+.hintIcon {
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
 /* Profile Form */
 .formGrid {
     display: grid;
@@ -199,6 +219,36 @@
     background: var(--color-primary-hover);
 }
 
+.currentPlanBadge {
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--color-success);
+    color: white;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.expiryInfo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-lg);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.expiryInfo strong {
+    color: var(--color-text);
+}
+
+.expiryIcon {
+    font-size: 1rem;
+}
+
 .usageBar {
     width: 100%;
     height: 8px;
@@ -212,6 +262,43 @@
     height: 100%;
     background: var(--color-primary);
     border-radius: 4px;
+}
+
+/* Billing Portal Button */
+.billingPortalBtn {
+    padding: var(--space-md) var(--space-xl);
+    background: linear-gradient(135deg, var(--color-primary) 0%, #8b5cf6 100%);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--transition-spring);
+    box-shadow: var(--shadow-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.billingPortalBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, var(--color-primary-hover) 0%, #7c3aed 100%);
+}
+
+.billingPortalBtn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.billingActions {
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: var(--space-lg);
 }
 
 /* Settings Checkboxes */
@@ -287,5 +374,15 @@
 
     .formGrid {
         grid-template-columns: 1fr;
+    }
+
+    .billingActions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .billingPortalBtn {
+        width: 100%;
+        justify-content: center;
     }
 }

@@ -30,17 +30,23 @@ export default function ComparisonDetailPage() {
                 ]);
 
                 const comparisonJson = await comparisonRes.json();
+
                 if (comparisonRes.ok) {
                     setData(comparisonJson);
                 } else {
-                    setError(comparisonJson.error || 'Failed to load comparison');
+                    const errorMsg = comparisonJson.error || `Failed to load comparison (${comparisonRes.status})`;
+                    console.error('Comparison API error:', errorMsg);
+                    setError(errorMsg);
                 }
 
                 const entitlementsJson = await entitlementsRes.json();
                 if (entitlementsRes.ok) {
                     setEntitlements(entitlementsJson);
+                } else {
+                    console.warn('Failed to load entitlements:', entitlementsJson);
                 }
             } catch (err) {
+                console.error('Fetch error:', err);
                 setError('Failed to load comparison');
             } finally {
                 setLoading(false);
@@ -53,7 +59,18 @@ export default function ComparisonDetailPage() {
     }, [params.id]);
 
     const handleCopyShareLink = async () => {
-        if (!data) return;
+        if (!data) {
+            console.warn('No data available for sharing');
+            toast.error('No comparison data available');
+            return;
+        }
+
+        if (!data.id) {
+            console.error('Comparison data missing ID:', data);
+            toast.error('Invalid comparison data');
+            return;
+        }
+
 
         // Check entitlements first
         if (!entitlements?.hasActiveEntitlement || !entitlements?.quotas?.share) {
@@ -80,9 +97,13 @@ export default function ComparisonDetailPage() {
             if (res.ok && shareData.shareId) {
                 const shareUrl = `${window.location.origin}/s/${shareData.shareId}`;
                 await navigator.clipboard.writeText(shareUrl);
-                toast.success('Share link copied to clipboard!');
+                const successMessage = shareData.isExisting
+                    ? 'Existing share link copied to clipboard!'
+                    : 'New share link created and copied to clipboard!';
+                toast.success(successMessage);
             } else {
-                toast.error(shareData.error || 'Failed to generate share link');
+                const errorMsg = shareData.error || 'Failed to generate share link';
+                toast.error(errorMsg);
             }
         } catch (err) {
             console.error('Failed to copy share link:', err);

@@ -1,6 +1,6 @@
 .footer {
   background: var(--color-bg-dark);
-  padding: var(--space-4xl) 0 var(--space-2xl);
+  padding: var(--space-xl) 0 var(--space-lg);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   position: relative;
   overflow: hidden;
@@ -10,46 +10,53 @@
 .footer::before {
   content: '';
   position: absolute;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
-  top: -200px;
-  right: -200px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.06) 0%, transparent 70%);
+  top: -150px;
+  right: -150px;
   pointer-events: none;
 }
 
 .footerContent {
-  display: grid;
-  gap: var(--space-2xl);
-  margin-bottom: var(--space-2xl);
   position: relative;
   z-index: 1;
 }
 
+/* PC端紧凑布局 */
+.footerMain {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-2xl);
+  margin-bottom: var(--space-lg);
+}
+
 .footerBrand {
-  max-width: 300px;
+  flex-shrink: 0;
+  max-width: 280px;
 }
 
 .footerBrand .logo {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 700;
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-sm);
   color: white;
   text-decoration: none;
-  transition: transform var(--transition-base);
+  transition: transform var(--transition-fast);
 }
 
 .footerBrand .logo:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .logoIconSvg {
-  width: 36px;
-  height: 36px;
-  filter: drop-shadow(0 2px 8px rgba(59, 130, 246, 0.3));
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 2px 6px rgba(59, 130, 246, 0.25));
 }
 
 .logoText {
@@ -59,84 +66,196 @@
 }
 
 .footerTagline {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.875rem;
-  margin-bottom: 0;
-  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  margin: 0;
+  display: block;
 }
 
-.footerLinks {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-lg);
+.footerNav {
+  display: flex;
+  gap: var(--space-xl);
+  flex: 1;
+  justify-content: flex-end;
 }
 
-.footerColumn h4 {
+.navGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 120px;
+}
+
+.navTitle {
   color: white;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  margin-bottom: var(--space-md);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  margin-bottom: var(--space-xs);
 }
 
-.footerColumn a {
-  display: block;
-  font-size: 0.875rem;
-  padding: var(--space-xs) 0;
-  color: rgba(255, 255, 255, 0.5);
-  transition: all var(--transition-fast);
+.navGroup a {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
+  transition: all var(--transition-fast);
+  padding: 2px 0;
+  line-height: 1.4;
 }
 
-.footerColumn a:hover {
+.navGroup a:hover {
   color: white;
-  transform: translateX(4px);
+  transform: translateX(2px);
+}
+
+.allTools {
+  color: var(--color-primary) !important;
+  font-weight: 600;
+}
+
+.allTools:hover {
+  color: var(--color-primary-light) !important;
+}
+
+/* 移动端紧凑布局 */
+.footerMobile {
+  display: none;
+}
+
+.footerMobile .mobileNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  justify-content: center;
+  align-items: center;
+}
+
+.footerMobile .mobileNav a {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  padding: var(--space-xs) var(--space-sm);
+  white-space: nowrap;
+}
+
+.footerMobile .mobileNav a:hover {
+  color: white;
+}
+
+.footerMobile .allTools {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: var(--radius-sm);
+  color: var(--color-primary);
+  font-weight: 600;
+  margin-left: var(--space-sm);
+}
+
+.footerMobile .allTools:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.5);
 }
 
 .footerBottom {
-  padding-top: var(--space-xl);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  text-align: center;
-  font-size: 0.875rem;
+  padding-top: var(--space-lg);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   position: relative;
   z-index: 1;
 }
 
-.footerBottom p {
-  margin-bottom: var(--space-sm);
-  color: rgba(255, 255, 255, 0.4);
+.footerBottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.copyright {
+  flex: 1;
+}
+
+.copyright p {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.disclaimer {
+  flex: 2;
+  text-align: right;
 }
 
 .footerDisclaimer {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.3);
-  max-width: 600px;
-  margin: 0 auto;
-  line-height: 1.6;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.5;
+  margin: 0;
 }
 
+/* 响应式设计 */
 @media (min-width: 768px) {
-  .footerContent {
-    grid-template-columns: 1fr 2fr;
+  .footer {
+    padding: var(--space-2xl) 0 var(--space-xl);
+  }
+
+  .footerMain {
+    gap: var(--space-3xl);
+  }
+
+  .footerNav {
+    gap: var(--space-2xl);
+  }
+
+  .navGroup {
+    min-width: 140px;
+  }
+}
+
+@media (max-width: 767px) {
+  /* 移动端：隐藏PC布局，显示移动布局 */
+  .footerMain {
+    display: none;
+  }
+
+  .footerMobile {
+    display: block;
+    margin-bottom: var(--space-md);
   }
 
   .footerBottom {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    text-align: left;
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-sm);
+  }
+
+  .disclaimer {
+    text-align: center;
+    flex: none;
   }
 
   .footerDisclaimer {
-    margin: 0;
-    text-align: right;
+    font-size: 0.75rem;
   }
 }
 
-@media (max-width: 640px) {
-  .footerLinks {
-    grid-template-columns: 1fr;
-    gap: var(--space-xl);
+@media (max-width: 480px) {
+  .footer {
+    padding: var(--space-lg) 0 var(--space-md);
+  }
+
+  .footerMobile .mobileNav {
+    gap: var(--space-xs);
+  }
+
+  .footerMobile .mobileNav a {
+    font-size: 0.7rem;
+    padding: 4px var(--space-xs);
+  }
+
+  .footerMobile .allTools {
+    margin-left: var(--space-xs);
   }
 }

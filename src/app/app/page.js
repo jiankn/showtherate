@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useToast } from '../../components/GlobalToast';
-import { ChartIcon, LinkIcon, RobotIcon, RocketIcon, HouseIcon, CalendarIcon, UsersIcon, FileEditIcon } from '../../components/Icons';
+import { ChartIcon, LinkIcon, RobotIcon, RocketIcon, HouseIcon, CalendarIcon, UsersIcon, FileEditIcon, SearchIcon } from '../../components/Icons';
 import styles from './page.module.css';
 
 export default function DashboardPage() {
@@ -15,6 +16,14 @@ export default function DashboardPage() {
     const [entitlements, setEntitlements] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isFirstVisit, setIsFirstVisit] = useState(false);
+    const [checkoutProcessing, setCheckoutProcessing] = useState(false);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const pollingRef = useRef(null);
+
+    // 检测 checkout 成功
+    const checkoutSuccess = searchParams.get('checkout') === 'success';
+    const productKey = searchParams.get('product');
 
     useEffect(() => {
         const hasVisited = localStorage.getItem('dashboard_visited');
@@ -24,6 +33,74 @@ export default function DashboardPage() {
         }
         loadData();
     }, []);
+
+    // 处理 checkout 成功后的订阅状态刷新
+    useEffect(() => {
+        if (!checkoutSuccess) return;
+
+        setCheckoutProcessing(true);
+        let attempts = 0;
+        const maxAttempts = 5;
+
+        const pollEntitlements = async () => {
+            attempts++;
+            try {
+                const res = await fetch('/api/user/entitlements');
+                if (res.ok) {
+                    const data = await res.json();
+                    // 检查是否已有活跃订阅
+                    if (data.hasActiveEntitlement && data.type !== 'free') {
+                        setEntitlements(data);
+                        setCheckoutProcessing(false);
+
+                        // 清除 URL 参数
+                        router.replace('/app', { scroll: false });
+
+                        // 显示成功提示
+                        const planName = data.type === 'subscription' ? 'Pro Plan' : 'Starter Pass';
+                        toast.success(`🎉 Welcome to ${planName}! Your subscription is now active.`);
+
+                        // 触发全局事件通知其他组件刷新
+                        window.dispatchEvent(new Event('entitlementsUpdated'));
+                        localStorage.setItem('entitlementsUpdate', Date.now().toString());
+
+                        // 停止轮询
+                        if (pollingRef.current) {
+                            clearInterval(pollingRef.current);
+                            pollingRef.current = null;
+                        }
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to poll entitlements:', error);
+            }
+
+            // 达到最大尝试次数
+            if (attempts >= maxAttempts) {
+                setCheckoutProcessing(false);
+                router.replace('/app', { scroll: false });
+                toast.info('Payment received! Your subscription should be active within a minute.');
+                if (pollingRef.current) {
+                    clearInterval(pollingRef.current);
+                    pollingRef.current = null;
+                }
+            }
+        };
+
+        // 立即执行一次
+        pollEntitlements();
+
+        // 每 2 秒轮询一次
+        pollingRef.current = setInterval(pollEntitlements, 2000);
+
+        return () => {
+            if (pollingRef.current) {
+                clearInterval(pollingRef.current);
+                pollingRef.current = null;
+            }
+        };
+    }, [checkoutSuccess, productKey, router, toast]);
 
     const loadData = async () => {
         try {
@@ -297,38 +374,94 @@ function ActionPanel({ draftCount, unlinkedCount }) {
     );
 }
 
-// ===== COMPARISONS LIST =====
+// ===== COMPARISONS MANAGER =====
 function ComparisonsList({ comparisons, onCopyLink, onDelete, formatDate }) {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [visibleCount, setVisibleCount] = useState(5);
+
+    // Filter comparisons
+    const filteredComparisons = comparisons.filter(c =>
+        (c.title?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        (c.clientName?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+    );
+
+    const hasHiddenItems = filteredComparisons.length > visibleCount;
+
     return (
         <div className={styles.listSection}>
-            <h2 className={styles.sectionTitle}>Recent Comparisons</h2>
+            <div className={styles.listHeader}>
+                <h2 className={styles.sectionTitle}>Recent Comparisons</h2>
+                <div className={styles.searchBox}>
+                    <SearchIcon className={styles.searchIcon} />
+                    <input
+                        type="text"
+                        placeholder="Search client or title..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className={styles.searchInput}
+                    />
+                </div>
+            </div>
+
             <div className={styles.list}>
-                {comparisons.map((c) => (
-                    <div key={c.id} className={styles.listItem}>
-                        <div className={styles.listIcon}>
-                            {c.scenarioCount >= 3 ? '💼' : '🏠'}
-                        </div>
-                        <div className={styles.listInfo}>
-                            <h3>{c.title}</h3>
-                            <p>{c.scenarioCount || 0} scenarios • {formatDate(c.createdAt)}</p>
-                        </div>
-                        <div className={styles.listActions}>
-                            {c.shareLink ? (
-                                <>
-                                    <Link href={`/s/${c.shareLink}`} target="_blank" className="btn btn-ghost btn-sm">
-                                        View
+                {filteredComparisons.length > 0 ? (
+                    filteredComparisons.slice(0, visibleCount).map((c) => (
+                        <div key={c.id} className={styles.listItem}>
+                            <div className={styles.listIcon}>
+                                {c.scenarioCount >= 3 ? '💼' : '🏠'}
+                            </div>
+                            <div className={styles.listInfo}>
+                                <div className={styles.listTitleRow}>
+                                    <Link href={`/app/comparisons/${c.id}`} className={styles.listTitle}>
+                                        {c.title}
                                     </Link>
-                                    <button onClick={() => onCopyLink(c.shareLink)} className="btn btn-primary btn-sm">
-                                        Copy
-                                    </button>
-                                </>
-                            ) : (
-                                <span className={styles.noLink}>No link</span>
-                            )}
-                            <button onClick={() => onDelete(c.id)} className={styles.deleteBtn}>×</button>
+                                    {c.clientName && (
+                                        <span className={styles.clientBadge}>
+                                            {c.clientName}
+                                        </span>
+                                    )}
+                                </div>
+                                <p className={styles.listMeta}>
+                                    {c.scenarioCount || 0} scenarios • {formatDate(c.createdAt)}
+                                </p>
+                            </div>
+                            <div className={styles.listActions}>
+                                {c.shareLink ? (
+                                    <>
+                                        <Link href={`/s/${c.shareLink}`} target="_blank" className={styles.actionBtnGhost}>
+                                            View
+                                        </Link>
+                                        <button onClick={() => onCopyLink(c.shareLink)} className={styles.actionBtnPrimary}>
+                                            Copy
+                                        </button>
+                                    </>
+                                ) : (
+                                    <span className={styles.noLink}>No link</span>
+                                )}
+                                <button
+                                    onClick={() => onDelete(c.id)}
+                                    className={styles.deleteBtn}
+                                    title="Delete Comparison"
+                                >
+                                    ×
+                                </button>
+                            </div>
                         </div>
+                    ))
+                ) : (
+                    <div className={styles.emptySearch}>
+                        <p>No comparisons found matching "{searchTerm}"</p>
                     </div>
-                ))}
+                )}
+
+                {hasHiddenItems && (
+                    <button
+                        className={styles.loadMoreBtn}
+                        onClick={() => setVisibleCount(prev => prev + 10)}
+                    >
+                        Load More Comparisons
+                    </button>
+                )}
             </div>
         </div>
     );
@@ -348,7 +481,11 @@ function EmptyState() {
 
 // ===== STATS FOOTER =====
 function StatsFooter({ comparisonCount, entitlements }) {
-    const getQuota = (q) => !q ? '—' : q.quota === -1 ? '∞' : `${q.remaining}/${q.quota}`;
+    const getRemaining = (q) => {
+        if (!q) return 0;
+        if (q.quota === -1) return '∞';
+        return Math.max(0, q.remaining);
+    };
 
     return (
         <div className={styles.statsFooter}>
@@ -360,20 +497,20 @@ function StatsFooter({ comparisonCount, entitlements }) {
             <div className={styles.statDivider} />
             <div className={styles.stat}>
                 <LinkIcon className={styles.statIcon} />
-                <span className={styles.statValue}>{getQuota(entitlements?.quotas?.share)}</span>
-                <span className={styles.statLabel}>Share Links</span>
+                <span className={styles.statValue}>{entitlements?.quotas?.share?.used || 0}</span>
+                <span className={styles.statLabel}>Links Shared</span>
             </div>
             <div className={styles.statDivider} />
             <div className={styles.stat}>
                 <HouseIcon className={styles.statIcon} />
-                <span className={styles.statValue}>{getQuota(entitlements?.quotas?.property)}</span>
-                <span className={styles.statLabel}>Property Lookups</span>
+                <span className={styles.statValue}>{getRemaining(entitlements?.quotas?.property)}</span>
+                <span className={styles.statLabel}>Lookups Left</span>
             </div>
             <div className={styles.statDivider} />
             <div className={styles.stat}>
                 <RobotIcon className={styles.statIcon} />
-                <span className={styles.statValue}>{getQuota(entitlements?.quotas?.ai)}</span>
-                <span className={styles.statLabel}>AI Scripts</span>
+                <span className={styles.statValue}>{getRemaining(entitlements?.quotas?.ai)}</span>
+                <span className={styles.statLabel}>AI Credits Left</span>
             </div>
         </div>
     );

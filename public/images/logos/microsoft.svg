@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 80" preserveAspectRatio="xMidYMid meet">
+  <rect x="0" y="0" width="220" height="80" fill="transparent"/>
+  <g transform="translate(8,10)">
+    <rect x="0" y="0" width="28" height="28" fill="#F35325"/>
+    <rect x="34" y="0" width="28" height="28" fill="#81BC06"/>
+    <rect x="0" y="34" width="28" height="28" fill="#05A6F0"/>
+    <rect x="34" y="34" width="28" height="28" fill="#FFBA08"/>
+  </g>
+  <text x="140" y="44" font-family="Arial, Helvetica, sans-serif" font-weight="600" font-size="28" fill="#222" text-anchor="middle" dominant-baseline="middle">Microsoft</text>
+</svg>
+
+

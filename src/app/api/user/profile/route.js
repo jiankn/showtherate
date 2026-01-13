@@ -12,7 +12,7 @@ function cleanString(value, maxLen = 200) {
 async function getAuthUserRow(supabaseAdmin, userId) {
     const { data } = await supabaseAdmin
         .from('users')
-        .select('id, email, name, first_name, last_name, contact_email, nmls, phone, x_handle, facebook, tiktok, instagram')
+        .select('id, email, name, first_name, last_name, contact_email, nmls, phone, x_handle, facebook, tiktok, instagram, avatar_url')
         .eq('id', userId)
         .maybeSingle();
     return data || null;
@@ -42,6 +42,7 @@ export async function GET() {
                 facebook: userRow?.facebook ?? null,
                 tiktok: userRow?.tiktok ?? null,
                 instagram: userRow?.instagram ?? null,
+                avatarUrl: userRow?.avatar_url ?? null,
             },
         });
     } catch (error) {
@@ -86,7 +87,7 @@ export async function PUT(request) {
             .from('users')
             .update(fields)
             .eq('id', userId)
-            .select('id, email, name, first_name, last_name, contact_email, nmls, phone, x_handle, facebook, tiktok, instagram')
+            .select('id, email, name, first_name, last_name, contact_email, nmls, phone, x_handle, facebook, tiktok, instagram, avatar_url')
             .single();
 
         if (error || !data) {
@@ -141,6 +142,7 @@ export async function PUT(request) {
                 facebook: userRow?.facebook ?? null,
                 tiktok: userRow?.tiktok ?? null,
                 instagram: userRow?.instagram ?? null,
+                avatarUrl: userRow?.avatar_url ?? null,
             },
         });
     } catch (error) {

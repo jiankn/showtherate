@@ -82,11 +82,105 @@
     z-index: 1;
 }
 
+/* Billing Toggle Wrapper */
+.billingToggleWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-2xl);
+}
+
+@media (min-width: 768px) {
+    .billingToggleWrapper {
+        flex-direction: row;
+        justify-content: center;
+        gap: var(--space-lg);
+    }
+}
+
+/* Billing Toggle (Pill Style) */
+.billingToggle {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    padding: 4px;
+    width: fit-content;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.billingToggleBtn {
+    padding: 12px 28px;
+    border-radius: 999px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.billingToggleBtn:hover {
+    color: white;
+}
+
+.billingToggleActive {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.35);
+}
+
+/* Savings Tip */
+.savingsTip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.15) 100%);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: 999px;
+    color: #4ADE80;
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+    }
+}
+
 .pricingGrid {
     display: grid;
     gap: var(--space-lg);
     max-width: 1200px;
     margin: 0 auto;
+}
+
+/* Centered grid for Team & Annual (2 cards) */
+.pricingGridCentered {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-xl);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.pricingGridCentered .pricingCard {
+    flex: 0 1 380px;
+    max-width: 400px;
 }
 
 @media (min-width: 768px) {
@@ -97,8 +191,34 @@
 
 @media (min-width: 1024px) {
     .pricingGrid {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
     }
+}
+
+/* Enterprise Card */
+.enterprise {
+    background: linear-gradient(180deg, rgba(139, 92, 246, 0.12) 0%, var(--glass-bg) 100%) !important;
+    border: 2px solid rgba(139, 92, 246, 0.4) !important;
+    box-shadow: 0 0 40px rgba(139, 92, 246, 0.15);
+}
+
+.enterprise:hover {
+    border-color: rgba(139, 92, 246, 0.6) !important;
+    box-shadow: 0 0 60px rgba(139, 92, 246, 0.25);
+}
+
+.btnEnterprise {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+    transition: all 0.25s ease;
+}
+
+.btnEnterprise:hover {
+    box-shadow: 0 0 35px rgba(139, 92, 246, 0.5);
+    transform: translateY(-2px);
 }
 
 .pricingCard {

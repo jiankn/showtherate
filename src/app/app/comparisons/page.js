@@ -230,7 +230,21 @@ export default function ComparisonsPage() {
 
             if (res.ok && data.shareId) {
                 const shareUrl = `${window.location.origin}/s/${data.shareId}`;
-                await navigator.clipboard.writeText(shareUrl);
+
+                // Try clipboard API with fallback
+                try {
+                    await navigator.clipboard.writeText(shareUrl);
+                } catch {
+                    // Fallback: create a temporary textarea
+                    const textarea = document.createElement('textarea');
+                    textarea.value = shareUrl;
+                    textarea.style.position = 'fixed';
+                    textarea.style.left = '-9999px';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                }
 
                 setComparisons(prev => prev.map(c =>
                     c.id === comparisonId
@@ -401,10 +415,10 @@ export default function ComparisonsPage() {
 
                 <div className={styles.statusTabs}>
                     {[
-                    { value: 'All', label: 'All' },
-                    { value: 'Active', label: 'Shared' },
-                    { value: 'Draft', label: 'Drafts' },
-                ].map((status) => (
+                        { value: 'All', label: 'All' },
+                        { value: 'Active', label: 'Shared' },
+                        { value: 'Draft', label: 'Drafts' },
+                    ].map((status) => (
                         <button
                             key={status.value}
                             className={`${styles.statusTab} ${filter === status.value ? styles.active : ''}`}

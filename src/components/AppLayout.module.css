@@ -21,6 +21,7 @@
     flex: 1;
     padding: var(--space-xl);
     overflow-y: auto;
+    position: relative;
 }
 
 /* Responsive */

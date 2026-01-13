@@ -40,14 +40,11 @@ export async function GET(request) {
         const { supabaseAdmin } = await import('@/lib/supabase/server');
 
         // 连接IMAP
-        console.log('Connecting to IMAP server...');
         const connection = await connectImap();
 
         try {
             // 拉取新邮件
-            console.log('Fetching new emails...');
             const emails = await fetchNewEmails(connection);
-            console.log(`Found ${emails.length} new emails`);
 
             const results = {
                 total: emails.length,
@@ -65,7 +62,6 @@ export async function GET(request) {
                         // 标记为已读
                         await markAsRead(connection, email.uid);
                         results.processed++;
-                        console.log(`Processed email: ${email.subject}`);
                     } else {
                         results.failed++;
                         results.errors.push({

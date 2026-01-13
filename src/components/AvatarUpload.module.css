@@ -1,0 +1,311 @@
+/* ===================================
+   Avatar Upload Component
+   =================================== */
+
+.container {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+/* Avatar Circle */
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all var(--transition-base);
+    flex-shrink: 0;
+}
+
+.avatar:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.avatar.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.avatarImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatarInitials {
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Hover Overlay */
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.overlay svg {
+    width: 28px;
+    height: 28px;
+    color: white;
+}
+
+.avatar:hover .overlay {
+    opacity: 1;
+}
+
+/* Action Buttons */
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.changeBtn {
+    padding: var(--space-sm) var(--space-lg);
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.changeBtn:hover:not(:disabled) {
+    background: var(--color-bg);
+    border-color: var(--color-text-secondary);
+}
+
+.changeBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.deleteBtn {
+    padding: var(--space-xs) var(--space-md);
+    background: transparent;
+    border: none;
+    font-size: 0.8125rem;
+    color: var(--color-negative);
+    cursor: pointer;
+    transition: opacity var(--transition-fast);
+}
+
+.deleteBtn:hover:not(:disabled) {
+    opacity: 0.7;
+}
+
+.deleteBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Error Message */
+.error {
+    margin-top: var(--space-sm);
+    font-size: 0.8125rem;
+    color: var(--color-negative);
+}
+
+/* Hidden Input */
+.hiddenInput {
+    display: none;
+}
+
+/* Modal Backdrop */
+.modalBackdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-modal);
+    padding: var(--space-lg);
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Modal */
+.modal {
+    background: white;
+    border-radius: var(--radius-xl);
+    width: 100%;
+    max-width: 450px;
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-lg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.modalHeader h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.closeBtn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.closeBtn:hover {
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+
+/* Crop Container */
+.cropContainer {
+    padding: var(--space-lg);
+    display: flex;
+    justify-content: center;
+    background: var(--color-bg);
+    min-height: 300px;
+    max-height: 400px;
+    overflow: auto;
+}
+
+.cropImage {
+    max-width: 100%;
+    max-height: 350px;
+}
+
+/* Progress Bar */
+.progressContainer {
+    height: 4px;
+    background: var(--color-border);
+    margin: 0 var(--space-lg);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progressBar {
+    height: 100%;
+    background: var(--color-primary);
+    transition: width 0.3s ease;
+}
+
+/* Modal Actions */
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    border-top: 1px solid var(--color-border);
+}
+
+.cancelBtn {
+    padding: var(--space-sm) var(--space-lg);
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.cancelBtn:hover:not(:disabled) {
+    background: var(--color-bg);
+}
+
+.cancelBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.uploadBtn {
+    padding: var(--space-sm) var(--space-xl);
+    background: var(--color-primary);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.uploadBtn:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+}
+
+.uploadBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .actions {
+        align-items: center;
+    }
+
+    .modal {
+        max-width: 100%;
+        margin: var(--space-md);
+    }
+}

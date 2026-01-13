@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
+import TestimonialsCarousel from '../components/TestimonialsCarousel';
+import ScrollProgress from '../components/ScrollProgress';
 import {
   LogoIcon, RocketIcon, LightningIcon, LinkIcon, RobotIcon,
   ChartIcon, HouseIcon, PhoneIcon, MoneyIcon, CalculatorIcon, CheckIcon
@@ -217,6 +219,139 @@ function FeaturesSection() {
     </section>
   );
 }
+
+// ===== FREE TOOLS SECTION =====
+function FreeToolsSection() {
+  const tools = [
+    {
+      icon: '🧮',
+      title: '2-1 Buydown Calculator',
+      description: 'Calculate temporary rate reduction costs and monthly savings',
+      href: '/calculator/2-1-buydown-calculator',
+      hot: true,
+    },
+    {
+      icon: '📊',
+      title: 'Points Break-Even',
+      description: 'See how long until discount points pay for themselves',
+      href: '/calculator/discount-points-break-even',
+      hot: true,
+    },
+    {
+      icon: '💰',
+      title: 'Cash to Close',
+      description: 'Estimate total cash needed including down payment and closing costs',
+      href: '/calculator/cash-to-close-calculator',
+    },
+    {
+      icon: '⚖️',
+      title: 'Buydown vs Points',
+      description: 'Compare temporary buydown vs permanent rate reduction',
+      href: '/compare/temporary-buydown-vs-points',
+    },
+    {
+      icon: '🔒',
+      title: 'Lock vs Float',
+      description: 'Decide whether to lock your rate now or wait',
+      href: '/compare/lock-vs-float',
+    },
+    {
+      icon: '📋',
+      title: 'Closing Costs Worksheet',
+      description: 'Detailed breakdown of all closing costs',
+      href: '/calculator/closing-costs-worksheet',
+    },
+  ];
+
+  return (
+    <section className={styles.freeTools}>
+      <div className="container">
+        <div className="section-header">
+          <h2 className="section-title">Free Mortgage Calculators</h2>
+          <p className="section-subtitle">
+            Help your clients understand their options with these free tools
+          </p>
+        </div>
+
+        <div className={styles.toolsGrid}>
+          {tools.map((tool, index) => (
+            <a key={index} href={tool.href} className={styles.toolCard}>
+              <div className={styles.toolIcon}>{tool.icon}</div>
+              <div className={styles.toolContent}>
+                <h3 className={styles.toolTitle}>
+                  {tool.title}
+                  {tool.hot && <span className={styles.toolHot}>HOT</span>}
+                </h3>
+                <p className={styles.toolDescription}>{tool.description}</p>
+              </div>
+              <svg className={styles.toolArrow} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </a>
+          ))}
+        </div>
+
+        <div className={styles.toolsCta}>
+          <a href="/calculator" className="btn btn-secondary">
+            View All Calculators →
+          </a>
+        </div>
+
+        {/* Compare Section */}
+        <div className={styles.compareSection}>
+          <h3 className={styles.subSectionTitle}>Compare Your Options</h3>
+          <div className={styles.compareGrid}>
+            <a href="/compare/fha-vs-conventional" className={styles.compareCard}>
+              <span className={styles.compareIcon}>🏠</span>
+              <div className={styles.compareContent}>
+                <h4>FHA vs Conventional</h4>
+                <p>Compare down payment, MI, and requirements</p>
+              </div>
+            </a>
+            <a href="/compare/temporary-buydown-vs-points" className={styles.compareCard}>
+              <span className={styles.compareIcon}>⚖️</span>
+              <div className={styles.compareContent}>
+                <h4>Buydown vs Points</h4>
+                <p>Temporary savings vs permanent reduction</p>
+              </div>
+            </a>
+            <a href="/compare/15-year-vs-30-year" className={styles.compareCard}>
+              <span className={styles.compareIcon}>📅</span>
+              <div className={styles.compareContent}>
+                <h4>15 vs 30 Year</h4>
+                <p>Monthly payment vs total interest</p>
+              </div>
+            </a>
+            <a href="/compare/lock-vs-float" className={styles.compareCard}>
+              <span className={styles.compareIcon}>🔒</span>
+              <div className={styles.compareContent}>
+                <h4>Lock vs Float</h4>
+                <p>Lock now or wait for better rates?</p>
+              </div>
+            </a>
+          </div>
+          <div className={styles.toolsCta}>
+            <a href="/compare" className="btn">
+              View All Comparisons
+            </a>
+          </div>
+        </div>
+
+        {/* Blog Teaser */}
+        <div className={styles.blogTeaser}>
+          <h3 className={styles.subSectionTitle}>Latest Insights</h3>
+          <p className={styles.blogTeaserText}>
+            Scripts, tutorials, and strategies to help you close more deals.
+          </p>
+          <a href="/blog" className="btn btn-secondary">
+            Read News & Insight →
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 
 // ===== TRUST BADGES SECTION =====
 function TrustMockup({ className }) {
@@ -524,6 +659,7 @@ function PricingSection() {
   const { data: session, status } = useSession();
   const { toast } = useToast();
   const [loadingProduct, setLoadingProduct] = useState(null);
+  const [billingTab, setBillingTab] = useState('individual');
 
   const handleCheckout = async (productKey) => {
     // 如果用户未登录，跳转到登录页并携带 product 参数
@@ -559,6 +695,10 @@ function PricingSection() {
     window.location.href = '/login?mode=signup';
   };
 
+  const handleContactSales = () => {
+    window.location.href = 'mailto:enterprise@showtherate.com?subject=Enterprise%20Plan%20Inquiry';
+  };
+
   return (
     <section id="pricing" className={styles.pricing}>
       <div className="container">
@@ -569,111 +709,174 @@ function PricingSection() {
           </p>
         </div>
 
-        <div className={styles.pricingGrid}>
-          {/* Free Demo */}
-          <div className={styles.pricingCard}>
-            <h3 className={styles.pricingName}>Free Demo</h3>
-            <div className={styles.pricingPrice}>
-              <span className={`number-display ${styles.numberDisplay}`}>$0</span>
-            </div>
-            <p className={styles.pricingDescription}>Try before you buy</p>
-
-            <ul className={styles.pricingFeatures}>
-              <li>✓ Local calculations only</li>
-              <li>✓ See how it works</li>
-              <li className={styles.disabled}>✗ No share links</li>
-              <li className={styles.disabled}>✗ No AI features</li>
-              <li className={styles.disabled}>✗ No saving</li>
-            </ul>
-
+        {/* Billing Toggle */}
+        <div className={styles.billingToggleWrapper}>
+          <div className={styles.billingToggle}>
             <button
-              onClick={handleSignUp}
-              className={`btn btn-full ${styles.btnSecondary}`}
+              className={`${styles.billingToggleBtn} ${billingTab === 'individual' ? styles.billingToggleActive : ''}`}
+              onClick={() => setBillingTab('individual')}
             >
-              Try Demo
+              Individual
+            </button>
+            <button
+              className={`${styles.billingToggleBtn} ${billingTab === 'team' ? styles.billingToggleActive : ''}`}
+              onClick={() => setBillingTab('team')}
+            >
+              Team & Annual
             </button>
           </div>
+          <span className={styles.savingsTip}>
+            💰 Save 20% with annual
+          </span>
+        </div>
 
-          {/* Starter Pass */}
-          <div className={styles.pricingCard}>
-            <h3 className={styles.pricingName}>Starter Pass</h3>
-            <div className={styles.pricingPrice}>
-              <span className={`number-display ${styles.numberDisplay}`}>$9.9</span>
-              <span className={styles.pricingPeriod}> / 7 days</span>
+        {billingTab === 'individual' ? (
+          /* Individual Plans */
+          <div className={styles.pricingGrid}>
+            {/* Free Demo */}
+            <div className={styles.pricingCard}>
+              <h3 className={styles.pricingName}>Free Demo</h3>
+              <div className={styles.pricingPrice}>
+                <span className={`number-display ${styles.numberDisplay}`}>$0</span>
+              </div>
+              <p className={styles.pricingDescription}>Try before you buy</p>
+
+              <ul className={styles.pricingFeatures}>
+                <li>✓ Local calculations only</li>
+                <li>✓ See how it works</li>
+                <li className={styles.disabled}>✗ No share links</li>
+                <li className={styles.disabled}>✗ No AI features</li>
+                <li className={styles.disabled}>✗ No saving</li>
+              </ul>
+
+              <button
+                onClick={handleSignUp}
+                className={`btn btn-full ${styles.btnSecondary}`}
+              >
+                Try Demo
+              </button>
             </div>
-            <p className={styles.pricingDescription}>Perfect for trying the full experience</p>
 
-            <ul className={styles.pricingFeatures}>
-              <li>✓ 5 Share Links</li>
-              <li>✓ 10 Property Tax Lookups</li>
-              <li>✓ 30 AI Generations</li>
-              <li>✓ Full comparison features</li>
-              <li>✓ $9.9 credit on upgrade</li>
-            </ul>
+            {/* Starter Pass */}
+            <div className={styles.pricingCard}>
+              <h3 className={styles.pricingName}>Starter Pass</h3>
+              <div className={styles.pricingPrice}>
+                <span className={`number-display ${styles.numberDisplay}`}>$9.9</span>
+                <span className={styles.pricingPeriod}> / 7 days</span>
+              </div>
+              <p className={styles.pricingDescription}>Perfect for trying the full experience</p>
 
-            <button
-              onClick={() => handleCheckout('STARTER_PASS')}
-              disabled={loadingProduct === 'STARTER_PASS'}
-              className={`btn btn-full ${styles.btnSecondary}`}
-            >
-              {loadingProduct === 'STARTER_PASS' ? 'Processing...' : 'Get Starter Pass'}
-            </button>
+              <ul className={styles.pricingFeatures}>
+                <li>✓ 5 Share Links</li>
+                <li>✓ 10 Property Tax Lookups</li>
+                <li>✓ 30 AI Generations</li>
+                <li>✓ Full comparison features</li>
+                <li>✓ $9.9 credit on upgrade</li>
+              </ul>
+
+              <button
+                onClick={() => handleCheckout('STARTER_PASS')}
+                disabled={loadingProduct === 'STARTER_PASS'}
+                className={`btn btn-full ${styles.btnSecondary}`}
+              >
+                {loadingProduct === 'STARTER_PASS' ? 'Processing...' : 'Get Starter Pass'}
+              </button>
+            </div>
+
+            {/* Pro Monthly */}
+            <div className={`${styles.pricingCard} ${styles.pricingCardFeatured}`}>
+              <div className={styles.pricingBadge}>
+                <span className={styles.badge}>✨ Most Popular</span>
+              </div>
+              <h3 className={styles.pricingName}>Pro Monthly</h3>
+              <div className={styles.pricingPrice}>
+                <span className={`number-display ${styles.numberDisplay}`}>$99</span>
+                <span className={styles.pricingPeriod}> / month</span>
+              </div>
+              <p className={styles.pricingDescription}>For serious loan officers</p>
+
+              <ul className={styles.pricingFeatures}>
+                <li>✓ Unlimited Share Links</li>
+                <li>✓ 150 Property Lookups/mo</li>
+                <li>✓ 300 AI Generations/mo</li>
+                <li>✓ Priority support</li>
+                <li>✓ PWA for mobile</li>
+              </ul>
+
+              <button
+                onClick={() => handleCheckout('MONTHLY')}
+                disabled={loadingProduct === 'MONTHLY'}
+                className={`btn btn-primary btn-full ${styles.btnPrimary}`}
+              >
+                {loadingProduct === 'MONTHLY' ? 'Processing...' : 'Subscribe'}
+              </button>
+            </div>
           </div>
+        ) : (
+          /* Team & Annual Plans */
+          <div className={`${styles.pricingGrid} ${styles.pricingGridCentered}`}>
+            {/* Annual Pro */}
+            <div className={`${styles.pricingCard} ${styles.pricingCardFeatured}`}>
+              <div className={styles.pricingBadge}>
+                <span className={styles.badge}>💰 Best Value</span>
+              </div>
+              <h3 className={styles.pricingName}>Annual Pro</h3>
+              <div className={styles.pricingPrice}>
+                <span className={`number-display ${styles.numberDisplay}`}>$950</span>
+                <span className={styles.pricingPeriod}> / year</span>
+              </div>
+              <p className={styles.pricingDescription}>Save $238 vs monthly</p>
 
-          {/* Subscription */}
-          <div className={`${styles.pricingCard} ${styles.pricingCardFeatured}`}>
-            <div className={styles.pricingBadge}>
-              <span className={styles.badge}>✨ Most Popular</span>
+              <ul className={styles.pricingFeatures}>
+                <li><span className={styles.checkIcon}>✓</span> <strong>Save $238/year</strong></li>
+                <li><span className={styles.checkIcon}>✓</span> Unlimited Share Links</li>
+                <li><span className={styles.checkIcon}>✓</span> 200 Property Lookups/mo</li>
+                <li><span className={styles.checkIcon}>✓</span> 350 AI Generations/mo</li>
+                <li><span className={styles.checkIcon}>✓</span> Priority support</li>
+              </ul>
+
+              <button
+                onClick={() => handleCheckout('YEARLY')}
+                disabled={loadingProduct === 'YEARLY'}
+                className={`btn btn-primary btn-full ${styles.btnPrimary}`}
+              >
+                {loadingProduct === 'YEARLY' ? 'Processing...' : 'Subscribe Yearly'}
+              </button>
             </div>
-            <h3 className={styles.pricingName}>Pro Subscription</h3>
-            <div className={styles.pricingPrice}>
-              <span className={`number-display ${styles.numberDisplay}`}>$59</span>
-              <span className={styles.pricingPeriod}> / month</span>
+
+            {/* Enterprise */}
+            <div className={`${styles.pricingCard} ${styles.pricingCardEnterprise}`}>
+              <div className={styles.pricingBadge}>
+                <span className={styles.badge}>🏢 Teams</span>
+              </div>
+              <h3 className={styles.pricingName}>Enterprise</h3>
+              <div className={styles.pricingPrice}>
+                <span className={`number-display ${styles.numberDisplay}`}>Custom</span>
+              </div>
+              <p className={styles.pricingDescription}>For teams & brokerages</p>
+
+              <ul className={styles.pricingFeatures}>
+                <li><span className={styles.checkIcon}>✓</span> <strong>Unlimited</strong> users</li>
+                <li><span className={styles.checkIcon}>✓</span> Team management dashboard</li>
+                <li><span className={styles.checkIcon}>✓</span> White-label branding</li>
+                <li><span className={styles.checkIcon}>✓</span> Custom integrations (CRM, LOS)</li>
+                <li><span className={styles.checkIcon}>✓</span> Dedicated account manager</li>
+                <li><span className={styles.checkIcon}>✓</span> Priority support & SLA</li>
+              </ul>
+
+              <button
+                onClick={handleContactSales}
+                className={`btn btn-full ${styles.btnEnterprise}`}
+              >
+                Contact Sales
+              </button>
             </div>
-            <p className={styles.pricingDescription}>For serious loan officers</p>
-
-            <ul className={styles.pricingFeatures}>
-              <li>✓ Unlimited Share Links</li>
-              <li>✓ 150 Property Lookups/mo</li>
-              <li>✓ 300 AI Generations/mo</li>
-              <li>✓ Priority support</li>
-              <li>✓ PWA for mobile</li>
-            </ul>
-
-            <button
-              onClick={() => handleCheckout('MONTHLY')}
-              disabled={loadingProduct === 'MONTHLY'}
-              className={`btn btn-primary btn-full ${styles.btnPrimary}`}
-            >
-              {loadingProduct === 'MONTHLY' ? 'Processing...' : 'Subscribe'}
-            </button>
           </div>
+        )}
 
-          {/* Annual Subscription */}
-          <div className={`${styles.pricingCard} ${styles.pricingCardBestValue}`}>
-            <h3 className={styles.pricingName}>Annual Pro</h3>
-            <div className={styles.pricingPrice}>
-              <span className={`number-display ${styles.numberDisplay}`}>$588</span>
-              <span className={styles.pricingPeriod}> / year</span>
-            </div>
-            <p className={styles.pricingDescription}>Best value for long term</p>
-
-            <ul className={styles.pricingFeatures}>
-              <li><span className={styles.checkIcon}>✓</span> <strong>Save $120/year</strong></li>
-              <li><span className={styles.checkIcon}>✓</span> Unlimited Share Links</li>
-              <li><span className={styles.checkIcon}>✓</span> 150 Property Lookups/mo</li>
-              <li><span className={styles.checkIcon}>✓</span> 300 AI Generations/mo</li>
-              <li><span className={styles.checkIcon}>✓</span> Priority support</li>
-            </ul>
-
-            <button
-              onClick={() => handleCheckout('YEARLY')}
-              disabled={loadingProduct === 'YEARLY'}
-              className={`btn btn-full ${styles.btnSecondary}`}
-            >
-              {loadingProduct === 'YEARLY' ? 'Processing...' : 'Subscribe Yearly'}
-            </button>
-          </div>
+        {/* Link to full pricing page */}
+        <div className={styles.pricingPageLink}>
+          <a href="/pricing">View Full Pricing & FAQ →</a>
         </div>
       </div>
     </section>
@@ -681,6 +884,64 @@ function PricingSection() {
 }
 
 // ===== TESTIMONIALS SECTION =====
+// Trusted Partners Logo Wall Component
+function TrustedPartners() {
+  // Use local PNG logos (Google Favicon) for faster loading
+  const partners = [
+    // Major Banks
+    { name: 'Wells Fargo', src: '/images/logos/wellsfargo.png' },
+    { name: 'Chase', src: '/images/logos/chase.png' },
+    { name: 'Bank of America', src: '/images/logos/bankofamerica.png' },
+    { name: 'Citibank', src: '/images/logos/citi.png' },
+    // Mortgage Companies
+    { name: 'Rocket Mortgage', src: '/images/logos/rocketmortgage.png' },
+    { name: 'United Wholesale Mortgage', src: '/images/logos/uwm.png' },
+    { name: 'loanDepot', src: '/images/logos/loandepot.png' },
+    { name: 'Fairway Independent', src: '/images/logos/fairway.svg' },
+    { name: 'Guild Mortgage', src: '/images/logos/guildmortgage.png' },
+    { name: 'CrossCountry Mortgage', src: '/images/logos/crosscountry.png' },
+    // Other Financial
+    { name: 'Movement Mortgage', src: '/images/logos/movement.png' },
+    { name: 'PrimeLending', src: '/images/logos/primelending.png' },
+    { name: 'Caliber Home Loans', src: '/images/logos/caliber.png' },
+    { name: 'Fannie Mae', src: '/images/logos/fanniemae.png' },
+    { name: 'Freddie Mac', src: '/images/logos/freddiemac.png' },
+    // Tech/Real Estate
+    { name: 'Zillow', src: '/images/logos/zillow.png' },
+    { name: 'Redfin', src: '/images/logos/redfin.png' },
+    { name: 'Keller Williams', src: '/images/logos/kellerwilliams.png' },
+    { name: 'RE/MAX', src: '/images/logos/remax.png' },
+    { name: 'Compass', src: '/images/logos/compass.png' },
+    { name: 'Coldwell Banker', src: '/images/logos/coldwellbanker.png' },
+    { name: 'Century 21', src: '/images/logos/century21.png' },
+    // More Mortgage
+    { name: 'Guaranteed Rate', src: '/images/logos/guaranteedrate.png' },
+    { name: 'Mr. Cooper', src: '/images/logos/mrcooper.png' }
+  ];
+
+  return (
+    <div className={styles.trustedPartners}>
+      <p className={styles.trustedLabel}>Our users work at</p>
+      <div className={styles.logoWall}>
+        <div className={styles.logoGrid}>
+          {partners.map((partner, index) => (
+            <div key={index} className={styles.partnerLogo} role="img" aria-label={partner.name}>
+              <img
+                src={partner.src}
+                alt={partner.name}
+                loading="lazy"
+                width="140"
+                height="40"
+                style={{ maxWidth: '120px', height: 'auto' }}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function TestimonialsSection() {
   const testimonials = [
     {
@@ -700,38 +961,50 @@ function TestimonialsSection() {
       author: "Jennifer L.",
       role: "Senior LO, FL",
       avatar: "https://randomuser.me/api/portraits/women/68.jpg"
+    },
+    {
+      quote: "Finally, a tool that makes mortgage comparisons visual and easy. My clients love the side-by-side view.",
+      author: "David K.",
+      role: "Mortgage Consultant, AZ",
+      avatar: "https://randomuser.me/api/portraits/men/67.jpg"
+    },
+    {
+      quote: "The property data integration saves me so much time. No more manual research for comps.",
+      author: "Lisa T.",
+      role: "Real Estate Agent, WA",
+      avatar: "https://randomuser.me/api/portraits/women/29.jpg"
+    },
+    {
+      quote: "Shareable links are a game-changer. Clients can review options anytime, anywhere.",
+      author: "Robert S.",
+      role: "Branch Manager, NV",
+      avatar: "https://randomuser.me/api/portraits/men/45.jpg"
+    },
+    {
+      quote: "Perfect for virtual closings. The digital experience is seamless and professional.",
+      author: "Maria G.",
+      role: "Digital LO, CO",
+      avatar: "https://randomuser.me/api/portraits/women/52.jpg"
+    },
+    {
+      quote: "The 60-second promise is real. I've increased my conversion rate by 40% since using this.",
+      author: "James P.",
+      role: "Senior Mortgage Advisor, GA",
+      avatar: "https://randomuser.me/api/portraits/men/81.jpg"
     }
   ];
 
   return (
     <section className={styles.testimonials}>
       <div className="container">
+        <TrustedPartners />
+
         <div className="section-header">
           <h2 className="section-title">Loved by Loan Officers</h2>
           <p className="section-subtitle">Join hundreds of LOs closing more deals</p>
         </div>
 
-        <div className={styles.testimonialsGrid}>
-          {testimonials.map((testimonial, index) => (
-            <div key={index} className={styles.testimonialCard}>
-              <p className={styles.testimonialQuote}>&ldquo;{testimonial.quote}&rdquo;</p>
-              <div className={styles.testimonialAuthor}>
-                <div className={styles.testimonialAvatar}>
-                  <Image
-                    src={testimonial.avatar}
-                    alt={testimonial.author}
-                    width={56}
-                    height={56}
-                  />
-                </div>
-                <div>
-                  <div className={styles.testimonialName}>{testimonial.author}</div>
-                  <div className={styles.testimonialRole}>{testimonial.role}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <TestimonialsCarousel items={testimonials} speedPxPerSec={40} />
       </div>
     </section>
   );
@@ -793,6 +1066,7 @@ export default function HomePage() {
       <main>
         <HeroSection />
         <FeaturesSection />
+        <FreeToolsSection />
         <TrustBadges />
         <DemoSection />
         <PricingSection />
@@ -800,6 +1074,7 @@ export default function HomePage() {
         <FAQ />
         <CTASection />
       </main>
+      <ScrollProgress />
       <Footer />
     </>
   );

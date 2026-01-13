@@ -3,11 +3,13 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSession, signOut } from 'next-auth/react';
+import { signOut } from 'next-auth/react';
+import { useUser } from './UserContext';
+import { HomeIcon, SettingsIcon, DiamondIcon, LogoutIcon } from './Icons';
 import styles from './TopBar.module.css';
 
 export default function TopBar({ onMobileMenuClick }) {
-    const { data: session } = useSession();
+    const { entitlements, subscriptionDetails, loading: loadingEntitlements, session } = useUser();
     const [showUserMenu, setShowUserMenu] = useState(false);
 
     const menuRef = useRef(null);
@@ -16,6 +18,40 @@ export default function TopBar({ onMobileMenuClick }) {
     const userEmail = session?.user?.email || '';
     const userImage = session?.user?.image || null;
     const userInitial = userName.charAt(0).toUpperCase();
+
+
+    // 根据订阅状态决定菜单项配置
+    const getUpgradeMenuItem = () => {
+        if (loadingEntitlements) {
+            return { href: '/app/upgrade', text: 'Upgrade Plan' };
+        }
+
+        if (!entitlements || !entitlements.hasActiveEntitlement) {
+            return { href: '/app/upgrade', text: 'Upgrade Plan' };
+        }
+
+        const { type } = entitlements;
+
+        if (type === 'starter_pass_7d') {
+            return { href: '/app/upgrade', text: 'Upgrade to Pro' };
+        }
+
+        if (type === 'subscription') {
+            // 所有订阅用户统一跳转到 upgrade 页面
+            // 月付用户可以升级年付，年付用户可以管理订阅
+            const billingCycle = subscriptionDetails?.billingCycle;
+            if (billingCycle === 'monthly') {
+                return { href: '/app/upgrade', text: 'Switch to Annual' };
+            }
+            // 年付用户也跳转到 upgrade 页面，显示 Manage Subscription
+            return { href: '/app/upgrade', text: 'Manage Subscription' };
+        }
+
+        return { href: '/app/upgrade', text: 'Upgrade Plan' };
+    };
+
+    const upgradeMenuItem = getUpgradeMenuItem();
+
 
     // Close menu on outside click
     useEffect(() => {
@@ -69,20 +105,24 @@ export default function TopBar({ onMobileMenuClick }) {
                             </div>
                             <div className={styles.dropdownDivider} />
                             <Link href="/" className={styles.dropdownItem}>
-                                🏠 Home
+                                <HomeIcon className={styles.dropdownIcon} />
+                                Home
                             </Link>
                             <Link href="/app/settings" className={styles.dropdownItem}>
-                                ⚙️ Settings
+                                <SettingsIcon className={styles.dropdownIcon} />
+                                Settings
                             </Link>
-                            <Link href="/app/upgrade" className={styles.dropdownItem}>
-                                💎 Upgrade Plan
+                            <Link href={upgradeMenuItem.href} className={styles.dropdownItem}>
+                                <DiamondIcon className={styles.dropdownIcon} />
+                                {upgradeMenuItem.text}
                             </Link>
                             <div className={styles.dropdownDivider} />
                             <button
                                 className={styles.dropdownItem}
                                 onClick={() => signOut({ callbackUrl: '/' })}
                             >
-                                🚪 Sign Out
+                                <LogoutIcon className={styles.dropdownIcon} />
+                                Sign Out
                             </button>
                         </div>
                     )}

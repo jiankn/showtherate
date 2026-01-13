@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useUser } from './UserContext';
 import {
     LogoIcon,
     ChartIcon,
@@ -11,7 +11,8 @@ import {
     RobotIcon,
     LinkIcon,
     RocketIcon,
-    EmailIcon
+    EmailIcon,
+    StarIcon
 } from './Icons';
 import styles from './Sidebar.module.css';
 
@@ -21,13 +22,13 @@ const navItems = [
     { href: '/app', icon: ChartIcon, label: 'Dashboard', exact: true },
     { href: '/app/comparisons', icon: LinkIcon, label: 'Comparisons' },
     { href: '/app/clients', icon: HouseIcon, label: 'Clients' },
-    { href: '/app/analytics', icon: RobotIcon, label: 'Engagement' },
+    { href: '/app/analytics', icon: RobotIcon, label: 'Analytics' },
     { href: '/app/tickets', icon: EmailIcon, label: 'Support' },
 ];
 
 export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }) {
     const pathname = usePathname();
-    const { data: session } = useSession();
+    const { entitlements, loading: loadingEntitlements, session, refreshUserData } = useUser();
     const [unreadCount, setUnreadCount] = useState(0);
 
     const isActive = (href, exact) => {
@@ -35,16 +36,15 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose
         return pathname.startsWith(href);
     };
 
+
     // 获取未读工单数量
     const fetchUnreadCount = async () => {
         if (!session?.user) return;
 
         try {
-            console.log('Fetching unread count...');
             const res = await fetch('/api/tickets/unread-count');
             if (res.ok) {
                 const data = await res.json();
-                console.log('Unread count:', data.count);
                 setUnreadCount(data.count || 0);
             }
         } catch (error) {
@@ -60,9 +60,7 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose
 
         // 监听工单状态更新消息
         const handleMessage = (event) => {
-            console.log('Sidebar received message:', event.data);
             if (event.data && event.data.type === 'TICKET_STATUS_UPDATED') {
-                console.log('Refreshing unread count...');
                 fetchUnreadCount();
             }
         };
@@ -70,30 +68,53 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose
         // 监听localStorage变化（跨标签页通信）
         const handleStorageChange = (event) => {
             if (event.key === 'ticketStatusUpdate') {
-                console.log('Storage change detected, refreshing unread count...');
                 fetchUnreadCount();
                 // 清理localStorage
                 localStorage.removeItem('ticketStatusUpdate');
+            }
+            // 监听订阅状态更新
+            if (event.key === 'entitlementsUpdate') {
+                refreshUserData();
+                localStorage.removeItem('entitlementsUpdate');
             }
         };
 
         // 监听自定义事件（同页面通信）
         const handleTicketUpdate = () => {
-            console.log('Custom event detected, refreshing unread count...');
             fetchUnreadCount();
+        };
+
+        // 监听订阅状态更新事件
+        const handleEntitlementsUpdate = () => {
+            refreshUserData();
         };
 
         window.addEventListener('message', handleMessage);
         window.addEventListener('storage', handleStorageChange);
         window.addEventListener('ticketStatusUpdated', handleTicketUpdate);
+        window.addEventListener('entitlementsUpdated', handleEntitlementsUpdate);
 
         return () => {
             clearInterval(interval);
             window.removeEventListener('message', handleMessage);
             window.removeEventListener('storage', handleStorageChange);
             window.removeEventListener('ticketStatusUpdated', handleTicketUpdate);
+            window.removeEventListener('entitlementsUpdated', handleEntitlementsUpdate);
         };
-    }, [session?.user]);
+    }, [session?.user, refreshUserData]);
+
+    // 获取套餐名称
+    const getPlanName = () => {
+        if (entitlements?.type === 'subscription') return 'Pro Plan';
+        if (entitlements?.type === 'starter_pass_7d') return 'Starter Pass';
+        return 'Free Plan';
+    };
+
+    // 判断是否显示升级按钮
+    const showUpgradeButton = entitlements?.type !== 'subscription';
+
+    // 判断是否为付费用户
+    const isPaidUser = entitlements?.type === 'subscription' || entitlements?.type === 'starter_pass_7d';
 
     const userName = session?.user?.name || session?.user?.email?.split('@')[0] || 'User';
     const userInitial = userName.charAt(0).toUpperCase();
@@ -141,6 +162,22 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose
                             )}
                         </Link>
                     ))}
+
+                    {/* Upgrade Navigation Item - 仅对非 Pro 用户显示 */}
+                    {showUpgradeButton && (
+                        <Link
+                            href="/app/upgrade"
+                            className={`${styles.navItem} ${styles.upgradeNavItem} ${isActive('/app/upgrade') ? styles.active : ''}`}
+                            title={collapsed ? 'Upgrade to Pro' : undefined}
+                            onClick={onMobileClose}
+                        >
+                            <RocketIcon className={styles.navIcon} />
+                            <span>{(!collapsed || mobileOpen) ? 'Upgrade' : ''}</span>
+                            {(!collapsed || mobileOpen) && (
+                                <span className={styles.upgradeLabel}>PRO</span>
+                            )}
+                        </Link>
+                    )}
                 </nav>
 
                 {/* Spacer */}
@@ -159,11 +196,31 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose
                     </Link>
 
                     {/* Plan Badge */}
-                    {(!collapsed || mobileOpen) && (
-                        <Link href="/app/upgrade" className={styles.planBadge}>
-                            <RocketIcon className={styles.planIcon} />
+                    {(!collapsed || mobileOpen) && showUpgradeButton && (
+                        <Link
+                            href="/app/upgrade"
+                            className={`${styles.planBadge} ${isPaidUser ? styles.planBadgePro : ''}`}
+                        >
+                            {isPaidUser ? (
+                                <StarIcon className={styles.planIcon} />
+                            ) : (
+                                <RocketIcon className={styles.planIcon} />
+                            )}
                             <div className={styles.planInfo}>
-                                <span className={styles.planName}>Free Plan</span>
+                                <span className={styles.planName}>
+                                    {getPlanName()}
+                                    {/* Starter Pass: 显示剩余天数 */}
+                                    {entitlements?.type === 'starter_pass_7d' && entitlements?.expiresAt && (
+                                        <span className={styles.daysLeft}>
+                                            {(() => {
+                                                const daysLeft = Math.ceil((new Date(entitlements.expiresAt) - new Date()) / (1000 * 60 * 60 * 24));
+                                                if (daysLeft <= 0) return ' · Expired';
+                                                if (daysLeft === 1) return ' · 1d left';
+                                                return ` · ${daysLeft}d left`;
+                                            })()}
+                                        </span>
+                                    )}
+                                </span>
                                 <span className={styles.planCta}>Upgrade →</span>
                             </div>
                         </Link>

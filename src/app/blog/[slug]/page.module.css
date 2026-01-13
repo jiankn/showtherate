@@ -1,67 +1,292 @@
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 3rem 1.5rem;
-    padding-top: calc(80px + 3rem);
+.article {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #0a0a1a 0%, #0f0f2a 100%);
 }
 
-.coverImageContainer {
-    margin: -3rem -1.5rem 2rem -1.5rem;
-    max-height: 500px;
+/* Hero Section */
+.hero {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    display: flex;
+    align-items: flex-end;
     overflow: hidden;
-    background-color: #f3f4f6;
 }
 
-.coverImage {
+.heroImage {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
 }
 
-.header {
-    margin-bottom: 2.5rem;
+.heroOverlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top,
+            rgba(10, 10, 26, 1) 0%,
+            rgba(10, 10, 26, 0.85) 30%,
+            rgba(10, 10, 26, 0.4) 60%,
+            rgba(10, 10, 26, 0.2) 100%);
 }
 
-.meta {
+.heroContent {
+    position: relative;
+    z-index: 1;
+    padding: 40px 24px;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.heroMeta {
     display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    font-size: 0.95rem;
-    color: #6b7280;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
 }
 
-.tag {
-    background: #f3f4f6;
-    color: #4b5563;
-    padding: 2px 8px;
+.heroTag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    background: rgba(99, 102, 241, 0.25);
+    color: #a5b4fc;
     border-radius: 4px;
-    font-size: 0.85rem;
-    font-weight: 500;
 }
 
-.title {
-    font-size: 2.25rem;
-    font-weight: 800;
-    line-height: 1.25;
-    color: var(--text-primary, #111827);
-    letter-spacing: -0.025em;
+.heroTitle {
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+    margin-bottom: 12px;
 }
 
+.heroDate {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Content Wrapper */
+.contentWrapper {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+}
+
+/* Content Styles */
 .content {
-    margin-top: 2rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.05rem;
+    line-height: 1.8;
 }
 
-@media (min-width: 848px) {
-    .coverImageContainer {
-        margin: 0 0 3rem 0;
-        border-radius: 12px;
+.content h1,
+.content h2,
+.content h3,
+.content h4 {
+    color: white;
+    font-weight: 600;
+    margin-top: 2em;
+    margin-bottom: 0.75em;
+}
+
+.content h1 {
+    font-size: 2rem;
+}
+
+.content h2 {
+    font-size: 1.5rem;
+}
+
+.content h3 {
+    font-size: 1.25rem;
+}
+
+.content p {
+    margin-bottom: 1.5em;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.content strong {
+    color: white;
+    font-weight: 600;
+}
+
+.content a {
+    color: #818cf8;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(129, 140, 248, 0.3);
+    transition: all 0.2s ease;
+}
+
+.content a:hover {
+    color: #a5b4fc;
+    border-bottom-color: #a5b4fc;
+}
+
+.content ul,
+.content ol {
+    margin-bottom: 1.5em;
+    padding-left: 1.5em;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.content li {
+    margin-bottom: 0.5em;
+}
+
+.content table {
+    width: 100%;
+    margin: 1.5em 0;
+    border-collapse: collapse;
+}
+
+.content th,
+.content td {
+    padding: 12px 16px;
+    text-align: left;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.content th {
+    background: rgba(99, 102, 241, 0.15);
+    color: white;
+    font-weight: 600;
+}
+
+.content td {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.content blockquote {
+    margin: 1.5em 0;
+    padding: 16px 24px;
+    background: rgba(99, 102, 241, 0.1);
+    border-left: 4px solid #6366f1;
+    border-radius: 0 8px 8px 0;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.content code {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: #f472b6;
+}
+
+.content pre {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1.5em 0;
+}
+
+.content pre code {
+    background: none;
+    padding: 0;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Article CTA */
+.articleCta {
+    margin-top: 48px;
+    padding: 32px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    border-radius: 16px;
+    text-align: center;
+}
+
+.articleCta p {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 16px;
+}
+
+/* Related Section */
+.relatedSection {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+}
+
+.relatedTitle {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.relatedGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+@media (min-width: 640px) {
+    .relatedGrid {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
-@media (min-width: 768px) {
-    .title {
-        font-size: 3rem;
-    }
+.relatedCard {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.relatedCard:hover {
+    transform: translateY(-4px);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+.relatedImage {
+    width: 100%;
+    height: 120px;
+    overflow: hidden;
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.relatedImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.relatedCard:hover .relatedImage img {
+    transform: scale(1.05);
+}
+
+.relatedContent {
+    padding: 16px;
+}
+
+.relatedDate {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    display: block;
+    margin-bottom: 6px;
+}
+
+.relatedCardTitle {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: white;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }

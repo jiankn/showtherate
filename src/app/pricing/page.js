@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { LogoIcon } from '../../components/Icons';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 import { useToast } from '../../components/GlobalToast';
 import styles from './page.module.css';
 
@@ -11,6 +12,7 @@ export default function PricingPage() {
     const { data: session, status } = useSession();
     const { toast } = useToast();
     const [loadingProduct, setLoadingProduct] = useState(null);
+    const [billingTab, setBillingTab] = useState('individual');
 
     const handleCheckout = async (productKey) => {
         // 如果用户未登录，跳转到登录页并携带 product 参数
@@ -45,23 +47,15 @@ export default function PricingPage() {
     const handleSignUp = () => {
         window.location.href = '/login?mode=signup';
     };
+
+    const handleContactSales = () => {
+        window.location.href = 'mailto:enterprise@showtherate.com?subject=Enterprise%20Plan%20Inquiry';
+    };
+
     return (
         <div className={styles.page}>
             {/* Header */}
-            <header className={styles.header}>
-                <div className="container">
-                    <nav className={styles.nav}>
-                        <Link href="/" className={styles.logo}>
-                            <LogoIcon className={styles.logoIconSvg} />
-                            <span>ShowTheRate</span>
-                        </Link>
-                        <div className={styles.navActions}>
-                            <Link href="/app" className="btn btn-ghost btn-sm">Sign In</Link>
-                            <Link href="/app/new" className="btn btn-primary btn-sm">Get Started</Link>
-                        </div>
-                    </nav>
-                </div>
-            </header>
+            <Header variant="dark" />
 
             {/* Hero */}
             <section className={styles.hero}>
@@ -74,114 +68,162 @@ export default function PricingPage() {
             {/* Pricing Cards */}
             <section className={styles.pricingSection}>
                 <div className="container">
-                    <div className={styles.pricingGrid}>
-                        {/* Free Demo */}
-                        <div className={`card ${styles.pricingCard}`}>
-                            <h3>Free Demo</h3>
-                            <div className={styles.price}>
-                                <span className="number-display">$0</span>
-                            </div>
-                            <p className={styles.priceDesc}>Try before you buy</p>
-
-                            <ul className={styles.features}>
-                                <li>✓ Local calculations</li>
-                                <li>✓ See how it works</li>
-                                <li className={styles.disabled}>✗ Share links</li>
-                                <li className={styles.disabled}>✗ AI features</li>
-                                <li className={styles.disabled}>✗ Save comparisons</li>
-                                <li className={styles.disabled}>✗ Property tax lookup</li>
-                            </ul>
-
+                    {/* Billing Toggle */}
+                    <div className={styles.billingToggleWrapper}>
+                        <div className={styles.billingToggle}>
                             <button
-                                onClick={handleSignUp}
-                                className="btn btn-secondary btn-full"
+                                className={`${styles.billingToggleBtn} ${billingTab === 'individual' ? styles.billingToggleActive : ''}`}
+                                onClick={() => setBillingTab('individual')}
                             >
-                                Try Demo
+                                Individual
+                            </button>
+                            <button
+                                className={`${styles.billingToggleBtn} ${billingTab === 'team' ? styles.billingToggleActive : ''}`}
+                                onClick={() => setBillingTab('team')}
+                            >
+                                Team & Annual
                             </button>
                         </div>
-
-                        {/* Starter Pass */}
-                        <div className={`card ${styles.pricingCard}`}>
-                            <h3>Starter Pass</h3>
-                            <div className={styles.price}>
-                                <span className="number-display">$9.9</span>
-                                <span className={styles.period}>/ 7 days</span>
-                            </div>
-                            <p className={styles.priceDesc}>Perfect for trying the full experience</p>
-
-                            <ul className={styles.features}>
-                                <li>✓ <strong>5</strong> Share Links</li>
-                                <li>✓ <strong>10</strong> Property Tax Lookups</li>
-                                <li>✓ <strong>30</strong> AI Generations</li>
-                                <li>✓ Full comparison features</li>
-                                <li>✓ Save unlimited comparisons</li>
-                                <li>✓ <strong>$9.9 credit</strong> on upgrade</li>
-                            </ul>
-
-                            <button
-                                onClick={() => handleCheckout('STARTER_PASS')}
-                                disabled={loadingProduct === 'STARTER_PASS'}
-                                className="btn btn-secondary btn-full"
-                            >
-                                {loadingProduct === 'STARTER_PASS' ? 'Processing...' : 'Get Starter Pass'}
-                            </button>
-                        </div>
-
-                        {/* Pro Subscription */}
-                        <div className={`card ${styles.pricingCard} ${styles.featured}`}>
-                            <div className={styles.badge}>✨ Most Popular</div>
-                            <h3>Pro Subscription</h3>
-                            <div className={styles.price}>
-                                <span className="number-display">$59</span>
-                                <span className={styles.period}>/ month</span>
-                            </div>
-                            <p className={styles.priceDesc}>For serious loan officers</p>
-
-                            <ul className={styles.features}>
-                                <li>✓ <strong>Unlimited</strong> Share Links</li>
-                                <li>✓ <strong>150</strong> Property Lookups/mo</li>
-                                <li>✓ <strong>300</strong> AI Generations/mo</li>
-                                <li>✓ Priority support</li>
-                                <li>✓ PWA for mobile</li>
-                                <li>✓ Analytics (coming soon)</li>
-                            </ul>
-
-                            <button
-                                onClick={() => handleCheckout('MONTHLY')}
-                                disabled={loadingProduct === 'MONTHLY'}
-                                className="btn btn-primary btn-full"
-                            >
-                                {loadingProduct === 'MONTHLY' ? 'Processing...' : 'Subscribe'}
-                            </button>
-                        </div>
-
-                        {/* Annual Subscription */}
-                        <div className={`card ${styles.pricingCard} ${styles.pricingCardBestValue}`}>
-                            <h3>Annual Pro</h3>
-                            <div className={styles.price}>
-                                <span className="number-display">$588</span>
-                                <span className={styles.period}>/ year</span>
-                            </div>
-                            <p className={styles.priceDesc}>Best value for long term</p>
-
-                            <ul className={styles.features}>
-                                <li>✓ <strong>Save $120/year</strong></li>
-                                <li>✓ <strong>Unlimited</strong> Share Links</li>
-                                <li>✓ <strong>150</strong> Property Lookups/mo</li>
-                                <li>✓ <strong>300</strong> AI Generations/mo</li>
-                                <li>✓ Priority support</li>
-                                <li>✓ PWA for mobile</li>
-                            </ul>
-
-                            <button
-                                onClick={() => handleCheckout('YEARLY')}
-                                disabled={loadingProduct === 'YEARLY'}
-                                className="btn btn-secondary btn-full"
-                            >
-                                {loadingProduct === 'YEARLY' ? 'Processing...' : 'Subscribe Yearly'}
-                            </button>
-                        </div>
+                        <span className={styles.savingsTip}>
+                            💰 Save 20% with annual
+                        </span>
                     </div>
+
+                    {billingTab === 'individual' ? (
+                        <div className={styles.pricingGrid}>
+                            {/* Free Demo */}
+                            <div className={`card ${styles.pricingCard}`}>
+                                <h3>Free Demo</h3>
+                                <div className={styles.price}>
+                                    <span className="number-display">$0</span>
+                                </div>
+                                <p className={styles.priceDesc}>Try before you buy</p>
+
+                                <ul className={styles.features}>
+                                    <li>✓ Local calculations</li>
+                                    <li>✓ See how it works</li>
+                                    <li className={styles.disabled}>✗ Share links</li>
+                                    <li className={styles.disabled}>✗ AI features</li>
+                                    <li className={styles.disabled}>✗ Save comparisons</li>
+                                </ul>
+
+                                <button
+                                    onClick={handleSignUp}
+                                    className="btn btn-secondary btn-full"
+                                >
+                                    Try Demo
+                                </button>
+                            </div>
+
+                            {/* Starter Pass */}
+                            <div className={`card ${styles.pricingCard}`}>
+                                <h3>Starter Pass</h3>
+                                <div className={styles.price}>
+                                    <span className="number-display">$9.9</span>
+                                    <span className={styles.period}>/ 7 days</span>
+                                </div>
+                                <p className={styles.priceDesc}>Perfect for trying the full experience</p>
+
+                                <ul className={styles.features}>
+                                    <li>✓ <strong>5</strong> Share Links</li>
+                                    <li>✓ <strong>10</strong> Property Tax Lookups</li>
+                                    <li>✓ <strong>30</strong> AI Generations</li>
+                                    <li>✓ Full comparison features</li>
+                                    <li>✓ <strong>$9.9 credit</strong> on upgrade</li>
+                                </ul>
+
+                                <button
+                                    onClick={() => handleCheckout('STARTER_PASS')}
+                                    disabled={loadingProduct === 'STARTER_PASS'}
+                                    className="btn btn-secondary btn-full"
+                                >
+                                    {loadingProduct === 'STARTER_PASS' ? 'Processing...' : 'Get Starter Pass'}
+                                </button>
+                            </div>
+
+                            {/* Pro Subscription */}
+                            <div className={`card ${styles.pricingCard} ${styles.featured}`}>
+                                <div className={styles.badge}>✨ Most Popular</div>
+                                <h3>Pro Monthly</h3>
+                                <div className={styles.price}>
+                                    <span className="number-display">$99</span>
+                                    <span className={styles.period}>/ month</span>
+                                </div>
+                                <p className={styles.priceDesc}>For serious loan officers</p>
+
+                                <ul className={styles.features}>
+                                    <li>✓ <strong>Unlimited</strong> Share Links</li>
+                                    <li>✓ <strong>150</strong> Property Lookups/mo</li>
+                                    <li>✓ <strong>300</strong> AI Generations/mo</li>
+                                    <li>✓ Priority support</li>
+                                    <li>✓ PWA for mobile</li>
+                                </ul>
+
+                                <button
+                                    onClick={() => handleCheckout('MONTHLY')}
+                                    disabled={loadingProduct === 'MONTHLY'}
+                                    className="btn btn-primary btn-full"
+                                >
+                                    {loadingProduct === 'MONTHLY' ? 'Processing...' : 'Subscribe'}
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className={`${styles.pricingGrid} ${styles.pricingGridCentered}`}>
+                            {/* Annual Pro */}
+                            <div className={`card ${styles.pricingCard} ${styles.featured}`}>
+                                <div className={styles.badge}>💰 Best Value</div>
+                                <h3>Annual Pro</h3>
+                                <div className={styles.price}>
+                                    <span className="number-display">$950</span>
+                                    <span className={styles.period}>/ year</span>
+                                </div>
+                                <p className={styles.priceDesc}>Save $238 vs monthly</p>
+
+                                <ul className={styles.features}>
+                                    <li>✓ <strong>Save $238/year</strong></li>
+                                    <li>✓ <strong>Unlimited</strong> Share Links</li>
+                                    <li>✓ <strong>200</strong> Property Lookups/mo</li>
+                                    <li>✓ <strong>350</strong> AI Generations/mo</li>
+                                    <li>✓ Priority support</li>
+                                </ul>
+
+                                <button
+                                    onClick={() => handleCheckout('YEARLY')}
+                                    disabled={loadingProduct === 'YEARLY'}
+                                    className="btn btn-primary btn-full"
+                                >
+                                    {loadingProduct === 'YEARLY' ? 'Processing...' : 'Subscribe Yearly'}
+                                </button>
+                            </div>
+
+                            {/* Enterprise */}
+                            <div className={`card ${styles.pricingCard} ${styles.enterprise}`}>
+                                <div className={styles.badge}>🏢 Teams</div>
+                                <h3>Enterprise</h3>
+                                <div className={styles.price}>
+                                    <span className="number-display">Custom</span>
+                                </div>
+                                <p className={styles.priceDesc}>For teams & brokerages</p>
+
+                                <ul className={styles.features}>
+                                    <li>✓ <strong>Unlimited</strong> users</li>
+                                    <li>✓ Team management dashboard</li>
+                                    <li>✓ White-label branding</li>
+                                    <li>✓ Custom integrations (CRM, LOS)</li>
+                                    <li>✓ Dedicated account manager</li>
+                                    <li>✓ Priority support & SLA</li>
+                                </ul>
+
+                                <button
+                                    onClick={handleContactSales}
+                                    className={`btn btn-full ${styles.btnEnterprise}`}
+                                >
+                                    Contact Sales
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -226,17 +268,7 @@ export default function PricingPage() {
             </section>
 
             {/* Footer */}
-            <footer className={styles.footer}>
-                <div className="container">
-                    <div className={styles.footerContent}>
-                        <p>© 2025 ShowTheRate. All rights reserved.</p>
-                        <div className={styles.footerLinks}>
-                            <Link href="/privacy">Privacy Policy</Link>
-                            <Link href="/terms">Terms of Service</Link>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 }

@@ -71,6 +71,10 @@ export default function ScenarioCard({ scenario, index }) {
 
             <div className={styles.loanInfo}>
                 <div>
+                    <span className={styles.infoLabel}>Home Price</span>
+                    <span className="number">{formatCurrency(scenario.inputs.homePrice)}</span>
+                </div>
+                <div>
                     <span className={styles.infoLabel}>Loan Amount</span>
                     <span className="number">{formatCurrency(outputs.loan.totalLoanAmount)}</span>
                 </div>

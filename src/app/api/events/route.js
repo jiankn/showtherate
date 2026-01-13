@@ -30,7 +30,7 @@ export async function POST(request) {
         // Validate share exists and get comparison/user info
         const { data: share, error: shareError } = await supabaseAdmin
             .from('shares')
-            .select('id, comparison_id, comparisons(user_id)')
+            .select('id, comparison_id, view_count, comparisons(user_id)')
             .eq('share_id', shareId)
             .single();
 
@@ -58,9 +58,10 @@ export async function POST(request) {
 
         // Increment view count for page_view events
         if (eventType === 'share_page_view') {
+            const currentCount = typeof share.view_count === 'number' ? share.view_count : 0;
             await supabaseAdmin
                 .from('shares')
-                .update({ view_count: share.view_count + 1 })
+                .update({ view_count: currentCount + 1 })
                 .eq('id', share.id);
         }
 

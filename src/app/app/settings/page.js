@@ -1,15 +1,16 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { useToast } from '../../../components/Toast';
+import { useToast } from '../../../components/GlobalToast';
+import { useUser } from '../../../components/UserContext';
+import AvatarUpload from '../../../components/AvatarUpload';
 import styles from './page.module.css';
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState('profile');
-    const { data: session } = useSession();
-    const toast = useToast();
+    const { toast } = useToast();
+    const { profile: userProfile, entitlements, loading: loadingUserData, refreshUserData, session } = useUser();
 
     const nmlsPattern = '^\\d{1,10}$';
     const usPhonePattern = '^(\\+1\\s?)?(\\(?\\d{3}\\)?[\\s.-]?)\\d{3}[\\s.-]?\\d{4}(\\s?(x|ext\\.?){1}\\s?\\d{1,6})?$';
@@ -60,6 +61,7 @@ export default function SettingsPage() {
         return new RegExp(usPhonePattern, 'i').test(v);
     };
 
+    // 使用UserContext中的profile数据
     const [profile, setProfile] = useState({
         firstName: '',
         lastName: '',
@@ -70,75 +72,49 @@ export default function SettingsPage() {
         facebook: '',
         tiktok: '',
         instagram: '',
+        avatarUrl: null,
     });
-    const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+
+    const isLoadingProfile = loadingUserData;
+    const isLoadingEntitlements = loadingUserData;
     const [isSaving, setIsSaving] = useState(false);
-    const [entitlements, setEntitlements] = useState(null);
-    const [isLoadingEntitlements, setIsLoadingEntitlements] = useState(true);
 
+    // 当UserContext中的profile数据更新时，同步到本地状态
     useEffect(() => {
-        let cancelled = false;
+        if (userProfile) {
+            setProfile({
+                firstName: userProfile.firstName || '',
+                lastName: userProfile.lastName || '',
+                email: userProfile.email || session?.user?.email || '',
+                nmls: userProfile.nmls || '',
+                phone: userProfile.phone || '',
+                xHandle: userProfile.xHandle || '',
+                facebook: userProfile.facebook || '',
+                tiktok: userProfile.tiktok || '',
+                instagram: userProfile.instagram || '',
+                avatarUrl: userProfile.avatarUrl || null,
+            });
+        } else if (session?.user) {
+            // 从session中获取默认值
+            const sessionEmail = session.user.email || '';
+            const sessionName = session.user.name || '';
+            const [fallbackFirstName, ...rest] = sessionName.trim().split(/\s+/).filter(Boolean);
+            const fallbackLastName = rest.length ? rest.join(' ') : '';
 
-        async function loadProfile() {
-            setIsLoadingProfile(true);
-            try {
-                const res = await fetch('/api/user/profile', { method: 'GET' });
-                const data = await res.json().catch(() => ({}));
-
-                const sessionEmail = session?.user?.email || '';
-                const sessionName = session?.user?.name || '';
-                const [fallbackFirstName, ...rest] = sessionName.trim().split(/\s+/).filter(Boolean);
-                const fallbackLastName = rest.length ? rest.join(' ') : '';
-
-                const next = {
-                    firstName: data?.profile?.firstName || fallbackFirstName || '',
-                    lastName: data?.profile?.lastName || fallbackLastName || '',
-                    email: data?.profile?.email || sessionEmail || '',
-                    nmls: data?.profile?.nmls || '',
-                    phone: data?.profile?.phone || '',
-                    xHandle: data?.profile?.xHandle || '',
-                    facebook: data?.profile?.facebook || '',
-                    tiktok: data?.profile?.tiktok || '',
-                    instagram: data?.profile?.instagram || '',
-                };
-
-                if (!cancelled) setProfile(next);
-            } catch {
-                if (!cancelled) toast.error('Failed to load profile');
-            } finally {
-                if (!cancelled) setIsLoadingProfile(false);
-            }
+            setProfile({
+                firstName: fallbackFirstName || '',
+                lastName: fallbackLastName || '',
+                email: sessionEmail,
+                nmls: '',
+                phone: '',
+                xHandle: '',
+                facebook: '',
+                tiktok: '',
+                instagram: '',
+                avatarUrl: null,
+            });
         }
-
-        loadProfile();
-
-        return () => {
-            cancelled = true;
-        };
-    }, [session?.user?.email, session?.user?.name, toast]);
-
-    useEffect(() => {
-        let cancelled = false;
-
-        async function loadEntitlements() {
-            setIsLoadingEntitlements(true);
-            try {
-                const res = await fetch('/api/user/entitlements', { method: 'GET' });
-                const data = await res.json().catch(() => null);
-                if (!cancelled) setEntitlements(res.ok ? data : null);
-            } catch {
-                if (!cancelled) setEntitlements(null);
-            } finally {
-                if (!cancelled) setIsLoadingEntitlements(false);
-            }
-        }
-
-        loadEntitlements();
-
-        return () => {
-            cancelled = true;
-        };
-    }, []);
+    }, [userProfile, session?.user]);
 
     const initials = useMemo(() => {
         const a = (profile.firstName || session?.user?.name || session?.user?.email || 'U').trim();
@@ -147,6 +123,9 @@ export default function SettingsPage() {
         const second = b ? b[0].toUpperCase() : '';
         return `${first}${second}`;
     }, [profile.firstName, profile.lastName, session?.user?.email, session?.user?.name]);
+
+    // Whether the user currently has an active entitlement (subscription or pass)
+    const hasActiveEntitlement = !!(entitlements?.hasActiveEntitlement || entitlements?.type === 'subscription');
 
     const handleSave = async () => {
         const nextProfile = {
@@ -180,6 +159,8 @@ export default function SettingsPage() {
             }
             if (data?.profile) setProfile((p) => ({ ...p, ...data.profile }));
             toast.success('Saved');
+            // 刷新UserContext中的数据
+            refreshUserData();
         } catch {
             toast.error('Failed to save changes');
         } finally {
@@ -223,10 +204,26 @@ export default function SettingsPage() {
                             <h2>Personal Information</h2>
                             <p className={styles.sectionDesc}>Update your photo and personal details here.</p>
 
-                            <div className={styles.avatarSection}>
-                                <div className={styles.avatar}>{initials}</div>
-                                <button className={styles.btnSecondary}>Change Photo</button>
+                            <div className={styles.profileHint}>
+                                <span className={styles.hintIcon}>💡</span>
+                                <span>The information below will be displayed on quote pages you share with clients, making it easy for them to contact you.</span>
                             </div>
+
+                            <AvatarUpload
+                                avatarUrl={profile.avatarUrl}
+                                initials={initials}
+                                disabled={isLoadingProfile}
+                                onUploadSuccess={(url) => {
+                                    setProfile((p) => ({ ...p, avatarUrl: url }));
+                                    refreshUserData();
+                                    toast.success('Avatar updated!');
+                                }}
+                                onDeleteSuccess={() => {
+                                    setProfile((p) => ({ ...p, avatarUrl: null }));
+                                    refreshUserData();
+                                    toast.success('Avatar removed');
+                                }}
+                            />
 
                             <div className={styles.formGrid}>
                                 <div className={styles.formGroup}>
@@ -234,7 +231,7 @@ export default function SettingsPage() {
                                     <input
                                         type="text"
                                         className={styles.input}
-                                        value={profile.firstName}
+                                        value={profile.firstName || ''}
                                         onChange={(e) => setProfile((p) => ({ ...p, firstName: e.target.value }))}
                                         disabled={isLoadingProfile}
                                     />
@@ -244,7 +241,7 @@ export default function SettingsPage() {
                                     <input
                                         type="text"
                                         className={styles.input}
-                                        value={profile.lastName}
+                                        value={profile.lastName || ''}
                                         onChange={(e) => setProfile((p) => ({ ...p, lastName: e.target.value }))}
                                         disabled={isLoadingProfile}
                                     />
@@ -254,7 +251,7 @@ export default function SettingsPage() {
                                     <input
                                         type="email"
                                         className={styles.input}
-                                        value={profile.email}
+                                        value={profile.email || ''}
                                         onChange={(e) => setProfile((p) => ({ ...p, email: e.target.value }))}
                                         autoComplete="email"
                                         disabled={isLoadingProfile}
@@ -265,7 +262,7 @@ export default function SettingsPage() {
                                     <input
                                         type="text"
                                         className={styles.input}
-                                        value={profile.nmls}
+                                        value={profile.nmls || ''}
                                         onChange={(e) => setProfile((p) => ({ ...p, nmls: normalizeNmls(e.target.value) }))}
                                         inputMode="numeric"
                                         pattern={nmlsPattern}
@@ -281,7 +278,7 @@ export default function SettingsPage() {
                                     <input
                                         type="tel"
                                         className={styles.input}
-                                        value={profile.phone}
+                                        value={profile.phone || ''}
                                         onChange={(e) => setProfile((p) => ({ ...p, phone: formatUsPhoneLive(e.target.value) }))}
                                         inputMode="tel"
                                         autoComplete="tel"
@@ -298,7 +295,7 @@ export default function SettingsPage() {
                                     <input
                                         type="text"
                                         className={styles.input}
-                                        value={profile.xHandle}
+                                        value={profile.xHandle || ''}
                                         onChange={(e) => setProfile((p) => ({ ...p, xHandle: e.target.value }))}
                                         placeholder="@handle"
                                         disabled={isLoadingProfile}
@@ -309,7 +306,7 @@ export default function SettingsPage() {
                                     <input
                                         type="text"
                                         className={styles.input}
-                                        value={profile.instagram}
+                                        value={profile.instagram || ''}
                                         onChange={(e) => setProfile((p) => ({ ...p, instagram: e.target.value }))}
                                         placeholder="@username or link"
                                         disabled={isLoadingProfile}
@@ -320,7 +317,7 @@ export default function SettingsPage() {
                                     <input
                                         type="text"
                                         className={styles.input}
-                                        value={profile.facebook}
+                                        value={profile.facebook || ''}
                                         onChange={(e) => setProfile((p) => ({ ...p, facebook: e.target.value }))}
                                         placeholder="Profile link"
                                         disabled={isLoadingProfile}
@@ -331,7 +328,7 @@ export default function SettingsPage() {
                                     <input
                                         type="text"
                                         className={styles.input}
-                                        value={profile.tiktok}
+                                        value={profile.tiktok || ''}
                                         onChange={(e) => setProfile((p) => ({ ...p, tiktok: e.target.value }))}
                                         placeholder="@username or link"
                                         disabled={isLoadingProfile}
@@ -352,33 +349,89 @@ export default function SettingsPage() {
                             <h2>Current Subscription</h2>
                             <p className={styles.sectionDesc}>Manage your plan and billing details.</p>
 
+                            {/* debug banner removed */}
+
                             <div className={styles.planCard}>
                                 <div>
                                     <span className={styles.planName}>
                                         {entitlements?.type === 'subscription'
-                                            ? 'Pro'
+                                            ? (entitlements?.quotas?.property?.quota >= 200 ? 'Pro Annual' : 'Pro Monthly')
                                             : entitlements?.type === 'starter_pass_7d'
                                                 ? 'Starter Pass'
                                                 : 'Free Plan'}
                                     </span>
                                     <span className={styles.planPrice}>
                                         {entitlements?.type === 'subscription'
-                                            ? '$59/month'
+                                            ? (entitlements?.quotas?.property?.quota >= 200 ? '$950/year' : '$99/month')
                                             : entitlements?.type === 'starter_pass_7d'
                                                 ? '$9.9 (7 days)'
                                                 : '$0/month'}
                                     </span>
                                 </div>
-                                <Link href="/app/upgrade" className={styles.upgradeBtn}>Upgrade to Pro</Link>
+                                {hasActiveEntitlement ? (
+                                    <span className={styles.currentPlanBadge}>Current Plan</span>
+                                ) : (
+                                    <Link href="/app/upgrade" className={styles.upgradeBtn}>Upgrade to Pro</Link>
+                                )}
                             </div>
+
+                            {/* Subscription / Pass Expiry Info */}
+                            {hasActiveEntitlement && entitlements?.expiresAt && (
+                                <div className={styles.expiryInfo}>
+                                    {entitlements?.type === 'subscription' ? (
+                                        <>
+                                            <span className={styles.expiryIcon}>📅</span>
+                                            <span>Next billing date: <strong>{new Date(entitlements.expiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</strong></span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className={styles.expiryIcon}>⏰</span>
+                                            <span>
+                                                Expires: <strong>{new Date(entitlements.expiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</strong>
+                                                {(() => {
+                                                    const daysLeft = Math.ceil((new Date(entitlements.expiresAt) - new Date()) / (1000 * 60 * 60 * 24));
+                                                    if (daysLeft <= 0) return ' (Expired)';
+                                                    if (daysLeft === 1) return ' (1 day left)';
+                                                    return ` (${daysLeft} days left)`;
+                                                })()}
+                                            </span>
+                                        </>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Billing Actions */}
+                            {hasActiveEntitlement && entitlements?.type === 'subscription' && (
+                                <div className={styles.billingActions}>
+                                    <button
+                                        onClick={async () => {
+                                            try {
+                                                toast.info('Opening billing portal...');
+                                                const res = await fetch('/api/billing/portal', { method: 'POST' });
+                                                if (res.ok) {
+                                                    const { url } = await res.json();
+                                                    window.location.href = url;
+                                                } else {
+                                                    toast.error('Failed to open billing portal');
+                                                }
+                                            } catch {
+                                                toast.error('Failed to open billing portal');
+                                            }
+                                        }}
+                                        className={styles.billingPortalBtn}
+                                        disabled={isLoadingEntitlements}
+                                    >
+                                        💳 Open Billing Portal
+                                    </button>
+                                </div>
+                            )}
 
                             {!isLoadingEntitlements && entitlements?.quotas && (
                                 <>
+                                    {/* Unlimited quotas */}
                                     {[
                                         { key: 'comparisons', label: 'Monthly Comparisons' },
                                         { key: 'share', label: 'Monthly Share Links' },
-                                        { key: 'property', label: 'Monthly Property Lookups' },
-                                        { key: 'ai', label: 'Monthly AI Generations' },
                                     ].map(({ key, label }) => {
                                         const q = entitlements?.quotas?.[key];
                                         if (!q) return null;
@@ -402,7 +455,168 @@ export default function SettingsPage() {
                                             </div>
                                         );
                                     })}
+
+                                    {/* Property Lookups - Base quota */}
+                                    {entitlements?.quotas?.property && (
+                                        <div className={styles.formGroup}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                                <label>Monthly Property Lookups</label>
+                                                <span style={{ fontSize: '0.875rem', color: '#64748b' }}>
+                                                    {entitlements.quotas.property.used} / {entitlements.quotas.property.quota} used
+                                                </span>
+                                            </div>
+                                            <div className={styles.usageBar}>
+                                                <div
+                                                    className={styles.usageFill}
+                                                    style={{
+                                                        width: `${Math.min(100, (entitlements.quotas.property.used / entitlements.quotas.property.quota) * 100)}%`
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* AI Generations - Base quota */}
+                                    {entitlements?.quotas?.ai && (
+                                        <div className={styles.formGroup}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                                <label>Monthly AI Generations</label>
+                                                <span style={{ fontSize: '0.875rem', color: '#64748b' }}>
+                                                    {entitlements.quotas.ai.used} / {entitlements.quotas.ai.quota} used
+                                                </span>
+                                            </div>
+                                            <div className={styles.usageBar}>
+                                                <div
+                                                    className={styles.usageFill}
+                                                    style={{
+                                                        width: `${Math.min(100, (entitlements.quotas.ai.used / entitlements.quotas.ai.quota) * 100)}%`
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
                                 </>
+                            )}
+
+                            {/* Boost Pack Card - Separate highlighted section */}
+                            {(entitlements?.quotas?.property?.bonus > 0 || entitlements?.quotas?.ai?.bonus > 0) && (
+                                <div style={{
+                                    marginTop: '24px',
+                                    padding: '20px',
+                                    background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%)',
+                                    border: '2px solid rgba(251, 191, 36, 0.4)',
+                                    borderRadius: '16px',
+                                    boxShadow: '0 4px 15px rgba(251, 191, 36, 0.15)'
+                                }}>
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '12px',
+                                        marginBottom: '16px'
+                                    }}>
+                                        <span style={{ fontSize: '1.5rem' }}>⚡</span>
+                                        <div>
+                                            <h3 style={{
+                                                margin: 0,
+                                                fontSize: '1.1rem',
+                                                fontWeight: 700,
+                                                color: '#92400e'
+                                            }}>
+                                                Boost Pack
+                                            </h3>
+                                            <p style={{
+                                                margin: 0,
+                                                fontSize: '0.8rem',
+                                                color: '#a16207'
+                                            }}>
+                                                Never resets • Valid for subscription period
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: '1fr 1fr',
+                                        gap: '16px',
+                                        marginBottom: '12px'
+                                    }}>
+                                        {entitlements?.quotas?.property?.bonus > 0 && (
+                                            <div style={{
+                                                padding: '12px 16px',
+                                                background: 'rgba(255, 255, 255, 0.7)',
+                                                borderRadius: '10px',
+                                                textAlign: 'center'
+                                            }}>
+                                                <div style={{
+                                                    fontSize: '1.5rem',
+                                                    fontWeight: 800,
+                                                    color: '#92400e',
+                                                    lineHeight: 1
+                                                }}>
+                                                    {entitlements.quotas.property.bonus}
+                                                </div>
+                                                <div style={{
+                                                    fontSize: '0.75rem',
+                                                    color: '#a16207',
+                                                    marginTop: '4px'
+                                                }}>
+                                                    Property Lookups
+                                                </div>
+                                            </div>
+                                        )}
+                                        {entitlements?.quotas?.ai?.bonus > 0 && (
+                                            <div style={{
+                                                padding: '12px 16px',
+                                                background: 'rgba(255, 255, 255, 0.7)',
+                                                borderRadius: '10px',
+                                                textAlign: 'center'
+                                            }}>
+                                                <div style={{
+                                                    fontSize: '1.5rem',
+                                                    fontWeight: 800,
+                                                    color: '#92400e',
+                                                    lineHeight: 1
+                                                }}>
+                                                    {entitlements.quotas.ai.bonus}
+                                                </div>
+                                                <div style={{
+                                                    fontSize: '0.75rem',
+                                                    color: '#a16207',
+                                                    marginTop: '4px'
+                                                }}>
+                                                    AI Generations
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div style={{
+                                        fontSize: '0.75rem',
+                                        color: '#78350f',
+                                        textAlign: 'center'
+                                    }}>
+                                        ✓ Valid during active subscription
+                                    </div>
+
+                                    <Link
+                                        href="/app/upgrade"
+                                        style={{
+                                            display: 'block',
+                                            marginTop: '16px',
+                                            padding: '10px 20px',
+                                            background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                                            color: 'white',
+                                            fontWeight: 600,
+                                            fontSize: '0.875rem',
+                                            textAlign: 'center',
+                                            borderRadius: '10px',
+                                            textDecoration: 'none',
+                                            boxShadow: '0 4px 12px rgba(245, 158, 11, 0.35)'
+                                        }}
+                                    >
+                                        Buy More Boost Pack
+                                    </Link>
+                                </div>
                             )}
                         </div>
                     )}

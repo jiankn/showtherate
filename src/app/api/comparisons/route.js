@@ -121,7 +121,7 @@ export async function POST(request) {
         }
 
         const body = await request.json();
-        const { title, scenarios, clientId } = body;
+        const { title, scenarios, clientId, aiScript } = body;
 
         // Validate input
         if (!scenarios || !Array.isArray(scenarios) || scenarios.length === 0) {
@@ -145,6 +145,7 @@ export async function POST(request) {
                 user_id: session.user.id,
                 title: title || 'Untitled Comparison',
                 client_id: clientId || null,
+                ai_script: aiScript || null,
             })
             .select('id')
             .single();

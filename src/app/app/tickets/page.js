@@ -141,7 +141,6 @@ export default function TicketsPage() {
             loadTickets(); // Reload list
 
             // 通知侧边栏刷新未读数量
-            console.log('Sending TICKET_STATUS_UPDATED message from ticket list');
             // 使用localStorage来实现跨组件通信
             localStorage.setItem('ticketStatusUpdate', Date.now().toString());
             // 同时尝试postMessage作为后备
@@ -182,7 +181,6 @@ export default function TicketsPage() {
             loadTickets(); // Reload list
 
             // 通知侧边栏刷新未读数量
-            console.log('Sending TICKET_STATUS_UPDATED message from ticket list');
             // 使用localStorage来实现跨组件通信
             localStorage.setItem('ticketStatusUpdate', Date.now().toString());
             // 同时尝试postMessage作为后备

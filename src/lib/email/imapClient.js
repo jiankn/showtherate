@@ -147,14 +147,12 @@ export async function processInboundEmail(email, supabaseAdmin) {
 
     // 4. 如果还是没找到，可以选择创建新工单（根据配置）
     if (!ticket) {
-        console.log('No matching ticket found for email:', email.subject);
         return { success: false, reason: 'no_matching_ticket' };
     }
 
     // 5. 验证发件人（必须是工单创建人）
     const senderEmail = email.from.address?.toLowerCase();
     if (senderEmail !== ticket.requester_email?.toLowerCase()) {
-        console.log('Email from non-requester:', senderEmail);
         // 标记为待审核
         await supabaseAdmin.from('ticket_messages').insert({
             ticket_id: ticket.id,

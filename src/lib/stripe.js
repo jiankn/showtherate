@@ -45,8 +45,18 @@ export const STRIPE_PRODUCTS = {
         entitlement: {
             type: 'subscription',
             shareQuota: -1, // Unlimited
-            propertyQuota: 150,
-            aiQuota: 300,
+            propertyQuota: 200,
+            aiQuota: 350,
+        },
+    },
+    BOOST_PACK: {
+        name: 'Boost Pack',
+        priceId: process.env.STRIPE_BOOST_PACK_PRICE_ID,
+        mode: 'payment',
+        requiresSubscription: true,
+        bonus: {
+            propertyQuota: 100,
+            aiQuota: 150,
         },
     },
 };

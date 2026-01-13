@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { LogoIcon } from './Icons';
@@ -11,6 +11,8 @@ export default function Header({ variant = 'default' }) {
   const { data: session, status } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [toolsMenuOpen, setToolsMenuOpen] = useState(false);
+  const toolsMenuRef = useRef(null);
 
   const isAuthenticated = status === 'authenticated' && session?.user;
 
@@ -22,7 +24,37 @@ export default function Header({ variant = 'default' }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (toolsMenuRef.current && !toolsMenuRef.current.contains(event.target)) {
+        setToolsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const headerClass = `${styles.header} ${scrolled ? styles.headerScrolled : ''} ${variant === 'dark' ? styles.headerDark : ''}`;
+
+  const toolsLinks = [
+    { label: '2-1 Buydown Calculator', href: '/calculator/2-1-buydown-calculator', hot: true },
+    { label: 'Points Break-Even', href: '/calculator/discount-points-break-even', hot: true },
+    { label: 'Cash to Close', href: '/calculator/cash-to-close-calculator' },
+    { label: 'Payment Shock', href: '/calculator/payment-shock-calculator', isNew: true },
+    { divider: true },
+    { label: 'Buydown vs Points', href: '/compare/temporary-buydown-vs-points' },
+    { label: '2-1 vs 3-2-1 Buydown', href: '/compare/2-1-vs-3-2-1-buydown', isNew: true },
+    { label: 'APR vs Interest Rate', href: '/compare/apr-vs-interest-rate', isNew: true },
+    { label: 'FHA vs Conventional', href: '/compare/fha-vs-conventional' },
+    { label: 'Lock vs Float', href: '/compare/lock-vs-float' },
+    { divider: true },
+    { label: 'vs Mortgage Coach', href: '/alternatives/mortgage-coach-alternative' },
+    { divider: true },
+    { label: 'All Calculators →', href: '/calculator', isViewAll: true },
+    { label: 'All Comparisons →', href: '/compare', isViewAll: true },
+    { label: 'All Alternatives →', href: '/alternatives', isViewAll: true },
+  ];
 
   return (
     <header className={headerClass}>
@@ -35,9 +67,44 @@ export default function Header({ variant = 'default' }) {
 
           <div className={styles.navLinks}>
             <Link href="/#features">Features</Link>
+
+            {/* Tools Dropdown */}
+            <div className={styles.dropdown} ref={toolsMenuRef}>
+              <button
+                className={styles.dropdownTrigger}
+                onClick={() => setToolsMenuOpen(!toolsMenuOpen)}
+                aria-expanded={toolsMenuOpen}
+              >
+                Tools
+                <svg className={`${styles.chevron} ${toolsMenuOpen ? styles.chevronOpen : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="6,9 12,15 18,9" />
+                </svg>
+              </button>
+
+              {toolsMenuOpen && (
+                <div className={styles.dropdownMenu}>
+                  {toolsLinks.map((item, index) => (
+                    item.divider ? (
+                      <div key={index} className={styles.dropdownDivider} />
+                    ) : (
+                      <Link
+                        key={index}
+                        href={item.href}
+                        className={`${styles.dropdownItem} ${item.isViewAll ? styles.dropdownViewAll : ''}`}
+                        onClick={() => setToolsMenuOpen(false)}
+                      >
+                        {item.label}
+                        {item.hot && <span className={styles.hotBadge}>HOT</span>}
+                        {item.isNew && <span className={styles.newBadge}>NEW</span>}
+                      </Link>
+                    )
+                  ))}
+                </div>
+              )}
+            </div>
+
             <Link href="/blog">News & Insight</Link>
             <Link href="/#pricing">Pricing</Link>
-            <Link href="/#demo">Demo</Link>
           </div>
 
           <div className={styles.navActions}>
@@ -63,9 +130,10 @@ export default function Header({ variant = 'default' }) {
       {mobileMenuOpen && (
         <div className={styles.mobileMenu}>
           <Link href="/#features" onClick={() => setMobileMenuOpen(false)}>Features</Link>
+          <Link href="/calculator" onClick={() => setMobileMenuOpen(false)}>Calculators</Link>
+          <Link href="/compare" onClick={() => setMobileMenuOpen(false)}>Compare Tools</Link>
           <Link href="/blog" onClick={() => setMobileMenuOpen(false)}>News & Insight</Link>
           <Link href="/#pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</Link>
-          <Link href="/#demo" onClick={() => setMobileMenuOpen(false)}>Demo</Link>
           {isAuthenticated ? (
             <>
               <Link href="/app" className="btn btn-secondary btn-full" onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
@@ -82,3 +150,4 @@ export default function Header({ variant = 'default' }) {
     </header>
   );
 }
+

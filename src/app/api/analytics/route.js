@@ -107,13 +107,45 @@ export async function GET(request) {
 
         const viewData = Object.entries(dailyViews).map(([name, views]) => ({ name, views }));
 
-        // Recent activity (last 10)
-        const recentActivity = events.slice(0, 10).map(e => ({
+        // Fetch enriched details for events
+        const comparisonIds = [...new Set(events.map(e => e.comparison_id))];
+
+        // 1. Get Comparisons
+        const { data: comparisons } = await supabaseAdmin
+            .from('comparisons')
+            .select('id, title, client_id')
+            .in('id', comparisonIds);
+
+        // 2. Get Clients
+        const clientIds = [...new Set((comparisons || []).map(c => c.client_id).filter(Boolean))];
+        const { data: clients } = await supabaseAdmin
+            .from('clients')
+            .select('id, first_name, last_name')
+            .in('id', clientIds);
+
+        const clientMap = (clients || []).reduce((acc, curr) => {
+            const name = [curr.first_name, curr.last_name].filter(Boolean).join(' ');
+            acc[curr.id] = name || 'Unknown Client';
+            return acc;
+        }, {});
+
+        const comparisonMap = (comparisons || []).reduce((acc, curr) => {
+            acc[curr.id] = {
+                ...curr,
+                clientName: curr.client_id ? clientMap[curr.client_id] : null
+            };
+            return acc;
+        }, {});
+
+        // Recent activity (allow more for grouping, e.g. 50)
+        const recentActivity = events.slice(0, 50).map(e => ({
             id: e.id,
             eventType: e.event_type,
             ctaType: e.cta_type,
             device: e.device,
             comparisonId: e.comparison_id,
+            comparisonTitle: comparisonMap[e.comparison_id]?.title || 'Unknown Comparison',
+            clientName: comparisonMap[e.comparison_id]?.clientName,
             time: e.created_at,
         }));
 

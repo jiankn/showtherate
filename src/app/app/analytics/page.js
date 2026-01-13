@@ -15,7 +15,7 @@ import {
     Cell,
     Legend
 } from 'recharts';
-import { ChartIcon, EyeIcon, LinkIcon } from '../../../components/Icons';
+import { ChartIcon, EyeIcon, LinkIcon, CalendarIcon, BarChartIcon } from '../../../components/Icons';
 import styles from './page.module.css';
 
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#6B7280'];
@@ -24,6 +24,7 @@ export default function AnalyticsPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [range, setRange] = useState('7d');
+    const [visibleCount, setVisibleCount] = useState(10);
 
     useEffect(() => {
         async function fetchAnalytics() {
@@ -70,15 +71,25 @@ export default function AnalyticsPage() {
                     <p>Track share opens and client engagement</p>
                 </div>
                 <div className={styles.rangeSelector}>
-                    {['7d', '30d'].map((r) => (
-                        <button
-                            key={r}
-                            className={`${styles.rangeBtn} ${range === r ? styles.active : ''}`}
-                            onClick={() => setRange(r)}
-                        >
-                            {r === '7d' ? 'Last 7 Days' : 'Last 30 Days'}
-                        </button>
-                    ))}
+                    <div className={styles.rangeLabel}>Time Range:</div>
+                    <div className={styles.rangeButtons}>
+                        {[
+                            { key: '7d', label: '7 Days', Icon: CalendarIcon },
+                            { key: '30d', label: '30 Days', Icon: BarChartIcon }
+                        ].map(({ key, label, Icon }) => (
+                            <button
+                                key={key}
+                                className={`${styles.rangeBtn} ${range === key ? styles.active : ''}`}
+                                onClick={() => setRange(key)}
+                                aria-pressed={range === key}
+                            >
+                                <span className={styles.btnIcon}>
+                                    <Icon />
+                                </span>
+                                <span className={styles.btnText}>{label}</span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
 
@@ -203,45 +214,116 @@ export default function AnalyticsPage() {
                 </div>
             </div>
 
-            {/* Recent Client Activity */}
+            {/* Recent Engagement (Smart Feed) */}
             <div className={styles.activitySection}>
-                <h2>Recent Client Activity</h2>
+                <h2>Recent Engagement</h2>
                 {recentActivity.length > 0 ? (
                     <div className={styles.activityList}>
-                        {recentActivity.map((activity) => (
-                            <div key={activity.id} className={styles.activityItem}>
-                                <div className={styles.activityIcon}>
-                                    {activity.eventType === 'share_page_view' ? '👁' : '👆'}
+                        {groupEventsBySession(recentActivity).slice(0, visibleCount).map((session) => (
+                            <div key={session.id} className={styles.sessionCard}>
+                                <div className={styles.sessionHeader}>
+                                    <div className={styles.sessionIcon}>
+                                        {session.hasClick ? (
+                                            <span style={{ fontSize: '1.2rem' }}>🎯</span>
+                                        ) : (
+                                            <LinkIcon />
+                                        )}
+                                    </div>
+                                    <div className={styles.sessionInfo}>
+                                        <div className={styles.sessionTitleRow}>
+                                            <Link href={`/app/comparisons/${session.comparisonId}`} className={styles.sessionTitle}>
+                                                {session.clientName ? `${session.clientName} - ` : ''}{session.title}
+                                            </Link>
+                                            {session.clientName && <span className={styles.clientBadge}>Client</span>}
+                                            {session.hasClick && <span className={styles.intentBadge}>High Intent</span>}
+                                        </div>
+                                        <div className={styles.sessionSummary}>
+                                            <span className={styles.sessionAction}>
+                                                {session.summaryText}
+                                            </span>
+                                            <span className={styles.sessionTime}>
+                                                • {new Date(session.lastActive).toLocaleString('en-US', {
+                                                    month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric'
+                                                })}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className={styles.activityContent}>
-                                    <p className={styles.activityText}>
-                                        {activity.eventType === 'share_page_view'
-                                            ? 'A client opened a share link'
-                                            : `CTA clicked: ${activity.ctaType || 'unknown'}`
-                                        }
-                                        {activity.device && ` on ${activity.device}`}
-                                    </p>
-                                    <span className={styles.activityTime}>
-                                        {new Date(activity.time).toLocaleString()}
-                                    </span>
-                                </div>
-                                {activity.comparisonId && (
-                                    <Link
-                                        href={`/app/comparisons/${activity.comparisonId}`}
-                                        className={styles.activityLink}
-                                    >
-                                        View →
-                                    </Link>
-                                )}
                             </div>
                         ))}
+
+                        {groupEventsBySession(recentActivity).length > visibleCount && (
+                            <button
+                                className={styles.loadMoreBtn}
+                                onClick={() => setVisibleCount(prev => prev + 10)}
+                            >
+                                Load More Activity
+                            </button>
+                        )}
                     </div>
                 ) : (
                     <div className={styles.emptyActivity}>
-                        <p>No activity yet. Share a comparison to start tracking.</p>
+                        <p>No activity in this period. Share a comparison to start tracking.</p>
                     </div>
                 )}
             </div>
         </div>
     );
+}
+
+// Helper: Group consecutive events into sessions
+function groupEventsBySession(events) {
+    if (!events || events.length === 0) return [];
+
+    const sessions = [];
+    let currentSession = null;
+
+    // Events are assumed to be sorted by time DESC
+    events.forEach(event => {
+        const eventTime = new Date(event.time).getTime();
+
+        // Check if event belongs to current session (same comparison + within 30 mins)
+        if (currentSession &&
+            currentSession.comparisonId === event.comparisonId &&
+            Math.abs(currentSession.lastActive - eventTime) < 30 * 60 * 1000) {
+
+            // Add to current session
+            currentSession.events.push(event);
+            if (event.eventType !== 'share_page_view') currentSession.hasClick = true;
+            // Keep lastActive as the most recent time (which is the first event added)
+        } else {
+            // Start new session
+            if (currentSession) sessions.push(currentSession);
+            currentSession = {
+                id: event.id, // Use latest event ID as session ID
+                comparisonId: event.comparisonId,
+                title: event.comparisonTitle || 'Unknown Comparison',
+                clientName: event.clientName,
+                lastActive: eventTime,
+                hasClick: event.eventType !== 'share_page_view',
+                events: [event]
+            };
+        }
+    });
+
+    if (currentSession) sessions.push(currentSession);
+
+    // Generate summary text for each session
+    return sessions.map(session => {
+        const viewCount = session.events.filter(e => e.eventType === 'share_page_view').length;
+        const clickCount = session.events.filter(e => e.eventType !== 'share_page_view').length;
+        const clickEvents = session.events.filter(e => e.eventType !== 'share_page_view');
+
+        let summaryParts = [];
+        if (viewCount > 0) summaryParts.push(`Viewed ${viewCount} time${viewCount !== 1 ? 's' : ''}`);
+        if (clickCount > 0) {
+            const actions = [...new Set(clickEvents.map(e => e.ctaType || 'CTA'))];
+            summaryParts.push(`Clicked ${actions.join(', ')}`);
+        }
+
+        return {
+            ...session,
+            summaryText: summaryParts.join(' & ')
+        };
+    });
 }

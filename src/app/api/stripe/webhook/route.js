@@ -12,6 +12,7 @@ export async function POST(request) {
     // Lazy load dependencies at runtime
     const { stripe, STRIPE_PRODUCTS } = await import('@/lib/stripe');
     const { supabaseAdmin } = await import('@/lib/supabase/server');
+    const { syncSubscriptionToDb } = await import('@/lib/subscriptionUtils');
 
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
     const body = await request.text();
@@ -34,7 +35,7 @@ export async function POST(request) {
 
             case 'customer.subscription.created':
             case 'customer.subscription.updated':
-                await handleSubscriptionUpdate(event.data.object, supabaseAdmin, STRIPE_PRODUCTS);
+                await handleSubscriptionUpdate(event.data.object, supabaseAdmin, syncSubscriptionToDb);
                 break;
 
             case 'customer.subscription.deleted':
@@ -42,7 +43,7 @@ export async function POST(request) {
                 break;
 
             case 'invoice.payment_succeeded':
-                await handleInvoicePaymentSucceeded(event.data.object, stripe, supabaseAdmin, STRIPE_PRODUCTS);
+                await handleInvoicePaymentSucceeded(event.data.object, stripe, supabaseAdmin, syncSubscriptionToDb);
                 break;
 
             case 'invoice.payment_failed':
@@ -50,7 +51,8 @@ export async function POST(request) {
                 break;
 
             default:
-                console.log(`Unhandled event type: ${event.type}`);
+                // Unknown event type - ignore
+                break;
         }
 
         return NextResponse.json({ received: true });
@@ -78,9 +80,93 @@ async function handleCheckoutComplete(session, supabaseAdmin, STRIPE_PRODUCTS) {
         return;
     }
 
-    // One-time payment (Starter Pass)
+    // One-time payment (Starter Pass or Boost Pack)
     if (session.mode === 'payment') {
+        // Handle Boost Pack (quota addon)
+        if (product.bonus) {
+            console.log(`[Webhook] Processing Boost Pack for user ${userId}`);
+
+            // Get current subscription end date
+            const { data: subscription, error: subError } = await supabaseAdmin
+                .from('subscriptions')
+                .select('current_period_end')
+                .eq('user_id', userId)
+                .single();
+
+            if (subError) {
+                console.error('[Webhook] Failed to get subscription:', subError);
+                return;
+            }
+
+            if (!subscription?.current_period_end) {
+                console.error('[Webhook] No active subscription found for user:', userId);
+                return;
+            }
+
+            // Bonus expires 3 months after subscription ends
+            const bonusExpiresAt = new Date(subscription.current_period_end);
+            bonusExpiresAt.setMonth(bonusExpiresAt.getMonth() + 3);
+
+            // Try RPC first, fallback to direct update if RPC doesn't exist
+            const { error: rpcError } = await supabaseAdmin.rpc('add_bonus_quota', {
+                p_user_id: userId,
+                p_property: product.bonus.propertyQuota,
+                p_ai: product.bonus.aiQuota,
+                p_expires_at: bonusExpiresAt.toISOString()
+            });
+
+            if (rpcError) {
+                console.warn('[Webhook] RPC failed, using direct update:', rpcError.message);
+
+                // Fallback: Direct update to entitlements
+                const { data: entitlement } = await supabaseAdmin
+                    .from('entitlements')
+                    .select('id, bonus_property_quota, bonus_ai_quota')
+                    .eq('user_id', userId)
+                    .eq('type', 'subscription')
+                    .single();
+
+                if (entitlement) {
+                    const { error: updateError } = await supabaseAdmin
+                        .from('entitlements')
+                        .update({
+                            bonus_property_quota: (entitlement.bonus_property_quota || 0) + product.bonus.propertyQuota,
+                            bonus_ai_quota: (entitlement.bonus_ai_quota || 0) + product.bonus.aiQuota,
+                            bonus_expires_at: bonusExpiresAt.toISOString()
+                        })
+                        .eq('id', entitlement.id);
+
+                    if (updateError) {
+                        console.error('[Webhook] Failed to update entitlement:', updateError);
+                        return;
+                    }
+                } else {
+                    console.error('[Webhook] No subscription entitlement found for user:', userId);
+                    return;
+                }
+            }
+
+            // Record purchase history
+            const { error: insertError } = await supabaseAdmin.from('quota_purchases').insert({
+                user_id: userId,
+                property_amount: product.bonus.propertyQuota,
+                ai_amount: product.bonus.aiQuota,
+                stripe_payment_intent_id: session.payment_intent
+            });
+
+            if (insertError) {
+                console.warn('[Webhook] Failed to record purchase history:', insertError.message);
+                // Don't return - quota was already added
+            }
+
+            console.log(`[Webhook] Boost Pack purchased for user ${userId}: +${product.bonus.propertyQuota} property, +${product.bonus.aiQuota} AI`);
+            return;
+        }
+
+        // Handle Starter Pass
         const { entitlement } = product;
+        if (!entitlement) return;
+
         const now = new Date();
         const endsAt = new Date(now.getTime() + entitlement.durationDays * 24 * 60 * 60 * 1000);
 
@@ -99,91 +185,14 @@ async function handleCheckoutComplete(session, supabaseAdmin, STRIPE_PRODUCTS) {
             stripe_payment_intent_id: session.payment_intent,
         });
 
-        console.log(`Created Starter Pass for user ${userId}`);
     }
 }
 
 /**
  * Handle subscription creation/update
  */
-async function handleSubscriptionUpdate(subscription, supabaseAdmin, STRIPE_PRODUCTS) {
-    const userId = subscription.metadata?.user_id;
-    const customerId = subscription.customer;
-
-    // Try to get user ID from metadata or customer
-    let resolvedUserId = userId;
-    if (!resolvedUserId) {
-        const { data } = await supabaseAdmin
-            .from('subscriptions')
-            .select('user_id')
-            .eq('stripe_customer_id', customerId)
-            .single();
-        resolvedUserId = data?.user_id;
-    }
-
-    if (!resolvedUserId) {
-        console.error('Could not resolve user ID for subscription');
-        return;
-    }
-
-    // Update subscription record
-    await supabaseAdmin.from('subscriptions').upsert({
-        user_id: resolvedUserId,
-        stripe_customer_id: customerId,
-        stripe_subscription_id: subscription.id,
-        status: subscription.status,
-        plan: subscription.items.data[0]?.price?.id,
-        current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-        cancel_at_period_end: subscription.cancel_at_period_end,
-    });
-
-    // Create/update entitlement for active subscriptions
-    if (['active', 'trialing'].includes(subscription.status)) {
-        const priceId = subscription.items.data[0]?.price?.id;
-        const product = Object.values(STRIPE_PRODUCTS).find(p => p.priceId === priceId);
-
-        if (product?.entitlement) {
-            const { entitlement } = product;
-
-            // Upsert subscription entitlement
-            const { data: existing } = await supabaseAdmin
-                .from('entitlements')
-                .select('id')
-                .eq('user_id', resolvedUserId)
-                .eq('type', 'subscription')
-                .single();
-
-            if (existing) {
-                // Update existing
-                await supabaseAdmin
-                    .from('entitlements')
-                    .update({
-                        ends_at: new Date(subscription.current_period_end * 1000).toISOString(),
-                        share_quota: entitlement.shareQuota,
-                        property_quota: entitlement.propertyQuota,
-                        ai_quota: entitlement.aiQuota,
-                    })
-                    .eq('id', existing.id);
-            } else {
-                // Create new
-                await supabaseAdmin.from('entitlements').insert({
-                    user_id: resolvedUserId,
-                    type: 'subscription',
-                    starts_at: new Date(subscription.current_period_start * 1000).toISOString(),
-                    ends_at: new Date(subscription.current_period_end * 1000).toISOString(),
-                    share_quota: entitlement.shareQuota,
-                    share_used: 0,
-                    property_quota: entitlement.propertyQuota,
-                    property_used: 0,
-                    ai_quota: entitlement.aiQuota,
-                    ai_used: 0,
-                });
-            }
-        }
-    }
-
-    console.log(`Updated subscription for user ${resolvedUserId}: ${subscription.status}`);
+async function handleSubscriptionUpdate(subscription, supabaseAdmin, syncSubscriptionToDb) {
+    await syncSubscriptionToDb(subscription, supabaseAdmin);
 }
 
 /**
@@ -213,23 +222,21 @@ async function handleSubscriptionDeleted(subscription, supabaseAdmin) {
             .eq('user_id', data.user_id)
             .eq('type', 'subscription');
 
-        console.log(`Cancelled subscription for user ${data.user_id}`);
     }
 }
 
 /**
  * Handle successful invoice payment (subscription renewal)
  */
-async function handleInvoicePaymentSucceeded(invoice, stripe, supabaseAdmin, STRIPE_PRODUCTS) {
+async function handleInvoicePaymentSucceeded(invoice, stripe, supabaseAdmin, syncSubscriptionToDb) {
     if (!invoice.subscription) return;
 
     const subscription = await stripe.subscriptions.retrieve(invoice.subscription);
-    await handleSubscriptionUpdate(subscription, supabaseAdmin, STRIPE_PRODUCTS);
+    await syncSubscriptionToDb(subscription, supabaseAdmin);
 }
 
 /**
  * Handle failed invoice payment
  */
 async function handleInvoicePaymentFailed(invoice) {
-    console.log('Invoice payment failed:', invoice.id);
 }

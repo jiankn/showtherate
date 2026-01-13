@@ -40,7 +40,7 @@ export async function GET(_request, { params }) {
 
         const { data: share, error: shareError } = await supabaseAdmin
             .from('shares')
-            .select('comparison_id, snapshot_json, expires_at, is_active')
+            .select('comparison_id, snapshot_json, expires_at, is_active, view_count')
             .eq('share_id', shareId)
             .eq('is_active', true)
             .gte('expires_at', nowIso)
@@ -62,6 +62,7 @@ export async function GET(_request, { params }) {
         return NextResponse.json({
             shareId,
             expiresAt: share.expires_at,
+            viewCount: share.view_count || 0,
             snapshot: {
                 ...(share.snapshot_json || {}),
                 lo: lo || undefined,

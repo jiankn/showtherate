@@ -202,3 +202,16 @@
     width: 100%;
     text-align: left;
 }
+
+.dropdownIcon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    opacity: 0.8;
+    transition: opacity var(--transition-fast);
+    display: inline-block;
+}
+
+.dropdownItem:hover .dropdownIcon {
+    opacity: 1;
+}
