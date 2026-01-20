@@ -51,6 +51,7 @@ export default function UserMenu({ session, variant = 'header' }) {
                         width={36}
                         height={36}
                         className={styles.avatarImage}
+                        unoptimized
                     />
                 ) : (
                     <div className={styles.avatarInitial}>{userInitial}</div>
@@ -68,6 +69,7 @@ export default function UserMenu({ session, variant = 'header' }) {
                                 width={40}
                                 height={40}
                                 className={styles.dropdownAvatar}
+                                unoptimized
                             />
                         ) : (
                             <div className={styles.dropdownAvatarInitial}>{userInitial}</div>

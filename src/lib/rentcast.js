@@ -136,41 +136,55 @@ async function incrementKeyUsage(keyIndex, period) {
 }
 
 /**
- * 严格顺序选择下一个可用的 API Key
- * - 单 Key 时：不检查配额，直接返回
- * - 多 Key 时：从 Key 0 开始，找第一个使用量 < 限制的 Key
+ * 轮询选择下一个 API Key（Round-Robin 取模轮询）
+ * - 单 Key 时：直接返回该 Key
+ * - 多 Key 时：基于总调用次数取模，实现负载均衡
  * 
  * @returns {{ key: string, index: number } | null}
  */
 async function selectNextKey() {
     const keys = getApiKeys();
 
-    // 单 Key 模式：不检查配额，直接返回
+    // 单 Key 模式：直接返回
     if (keys.length === 1) {
-        console.log('[RentCast] Single key mode - no quota limit');
+        console.log('[RentCast] Single key mode');
         return { key: keys[0], index: 0 };
     }
 
-    // 多 Key 模式：启用配额控制
+    // 多 Key 模式：轮询分配
     const period = getCurrentBillingPeriod();
     const usages = await getKeyUsages(period);
 
+    // 计算总调用次数
+    const totalUsed = usages.reduce((sum, u) => sum + u.usage_count, 0);
+
+    // 取模得到下一个 Key 索引（Round-Robin）
+    const nextIndex = totalUsed % keys.length;
+
     console.log(`[RentCast] Billing period: ${period}, Reset day: ${RESET_DAY}`);
     console.log(`[RentCast] Key usages:`, usages.map(u => `Key${u.key_index}=${u.usage_count}/${MONTHLY_LIMIT_PER_KEY}`).join(', '));
+    console.log(`[RentCast] Round-robin: total=${totalUsed}, next=Key${nextIndex}`);
 
-    // 严格按索引顺序查找第一个未满的 Key
-    for (let i = 0; i < usages.length; i++) {
-        if (usages[i].usage_count < MONTHLY_LIMIT_PER_KEY) {
-            console.log(`[RentCast] Selected Key ${i} (usage: ${usages[i].usage_count})`);
-            return {
-                key: keys[i],
-                index: i
-            };
+    // 检查选中的 Key 是否已达到配额限制
+    const selectedUsage = usages.find(u => u.key_index === nextIndex);
+    if (selectedUsage && selectedUsage.usage_count >= MONTHLY_LIMIT_PER_KEY) {
+        // 如果轮询到的 Key 已满，尝试找其他可用的 Key
+        for (let i = 0; i < keys.length; i++) {
+            const usage = usages.find(u => u.key_index === i);
+            if (!usage || usage.usage_count < MONTHLY_LIMIT_PER_KEY) {
+                console.log(`[RentCast] Key${nextIndex} exhausted, fallback to Key${i}`);
+                return { key: keys[i], index: i };
+            }
         }
+        // 所有 Key 都已达到限制
+        console.warn('[RentCast] All API keys have reached monthly limit');
+        return null;
     }
 
-    console.warn('[RentCast] All API keys have reached monthly limit');
-    return null;
+    return {
+        key: keys[nextIndex],
+        index: nextIndex
+    };
 }
 
 /**
