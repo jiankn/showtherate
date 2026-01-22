@@ -1,9 +1,10 @@
 'use client';
 
-import { Suspense, useState, useCallback, useMemo, useEffect } from 'react';
+import { Suspense, useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useToast } from '../../../components/GlobalToast';
+import { useUser } from '../../../components/UserContext';
 import ClientSearchInput from '../../../components/ClientSearchInput';
 import {
     calculateScenario,
@@ -311,13 +312,13 @@ function ScenarioBuilderPageInner() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { toast, confirm } = useToast();
+    const { profile: userProfile, session } = useUser();
     const [scenarios, setScenarios] = useState([
         createEmptyScenario('Option A'),
         { ...createEmptyScenario('Option B'), inputs: { ...createEmptyScenario().inputs, interestRate: 5.875 } },
     ]);
     const [comparisonTitle, setComparisonTitle] = useState('Mortgage Comparison');
     const [selectedClient, setSelectedClient] = useState(null);
-    const [showPreviewModal, setShowPreviewModal] = useState(false);
     const [entitlements, setEntitlements] = useState(null);
     const [isLoadingEntitlements, setIsLoadingEntitlements] = useState(true);
     const [propertyAddress, setPropertyAddress] = useState('');
@@ -335,7 +336,14 @@ function ScenarioBuilderPageInner() {
     const [isAIGenerated, setIsAIGenerated] = useState(false);
     const [canUseAI, setCanUseAI] = useState(false);
 
+    // Draft storage
+    const DRAFT_STORAGE_KEY = 'showtherate_comparison_draft';
+    const hasDraftRestored = useRef(false);
+    const [showDraftPrompt, setShowDraftPrompt] = useState(false);
+    const [savedDraft, setSavedDraft] = useState(null);
+
     const isSubscriber = entitlements?.type === 'subscription';
+    const hasPaidPlan = entitlements?.hasActiveEntitlement === true;
     const closingScriptRemaining = typeof entitlements?.quotas?.closingScript?.remaining === 'number'
         ? entitlements.quotas.closingScript.remaining
         : null;
@@ -386,6 +394,59 @@ function ScenarioBuilderPageInner() {
         })();
     }, [searchParams]);
 
+    // Clone existing comparison from URL param
+    const hasClonedRef = useRef(false);
+    useEffect(() => {
+        const cloneId = searchParams.get('clone');
+        if (!cloneId || hasClonedRef.current) return;
+
+        hasClonedRef.current = true;
+
+        (async () => {
+            try {
+                const res = await fetch(`/api/comparisons/${cloneId}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.scenarios) {
+                        // Set title with "Copy of" prefix
+                        setComparisonTitle(`Copy of ${data.title || 'Mortgage Comparison'}`);
+
+                        // Map scenarios to the expected format
+                        const clonedScenarios = data.scenarios.map((s, idx) => ({
+                            id: `${Date.now()}-${idx}`,
+                            name: s.name || `Option ${String.fromCharCode(65 + idx)}`,
+                            inputs: s.inputs || {},
+                        }));
+
+                        if (clonedScenarios.length > 0) {
+                            setScenarios(clonedScenarios);
+                        }
+
+                        // Set property address if available
+                        const firstScenario = clonedScenarios[0];
+                        if (firstScenario?.inputs?.propertyAddress) {
+                            setPropertyAddress(firstScenario.inputs.propertyAddress);
+                        }
+
+                        // Set AI script if available
+                        if (data.aiScript) {
+                            setAiText(data.aiScript);
+                            setIsAIGenerated(true);
+                        }
+
+                        toast.info('Comparison loaded! Make your changes and save as a new comparison.');
+                    }
+                } else {
+                    toast.error('Failed to load comparison for cloning');
+                }
+            } catch (err) {
+                console.error('Failed to clone comparison:', err);
+                toast.error('Failed to load comparison');
+            }
+        })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchParams]);
+
     // Calculate all scenarios
     const calculatedScenarios = useMemo(() => {
         return scenarios.map(scenario => {
@@ -415,12 +476,12 @@ function ScenarioBuilderPageInner() {
         };
         setScenarios(prev => [...prev, newScenario]);
         toast.success('Scenario duplicated');
-    }, [scenarios.length, toast]);
+    }, [scenarios.length]); // 移除toast依赖
 
     const handleRemoveScenario = useCallback((id) => {
         setScenarios(prev => prev.filter(s => s.id !== id));
         toast.success('Scenario removed');
-    }, [toast]);
+    }, []); // 移除toast依赖
 
     const handleAddScenario = useCallback(() => {
         if (scenarios.length >= 4) {
@@ -429,7 +490,7 @@ function ScenarioBuilderPageInner() {
         }
         const newScenario = createEmptyScenario(`Option ${String.fromCharCode(65 + scenarios.length)}`);
         setScenarios(prev => [...prev, newScenario]);
-    }, [scenarios.length, toast]);
+    }, [scenarios.length]); // 移除toast依赖
 
     const handleFetchProperty = useCallback(async () => {
         const address = propertyAddress.trim();
@@ -519,7 +580,7 @@ function ScenarioBuilderPageInner() {
         } finally {
             setIsFetchingProperty(false);
         }
-    }, [propertyAddress, toast]);
+    }, [propertyAddress]); // 移除toast依赖
 
     const aiSummaryPayload = useMemo(() => {
         const outputs = calculatedScenarios.map(s => s.outputs).filter(Boolean);
@@ -598,7 +659,7 @@ function ScenarioBuilderPageInner() {
         } finally {
             setIsGeneratingAI(false);
         }
-    }, [aiSummaryPayload, aiType, comparisonTitle, toast]);
+    }, [aiSummaryPayload, aiType, comparisonTitle]); // 移除toast依赖
 
     // Generate AI script (subscribers only, once per comparison)
     const handleGenerateAIScript = useCallback(async () => {
@@ -607,8 +668,8 @@ function ScenarioBuilderPageInner() {
             return;
         }
 
-        if (!isSubscriber) {
-            toast.error('AI generation requires subscription');
+        if (!hasPaidPlan) {
+            toast.error('AI generation requires a paid plan');
             return;
         }
 
@@ -674,7 +735,7 @@ function ScenarioBuilderPageInner() {
         } finally {
             setIsGeneratingAI(false);
         }
-    }, [aiSummaryPayload, aiType, comparisonTitle, isSubscriber, hasUsedAI, closingScriptRemaining, toast]);
+    }, [aiSummaryPayload, aiType, comparisonTitle, hasPaidPlan, hasUsedAI, closingScriptRemaining]); // 移除toast依赖
 
     const handleCopyAIScript = useCallback(async () => {
         if (!aiText) return;
@@ -684,7 +745,7 @@ function ScenarioBuilderPageInner() {
         } catch {
             toast.error('Failed to copy');
         }
-    }, [aiText, toast]);
+    }, [aiText]); // 移除toast依赖
 
     const handlePreview = useCallback(() => {
         if (!aiSummaryPayload) {
@@ -692,8 +753,69 @@ function ScenarioBuilderPageInner() {
             return;
         }
 
-        setShowPreviewModal(true);
-    }, [aiSummaryPayload, toast]);
+        const previewId = 'preview';
+        const profileName = [userProfile?.firstName, userProfile?.lastName]
+            .filter(Boolean)
+            .join(' ')
+            .trim();
+        const loName = profileName || session?.user?.name || null;
+        const normalizedScenarios = calculatedScenarios.map((scenario, idx) => ({
+            id: scenario.id || `${previewId}-${idx}`,
+            name: scenario.name || `Option ${String.fromCharCode(65 + idx)}`,
+            inputs: idx === 0
+                ? { ...scenario.inputs, propertyAddress: propertyAddress.trim() || null }
+                : scenario.inputs,
+            outputs: scenario.outputs || null,
+        }));
+        const rawHomePrice = normalizedScenarios[0]?.inputs?.homePrice;
+        const homePrice = typeof rawHomePrice === 'number' && !Number.isNaN(rawHomePrice)
+            ? rawHomePrice
+            : null;
+
+        const previewPayload = {
+            id: previewId,
+            title: comparisonTitle,
+            aiScript: aiText || null,
+            scenarios: normalizedScenarios,
+            createdAt: new Date().toISOString(),
+            viewCount: 0,
+            loName,
+            loNmls: userProfile?.nmls || null,
+            loEmail: userProfile?.email || session?.user?.email || null,
+            loPhone: userProfile?.phone || null,
+            loX: userProfile?.xHandle || null,
+            loFacebook: userProfile?.facebook || null,
+            loTikTok: userProfile?.tiktok || null,
+            loInstagram: userProfile?.instagram || null,
+            loAvatarUrl: userProfile?.avatarUrl || session?.user?.image || null,
+            propertyAddress: propertyAddress.trim() || null,
+            homePrice,
+        };
+
+        try {
+            localStorage.setItem(`comparison_${previewId}`, JSON.stringify(previewPayload));
+        } catch (error) {
+            console.error('Failed to store preview data:', error);
+            toast.error('Preview failed. Please allow local storage and try again.');
+            return;
+        }
+
+        const previewUrl = `/s/${previewId}`;
+        const previewWindow = window.open(previewUrl, '_blank', 'noopener,noreferrer');
+        if (!previewWindow) {
+            router.push(previewUrl);
+        }
+    }, [
+        aiSummaryPayload,
+        calculatedScenarios,
+        comparisonTitle,
+        aiText,
+        userProfile,
+        session,
+        propertyAddress,
+        toast,
+        router,
+    ]);
 
     // Refresh entitlements (for real-time quota update)
     const refreshEntitlements = useCallback(async () => {
@@ -736,9 +858,11 @@ function ScenarioBuilderPageInner() {
                     title: comparisonTitle,
                     clientId: selectedClient?.id || null,
                     aiScript: aiText || null,
-                    scenarios: calculatedScenarios.map(s => ({
+                    scenarios: calculatedScenarios.map((s, idx) => ({
                         name: s.name,
-                        inputs: s.inputs,
+                        inputs: idx === 0
+                            ? { ...s.inputs, propertyAddress: propertyAddress.trim() || null }
+                            : s.inputs,
                         outputs: s.outputs,
                     })),
                 }),
@@ -786,7 +910,7 @@ function ScenarioBuilderPageInner() {
         } finally {
             setIsSaving(false);
         }
-    }, [calculatedScenarios, comparisonTitle, selectedClient, hasShareQuota, confirm, refreshEntitlements, router, toast]);
+    }, [calculatedScenarios, comparisonTitle, selectedClient, hasShareQuota, confirm, refreshEntitlements, router]); // 移除toast依赖
 
     return (
         <div className={styles.page}>
@@ -954,8 +1078,8 @@ function ScenarioBuilderPageInner() {
                                     <CopyIcon className={styles.aiCopyIcon} />
                                     Copy
                                 </button>
-                                {/* Show Try AI button for subscribers who haven't used AI yet */}
-                                {isSubscriber && canUseAI && !hasUsedAI && (
+                                {/* Show Try AI button for paid users who haven't used AI yet */}
+                                {hasPaidPlan && canUseAI && !hasUsedAI && (
                                     <button
                                         className={styles.aiTryAIBtn}
                                         onClick={handleGenerateAIScript}
@@ -968,7 +1092,7 @@ function ScenarioBuilderPageInner() {
                             <div className={styles.aiMeta}>
                                 {isAIGenerated && <span className={styles.aiTag}>AI Generated</span>}
                                 {aiMeta?.isAI === false && <span>Template</span>}
-                                {typeof aiMeta?.remaining === 'number' && isSubscriber && (
+                                {typeof aiMeta?.remaining === 'number' && hasPaidPlan && (
                                     <span>AI remaining: {aiMeta.remaining === -1 ? '∞' : aiMeta.remaining}</span>
                                 )}
                                 {!aiText && (
@@ -986,6 +1110,14 @@ function ScenarioBuilderPageInner() {
                     ← Back to Dashboard
                 </Link>
                 <div className={styles.actionButtons}>
+                    <button
+                        className={styles.previewBtn}
+                        onClick={handlePreview}
+                        disabled={isSaving || calculatedScenarios.length === 0}
+                        title="Preview how it looks"
+                    >
+                        👁 Preview
+                    </button>
                     {shareQuotaRemaining !== null && shareQuotaRemaining !== -1 && (
                         <span className={styles.quotaInfo}>
                             {shareQuotaRemaining} share{shareQuotaRemaining !== 1 ? 's' : ''} remaining
@@ -1002,44 +1134,6 @@ function ScenarioBuilderPageInner() {
                 </div>
             </div>
 
-            {/* Preview Modal (local only; no share link) */}
-            {showPreviewModal && (
-                <div className={styles.modalOverlay} onClick={() => setShowPreviewModal(false)}>
-                    <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-                        <div className={styles.modalHeader}>
-                            <h3>Preview</h3>
-                            <button className={styles.closeBtn} onClick={() => setShowPreviewModal(false)}>
-                                <CloseIcon className={styles.iconSvg} />
-                            </button>
-                        </div>
-
-                        <div className={styles.modalContent}>
-                            <p className={styles.previewHint}>
-                                Local preview only.
-                            </p>
-
-                            {aiSummaryPayload && (
-                                <div className={styles.aiText}>
-                                    <div>
-                                        <strong>{aiSummaryPayload.betterMonthlyLabel}</strong> saves {formatCurrency(aiSummaryPayload.monthlySavings)}/month • {formatCurrency(aiSummaryPayload.fiveYearTotalDifference)}/5 years
-                                    </div>
-                                    <div>
-                                        Cash-to-close difference: {formatCurrency(aiSummaryPayload.cashToCloseDifference)}
-                                    </div>
-                                </div>
-                            )}
-
-                            {entitlements?.type !== 'subscription' && (
-                                <div className={styles.modalActions}>
-                                    <Link href="/app/upgrade" className={styles.previewBtn}>
-                                        Upgrade →
-                                    </Link>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

@@ -20,6 +20,7 @@ export default function DashboardPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pollingRef = useRef(null);
+    const hasShownToast = useRef(false);
 
     // 检测 checkout 成功
     const checkoutSuccess = searchParams.get('checkout') === 'success';
@@ -48,17 +49,35 @@ export default function DashboardPage() {
                 const res = await fetch('/api/user/entitlements');
                 if (res.ok) {
                     const data = await res.json();
-                    // 检查是否已有活跃订阅
-                    if (data.hasActiveEntitlement && data.type !== 'free') {
+                    // 检查是否已有正确的活跃订阅
+                    // 根据购买的产品判断期望的 entitlement 类型
+                    const expectedType = ['monthly', 'yearly'].includes(productKey?.toLowerCase())
+                        ? 'subscription'
+                        : 'starter_pass_7d';
+                    const isCorrectType = data.type === expectedType ||
+                        (expectedType === 'subscription' && data.type === 'subscription') ||
+                        (expectedType === 'starter_pass_7d' && data.type === 'starter_pass_7d');
+
+                    if (data.hasActiveEntitlement && data.type !== 'free' && isCorrectType) {
                         setEntitlements(data);
                         setCheckoutProcessing(false);
 
                         // 清除 URL 参数
                         router.replace('/app', { scroll: false });
 
-                        // 显示成功提示
-                        const planName = data.type === 'subscription' ? 'Pro Plan' : 'Starter Pass';
-                        toast.success(`🎉 Welcome to ${planName}! Your subscription is now active.`);
+                        // 显示成功提示（只弹一次）
+                        if (!hasShownToast.current) {
+                            hasShownToast.current = true;
+                            // 根据 URL 参数中的 product 判断产品类型
+                            const productMap = {
+                                'MONTHLY': 'Pro Plan',
+                                'YEARLY': 'Pro Plan (Annual)',
+                                'STARTER_PASS': 'Starter Pass'
+                            };
+                            const planName = productMap[productKey?.toUpperCase()] ||
+                                (data.type === 'subscription' ? 'Pro Plan' : 'Starter Pass');
+                            toast.success(`🎉 Welcome to ${planName}! Your subscription is now active.`);
+                        }
 
                         // 触发全局事件通知其他组件刷新
                         window.dispatchEvent(new Event('entitlementsUpdated'));
@@ -100,7 +119,7 @@ export default function DashboardPage() {
                 pollingRef.current = null;
             }
         };
-    }, [checkoutSuccess, productKey, router, toast]);
+    }, [checkoutSuccess, productKey, router]); // 移除toast依赖
 
     const loadData = async () => {
         try {
