@@ -255,6 +255,18 @@
     border-color: rgba(59, 130, 246, 0.7) !important;
 }
 
+.currentPlan {
+    background: linear-gradient(180deg, rgba(34, 197, 94, 0.12) 0%, var(--glass-bg) 100%) !important;
+    border: 2px solid rgba(34, 197, 94, 0.5) !important;
+    box-shadow: 0 0 50px rgba(34, 197, 94, 0.2), var(--card-shadow-glass);
+}
+
+.currentPlan:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 0 60px rgba(34, 197, 94, 0.25), var(--card-shadow-glass);
+    border-color: rgba(34, 197, 94, 0.6) !important;
+}
+
 /* Best Value / Annual Card */
 .pricingCardBestValue {
     background: linear-gradient(180deg, rgba(139, 92, 246, 0.1) 0%, var(--glass-bg) 100%) !important;

@@ -1,18 +1,44 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { useToast } from '../../components/GlobalToast';
+import { useUser } from '../../components/UserContext';
 import styles from './page.module.css';
 
 export default function PricingPage() {
     const { data: session, status } = useSession();
     const { toast } = useToast();
+    const { isPro, isStarterPass, loading: userLoading } = useUser();
+    const router = useRouter();
     const [loadingProduct, setLoadingProduct] = useState(null);
     const [billingTab, setBillingTab] = useState('individual');
+
+    // 如果用户已经有活跃订阅，重定向到dashboard
+    useEffect(() => {
+        if (!userLoading && (isPro || isStarterPass)) {
+            const planName = isPro ? 'Pro' : 'Starter Pass';
+            toast.info(`You already have a ${planName} plan!`);
+            router.push('/app');
+        }
+    }, [isPro, isStarterPass, userLoading, router, toast]);
+
+    // 如果正在加载用户状态，显示加载中
+    if (userLoading) {
+        return (
+            <div className={styles.page}>
+                <Header variant="dark" />
+                <div style={{ minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div>Loading...</div>
+                </div>
+                <Footer />
+            </div>
+        );
+    }
 
     const handleCheckout = async (productKey) => {
         // 如果用户未登录，跳转到登录页并携带 product 参数
@@ -116,40 +142,55 @@ export default function PricingPage() {
                             </div>
 
                             {/* Starter Pass */}
-                            <div className={`card ${styles.pricingCard}`}>
+                            <div className={`card ${styles.pricingCard} ${isStarterPass ? styles.currentPlan : ''}`}>
+                                <div className={styles.badge}>
+                                    {isStarterPass ? '✅ Current Plan' : '🚀 Try Risk-Free'}
+                                </div>
                                 <h3>Starter Pass</h3>
                                 <div className={styles.price}>
                                     <span className="number-display">$9.9</span>
                                     <span className={styles.period}>/ 7 days</span>
                                 </div>
-                                <p className={styles.priceDesc}>Perfect for trying the full experience</p>
+                                <p className={styles.priceDesc}>
+                                    {isStarterPass ? 'Your active trial' : 'Perfect for trying the full experience'}
+                                </p>
 
                                 <ul className={styles.features}>
-                                    <li>✓ <strong>5</strong> Share Links</li>
+                                    <li>✓ <strong>10</strong> Share Links</li>
                                     <li>✓ <strong>10</strong> Property Tax Lookups</li>
                                     <li>✓ <strong>30</strong> AI Generations</li>
                                     <li>✓ Full comparison features</li>
                                     <li>✓ <strong>$9.9 credit</strong> on upgrade</li>
                                 </ul>
 
-                                <button
-                                    onClick={() => handleCheckout('STARTER_PASS')}
-                                    disabled={loadingProduct === 'STARTER_PASS'}
-                                    className="btn btn-secondary btn-full"
-                                >
-                                    {loadingProduct === 'STARTER_PASS' ? 'Processing...' : 'Get Starter Pass'}
-                                </button>
+                                {isStarterPass ? (
+                                    <Link href="/app/settings" className="btn btn-secondary btn-full">
+                                        Manage Trial
+                                    </Link>
+                                ) : (
+                                    <button
+                                        onClick={() => handleCheckout('STARTER_PASS')}
+                                        disabled={loadingProduct === 'STARTER_PASS'}
+                                        className="btn btn-secondary btn-full"
+                                    >
+                                        {loadingProduct === 'STARTER_PASS' ? 'Processing...' : 'Get Starter Pass'}
+                                    </button>
+                                )}
                             </div>
 
                             {/* Pro Subscription */}
-                            <div className={`card ${styles.pricingCard} ${styles.featured}`}>
-                                <div className={styles.badge}>✨ Most Popular</div>
+                            <div className={`card ${styles.pricingCard} ${styles.featured} ${isPro ? styles.currentPlan : ''}`}>
+                                <div className={styles.badge}>
+                                    {isPro ? '✅ Current Plan' : '✨ Most Popular'}
+                                </div>
                                 <h3>Pro Monthly</h3>
                                 <div className={styles.price}>
                                     <span className="number-display">$99</span>
                                     <span className={styles.period}>/ month</span>
                                 </div>
-                                <p className={styles.priceDesc}>For serious loan officers</p>
+                                <p className={styles.priceDesc}>
+                                    {isPro ? 'Your active subscription' : 'For serious loan officers'}
+                                </p>
 
                                 <ul className={styles.features}>
                                     <li>✓ <strong>Unlimited</strong> Share Links</li>
@@ -159,13 +200,19 @@ export default function PricingPage() {
                                     <li>✓ PWA for mobile</li>
                                 </ul>
 
-                                <button
-                                    onClick={() => handleCheckout('MONTHLY')}
-                                    disabled={loadingProduct === 'MONTHLY'}
-                                    className="btn btn-primary btn-full"
-                                >
-                                    {loadingProduct === 'MONTHLY' ? 'Processing...' : 'Subscribe'}
-                                </button>
+                                {isPro ? (
+                                    <Link href="/app/settings" className="btn btn-secondary btn-full">
+                                        Manage Subscription
+                                    </Link>
+                                ) : (
+                                    <button
+                                        onClick={() => handleCheckout('MONTHLY')}
+                                        disabled={loadingProduct === 'MONTHLY'}
+                                        className="btn btn-primary btn-full"
+                                    >
+                                        {loadingProduct === 'MONTHLY' ? 'Processing...' : 'Subscribe'}
+                                    </button>
+                                )}
                             </div>
                         </div>
                     ) : (
