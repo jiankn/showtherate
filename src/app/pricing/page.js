@@ -20,12 +20,37 @@ export default function PricingPage() {
 
     // 如果用户已经有活跃订阅，重定向到dashboard
     useEffect(() => {
+        const debugInfo = {
+            userLoading,
+            isPro,
+            isStarterPass,
+            session: !!session,
+            email: session?.user?.email,
+            entitlements: (window as any)?.userEntitlements || 'not loaded'
+        };
+        console.log('Pricing page debug:', debugInfo);
+
         if (!userLoading && (isPro || isStarterPass)) {
             const planName = isPro ? 'Pro' : 'Starter Pass';
+            console.log(`User has ${planName} plan, redirecting...`);
             toast.info(`You already have a ${planName} plan!`);
             router.push('/app');
         }
-    }, [isPro, isStarterPass, userLoading, router, toast]);
+    }, [isPro, isStarterPass, userLoading, router, toast, session]);
+
+    // 手动检查API以确保数据正确
+    useEffect(() => {
+        if (session?.user && !userLoading) {
+            console.log('Manually checking entitlements API...');
+            fetch('/api/user/entitlements')
+                .then(res => res.json())
+                .then(data => {
+                    console.log('Raw entitlements API response:', data);
+                    (window as any).userEntitlements = data;
+                })
+                .catch(err => console.error('Failed to fetch entitlements:', err));
+        }
+    }, [session, userLoading]);
 
     // 如果正在加载用户状态，显示加载中
     if (userLoading) {
@@ -80,6 +105,28 @@ export default function PricingPage() {
 
     return (
         <div className={styles.page}>
+            {/* Debug Info - 临时添加 */}
+            {!userLoading && (
+                <div style={{
+                    position: 'fixed',
+                    top: '10px',
+                    right: '10px',
+                    background: 'rgba(0,0,0,0.8)',
+                    color: 'white',
+                    padding: '10px',
+                    borderRadius: '5px',
+                    fontSize: '12px',
+                    zIndex: 9999,
+                    maxWidth: '300px'
+                }}>
+                    <div>User: {session?.user?.email}</div>
+                    <div>Loading: {userLoading ? 'true' : 'false'}</div>
+                    <div>isPro: {isPro ? 'true' : 'false'}</div>
+                    <div>isStarterPass: {isStarterPass ? 'true' : 'false'}</div>
+                    <div>Entitlements: {JSON.stringify((window as any)?.userEntitlements, null, 2)}</div>
+                </div>
+            )}
+
             {/* Header */}
             <Header variant="dark" />
 
