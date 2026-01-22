@@ -13,45 +13,19 @@ import styles from './page.module.css';
 export default function PricingPage() {
     const { data: session, status } = useSession();
     const { toast } = useToast();
-    const { isPro, isStarterPass, loading: userLoading, refreshUserData } = useUser();
+    const { isPro, isStarterPass, loading: userLoading } = useUser();
     const router = useRouter();
     const [loadingProduct, setLoadingProduct] = useState(null);
     const [billingTab, setBillingTab] = useState('individual');
-    const [forceCheck, setForceCheck] = useState(false);
 
     // 如果用户已经有活跃订阅，重定向到dashboard
     useEffect(() => {
-        const debugInfo = {
-            userLoading,
-            isPro,
-            isStarterPass,
-            session: !!session,
-            email: session?.user?.email,
-            entitlements: (window as any)?.userEntitlements || 'not loaded'
-        };
-        console.log('Pricing page debug:', debugInfo);
-
         if (!userLoading && (isPro || isStarterPass)) {
             const planName = isPro ? 'Pro' : 'Starter Pass';
-            console.log(`User has ${planName} plan, redirecting...`);
             toast.info(`You already have a ${planName} plan!`);
             router.push('/app');
         }
-    }, [isPro, isStarterPass, userLoading, router, toast, session]);
-
-    // 手动检查API以确保数据正确
-    useEffect(() => {
-        if (session?.user && !userLoading) {
-            console.log('Manually checking entitlements API...');
-            fetch('/api/user/entitlements')
-                .then(res => res.json())
-                .then(data => {
-                    console.log('Raw entitlements API response:', data);
-                    (window as any).userEntitlements = data;
-                })
-                .catch(err => console.error('Failed to fetch entitlements:', err));
-        }
-    }, [session, userLoading]);
+    }, [isPro, isStarterPass, userLoading, router, toast]);
 
     // 如果正在加载用户状态，显示加载中
     if (userLoading) {
@@ -106,28 +80,6 @@ export default function PricingPage() {
 
     return (
         <div className={styles.page}>
-            {/* Debug Info - 临时添加 */}
-            {!userLoading && (
-                <div style={{
-                    position: 'fixed',
-                    top: '10px',
-                    right: '10px',
-                    background: 'rgba(0,0,0,0.8)',
-                    color: 'white',
-                    padding: '10px',
-                    borderRadius: '5px',
-                    fontSize: '12px',
-                    zIndex: 9999,
-                    maxWidth: '300px'
-                }}>
-                    <div>User: {session?.user?.email}</div>
-                    <div>Loading: {userLoading ? 'true' : 'false'}</div>
-                    <div>isPro: {isPro ? 'true' : 'false'}</div>
-                    <div>isStarterPass: {isStarterPass ? 'true' : 'false'}</div>
-                    <div>Entitlements: {JSON.stringify((window as any)?.userEntitlements, null, 2)}</div>
-                </div>
-            )}
-
             {/* Header */}
             <Header variant="dark" />
 
@@ -136,29 +88,6 @@ export default function PricingPage() {
                 <div className="container">
                     <h1>Simple, Transparent Pricing</h1>
                     <p>No hidden fees. No surprises. Start low-risk and upgrade when you&apos;re ready.</p>
-
-                    {/* 临时调试按钮 */}
-                    {session?.user && (
-                        <div style={{ marginTop: '20px' }}>
-                            <button
-                                onClick={() => {
-                                    console.log('Force refreshing user data...');
-                                    refreshUserData();
-                                    setForceCheck(!forceCheck);
-                                }}
-                                style={{
-                                    padding: '8px 16px',
-                                    background: '#3B82F6',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                🔄 Refresh User Status
-                            </button>
-                        </div>
-                    )}
                 </div>
             </section>
 
