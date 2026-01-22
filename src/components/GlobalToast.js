@@ -107,13 +107,13 @@ export function ToastProvider({ children }) {
         setToasts(prev => [...prev, { id, title, description, type, duration }]);
     }, []);
 
-    // Shorthand methods
-    const toast = {
+    // Shorthand methods - memoized to prevent unnecessary re-renders
+    const toast = useMemo(() => ({
         success: (title, options) => showToast(title, 'success', options),
         error: (title, options) => showToast(title, 'error', options),
         warning: (title, options) => showToast(title, 'warning', options),
         info: (title, options) => showToast(title, 'info', options),
-    };
+    }), [showToast]);
 
     // Show confirm dialog (returns Promise)
     const confirm = useCallback((message, options = {}) => {

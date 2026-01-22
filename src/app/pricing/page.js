@@ -25,7 +25,7 @@ export default function PricingPage() {
             toast.info(`You already have a ${planName} plan!`);
             router.push('/app');
         }
-    }, [isPro, isStarterPass, userLoading, router, toast]);
+    }, [isPro, isStarterPass, userLoading, router]); // 移除toast依赖，避免无限循环
 
     // 如果正在加载用户状态，显示加载中
     if (userLoading) {
