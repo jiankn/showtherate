@@ -16,7 +16,6 @@ import {
     LOAN_TYPES
 } from '@/lib/calculator';
 import { CopyIcon, TrashIcon, PlusIcon, RocketIcon, CloseIcon } from '../../../components/Icons';
-import PreviewModal from '../../../components/PreviewModal';
 import styles from './page.module.css';
 
 // Helper to format number with commas
@@ -320,7 +319,6 @@ function ScenarioBuilderPageInner() {
     ]);
     const [comparisonTitle, setComparisonTitle] = useState('Mortgage Comparison');
     const [selectedClient, setSelectedClient] = useState(null);
-    const [showPreviewModal, setShowPreviewModal] = useState(false);
     const [entitlements, setEntitlements] = useState(null);
     const [isLoadingEntitlements, setIsLoadingEntitlements] = useState(true);
     const [propertyAddress, setPropertyAddress] = useState('');
@@ -755,8 +753,69 @@ function ScenarioBuilderPageInner() {
             return;
         }
 
-        setShowPreviewModal(true);
-    }, [aiSummaryPayload, toast]);
+        const previewId = 'preview';
+        const profileName = [userProfile?.firstName, userProfile?.lastName]
+            .filter(Boolean)
+            .join(' ')
+            .trim();
+        const loName = profileName || session?.user?.name || null;
+        const normalizedScenarios = calculatedScenarios.map((scenario, idx) => ({
+            id: scenario.id || `${previewId}-${idx}`,
+            name: scenario.name || `Option ${String.fromCharCode(65 + idx)}`,
+            inputs: idx === 0
+                ? { ...scenario.inputs, propertyAddress: propertyAddress.trim() || null }
+                : scenario.inputs,
+            outputs: scenario.outputs || null,
+        }));
+        const rawHomePrice = normalizedScenarios[0]?.inputs?.homePrice;
+        const homePrice = typeof rawHomePrice === 'number' && !Number.isNaN(rawHomePrice)
+            ? rawHomePrice
+            : null;
+
+        const previewPayload = {
+            id: previewId,
+            title: comparisonTitle,
+            aiScript: aiText || null,
+            scenarios: normalizedScenarios,
+            createdAt: new Date().toISOString(),
+            viewCount: 0,
+            loName,
+            loNmls: userProfile?.nmls || null,
+            loEmail: userProfile?.email || session?.user?.email || null,
+            loPhone: userProfile?.phone || null,
+            loX: userProfile?.xHandle || null,
+            loFacebook: userProfile?.facebook || null,
+            loTikTok: userProfile?.tiktok || null,
+            loInstagram: userProfile?.instagram || null,
+            loAvatarUrl: userProfile?.avatarUrl || session?.user?.image || null,
+            propertyAddress: propertyAddress.trim() || null,
+            homePrice,
+        };
+
+        try {
+            localStorage.setItem(`comparison_${previewId}`, JSON.stringify(previewPayload));
+        } catch (error) {
+            console.error('Failed to store preview data:', error);
+            toast.error('Preview failed. Please allow local storage and try again.');
+            return;
+        }
+
+        const previewUrl = `/s/${previewId}`;
+        const previewWindow = window.open(previewUrl, '_blank', 'noopener,noreferrer');
+        if (!previewWindow) {
+            // 如果新窗口被阻止，显示提示信息而不是跳转当前页面
+            toast.error('Preview popup was blocked. Please allow popups for this site and try again.');
+        }
+    }, [
+        aiSummaryPayload,
+        calculatedScenarios,
+        comparisonTitle,
+        aiText,
+        userProfile,
+        session,
+        propertyAddress,
+        router,
+    ]); // 移除toast依赖避免无限循环
 
     // Refresh entitlements (for real-time quota update)
     const refreshEntitlements = useCallback(async () => {
@@ -1075,17 +1134,6 @@ function ScenarioBuilderPageInner() {
                 </div>
             </div>
 
-            {/* Preview Modal */}
-            <PreviewModal
-                isOpen={showPreviewModal}
-                onClose={() => setShowPreviewModal(false)}
-                title={comparisonTitle}
-                scenarios={calculatedScenarios}
-                aiScript={aiText}
-                loProfile={userProfile}
-                propertyAddress={propertyAddress}
-                homePrice={scenarios[0]?.inputs?.purchasePrice}
-            />
         </div>
     );
 }
