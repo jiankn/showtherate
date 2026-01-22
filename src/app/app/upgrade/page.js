@@ -233,7 +233,7 @@ export default function UpgradePage() {
                         <p className={styles.priceDesc}>Try the full experience</p>
 
                         <ul className={styles.features}>
-                            <li><CheckIcon className={styles.checkIcon} /> <strong>5</strong> Share Links</li>
+                            <li><CheckIcon className={styles.checkIcon} /> <strong>10</strong> Share Links</li>
                             <li><CheckIcon className={styles.checkIcon} /> <strong>10</strong> Property Lookups</li>
                             <li><CheckIcon className={styles.checkIcon} /> <strong>30</strong> AI Generations</li>
                             <li><CheckIcon className={styles.checkIcon} /> Full comparison features</li>
@@ -282,13 +282,9 @@ export default function UpgradePage() {
                             <li><CheckIcon className={styles.checkIcon} /> Analytics (coming soon)</li>
                         </ul>
 
-                        {isMonthly ? (
+                        {isPro ? (
                             <button className={styles.btnCurrent} disabled>
                                 ✓ Current Plan
-                            </button>
-                        ) : isYearly ? (
-                            <button className={styles.btnGhost} disabled>
-                                —
                             </button>
                         ) : (
                             <button
@@ -412,6 +408,12 @@ export default function UpgradePage() {
                                     <div className={`${styles.priceRow} ${styles.credit}`}>
                                         <span>Credit from remaining monthly</span>
                                         <span>-${upgradePreview.monthlyCredit.toFixed(2)}</span>
+                                    </div>
+                                )}
+                                {upgradePreview.balanceCredit > 0 && (
+                                    <div className={`${styles.priceRow} ${styles.credit}`}>
+                                        <span>Account credit applied</span>
+                                        <span>-${upgradePreview.balanceCredit.toFixed(2)}</span>
                                     </div>
                                 )}
                                 <div className={styles.priceDivider}></div>
