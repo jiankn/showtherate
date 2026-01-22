@@ -13,10 +13,11 @@ import styles from './page.module.css';
 export default function PricingPage() {
     const { data: session, status } = useSession();
     const { toast } = useToast();
-    const { isPro, isStarterPass, loading: userLoading } = useUser();
+    const { isPro, isStarterPass, loading: userLoading, refreshUserData } = useUser();
     const router = useRouter();
     const [loadingProduct, setLoadingProduct] = useState(null);
     const [billingTab, setBillingTab] = useState('individual');
+    const [forceCheck, setForceCheck] = useState(false);
 
     // 如果用户已经有活跃订阅，重定向到dashboard
     useEffect(() => {
@@ -135,6 +136,29 @@ export default function PricingPage() {
                 <div className="container">
                     <h1>Simple, Transparent Pricing</h1>
                     <p>No hidden fees. No surprises. Start low-risk and upgrade when you&apos;re ready.</p>
+
+                    {/* 临时调试按钮 */}
+                    {session?.user && (
+                        <div style={{ marginTop: '20px' }}>
+                            <button
+                                onClick={() => {
+                                    console.log('Force refreshing user data...');
+                                    refreshUserData();
+                                    setForceCheck(!forceCheck);
+                                }}
+                                style={{
+                                    padding: '8px 16px',
+                                    background: '#3B82F6',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                🔄 Refresh User Status
+                            </button>
+                        </div>
+                    )}
                 </div>
             </section>
 
