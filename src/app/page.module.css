@@ -324,6 +324,58 @@
   margin-top: var(--space-xs);
 }
 
+/* Savings Callout - Competitor Comparison */
+.savingsCallout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.1) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: var(--radius-full);
+  margin-top: var(--space-lg);
+  animation: fade-up 0.6s ease-out 0.5s both;
+}
+
+.savingsIcon {
+  font-size: 1.25rem;
+}
+
+.savingsText {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.savingsText strong {
+  color: #4ADE80;
+  font-weight: 700;
+}
+
+.savingsText a {
+  color: #4ADE80;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.savingsText a:hover {
+  text-decoration: underline;
+  color: #86EFAC;
+}
+
+@media (max-width: 640px) {
+  .savingsCallout {
+    flex-direction: column;
+    text-align: center;
+    padding: var(--space-md);
+  }
+
+  .savingsText {
+    font-size: 0.85rem;
+  }
+}
+
 /* Quick Compare Widget - Enhanced Glass */
 .heroVisual {
   display: flex;
@@ -1868,6 +1920,83 @@
 }
 
 /* Link to full pricing page */
+/* Competitor Comparison Callout */
+.competitorCompare {
+  margin-top: var(--space-2xl);
+  padding: 0 var(--space-md);
+}
+
+.competitorCompareInner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  padding: var(--space-lg) var(--space-xl);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: var(--radius-2xl);
+  flex-wrap: wrap;
+}
+
+.competitorIcon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.competitorText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  flex: 1;
+  min-width: 200px;
+}
+
+.competitorText strong {
+  font-size: 1.1rem;
+  color: white;
+  font-weight: 600;
+}
+
+.competitorText span {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.competitorBtn {
+  padding: var(--space-sm) var(--space-lg);
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  border: none;
+  border-radius: var(--radius-lg);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.competitorBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35);
+}
+
+@media (max-width: 640px) {
+  .competitorCompareInner {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-md);
+  }
+
+  .competitorText {
+    align-items: center;
+  }
+
+  .competitorBtn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
 .pricingPageLink {
   text-align: center;
   margin-top: var(--space-2xl);
@@ -1887,6 +2016,156 @@
 /* ================================
    Testimonials Section (Premium)
    ================================ */
+/* ================================
+   Success Stories Section
+   ================================ */
+.successStories {
+  padding: var(--space-4xl) 0;
+  background: linear-gradient(180deg, var(--color-bg) 0%, rgba(16, 185, 129, 0.03) 50%, var(--color-bg) 100%);
+  position: relative;
+}
+
+.storiesGrid {
+  display: grid;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-3xl);
+}
+
+@media (min-width: 768px) {
+  .storiesGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.storyCard {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-xl);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.storyCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.storyMetric {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.storyIcon {
+  font-size: 2.5rem;
+}
+
+.storyNumbers {
+  display: flex;
+  flex-direction: column;
+}
+
+.storyValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #059669;
+  line-height: 1.2;
+}
+
+.storyTimeframe {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.storyQuote {
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  font-style: italic;
+  flex: 1;
+  margin: 0;
+}
+
+.storyAuthor {
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.storyName {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.storyRole {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/* Proof Bar - Social Proof Statistics */
+.proofBar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-xl);
+  padding: var(--space-xl) var(--space-2xl);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: var(--radius-2xl);
+  flex-wrap: wrap;
+}
+
+.proofItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 120px;
+}
+
+.proofValue {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+
+.proofLabel {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-top: var(--space-xs);
+}
+
+.proofDivider {
+  width: 1px;
+  height: 40px;
+  background: var(--color-border);
+}
+
+@media (max-width: 640px) {
+  .proofBar {
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .proofDivider {
+    width: 60px;
+    height: 1px;
+  }
+
+  .proofValue {
+    font-size: 1.75rem;
+  }
+}
+
 .testimonials {
   padding: var(--space-4xl) 0;
   background: var(--color-bg);
@@ -2986,7 +3265,7 @@
 .addressInput {
   flex: 1;
   min-width: 200px;
-  height: 86px;
+  height: 56px;
   border: 2px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 0 var(--space-md);
