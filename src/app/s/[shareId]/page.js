@@ -255,6 +255,23 @@ export default function SharePage() {
                         )}
                     </div>
                 )}
+
+                {/* Timestamp - shows in client's local timezone */}
+                {data.createdAt && (
+                    <div className={styles.timestamp}>
+                        <span className={styles.timestampIcon}>📅</span>
+                        <span className={styles.timestampText}>
+                            Updated {new Date(data.createdAt).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: 'numeric',
+                                minute: '2-digit',
+                                hour12: true
+                            })}
+                        </span>
+                    </div>
+                )}
             </section>
 
             {/* Scenario Cards */}

@@ -10,12 +10,23 @@ function cleanString(value, maxLen = 200) {
 }
 
 async function getAuthUserRow(supabaseAdmin, userId) {
-    const { data } = await supabaseAdmin
+    // First try with preferences column
+    let result = await supabaseAdmin
         .from('users')
-        .select('id, email, name, first_name, last_name, contact_email, nmls, phone, x_handle, facebook, tiktok, instagram, avatar_url')
+        .select('id, email, name, first_name, last_name, contact_email, nmls, phone, x_handle, facebook, tiktok, instagram, avatar_url, preferences')
         .eq('id', userId)
         .maybeSingle();
-    return data || null;
+
+    // If preferences column doesn't exist, query without it
+    if (result.error && result.error.message?.includes('preferences')) {
+        result = await supabaseAdmin
+            .from('users')
+            .select('id, email, name, first_name, last_name, contact_email, nmls, phone, x_handle, facebook, tiktok, instagram, avatar_url')
+            .eq('id', userId)
+            .maybeSingle();
+    }
+
+    return result.data || null;
 }
 
 export async function GET() {
@@ -43,6 +54,7 @@ export async function GET() {
                 tiktok: userRow?.tiktok ?? null,
                 instagram: userRow?.instagram ?? null,
                 avatarUrl: userRow?.avatar_url ?? null,
+                preferences: userRow?.preferences ?? { emailNotifications: true, theme: 'system' },
             },
         });
     } catch (error) {
@@ -66,6 +78,19 @@ export async function PUT(request) {
 
         const userId = session.user.id;
 
+        // Handle preferences if provided
+        let preferences = undefined;
+        if (profile.preferences && typeof profile.preferences === 'object') {
+            preferences = {
+                emailNotifications: typeof profile.preferences.emailNotifications === 'boolean'
+                    ? profile.preferences.emailNotifications
+                    : true,
+                theme: ['light', 'dark', 'system'].includes(profile.preferences.theme)
+                    ? profile.preferences.theme
+                    : 'system',
+            };
+        }
+
         const fields = {
             first_name: cleanString(profile.firstName, 80),
             last_name: cleanString(profile.lastName, 80),
@@ -76,6 +101,7 @@ export async function PUT(request) {
             facebook: cleanString(profile.facebook, 200),
             tiktok: cleanString(profile.tiktok, 200),
             instagram: cleanString(profile.instagram, 200),
+            ...(preferences && { preferences }),
             updated_at: new Date().toISOString(),
         };
 
@@ -83,12 +109,47 @@ export async function PUT(request) {
             if (fields[k] === null) delete fields[k];
         });
 
-        const { data, error } = await supabaseAdmin
-            .from('users')
-            .update(fields)
-            .eq('id', userId)
-            .select('id, email, name, first_name, last_name, contact_email, nmls, phone, x_handle, facebook, tiktok, instagram, avatar_url')
-            .single();
+        // Try to save with preferences first, fallback without if column doesn't exist
+        let data, error;
+        const hasPreferencesField = preferences !== undefined;
+
+        if (hasPreferencesField) {
+            // First attempt: save with preferences
+            const result = await supabaseAdmin
+                .from('users')
+                .update(fields)
+                .eq('id', userId)
+                .select('id, email, name, first_name, last_name, contact_email, nmls, phone, x_handle, facebook, tiktok, instagram, avatar_url, preferences')
+                .single();
+
+            // Check if it failed due to missing preferences column
+            if (result.error && result.error.message?.includes('preferences')) {
+                console.warn('Preferences column not found, saving without preferences');
+                // Remove preferences from fields and try again
+                delete fields.preferences;
+                const fallbackResult = await supabaseAdmin
+                    .from('users')
+                    .update(fields)
+                    .eq('id', userId)
+                    .select('id, email, name, first_name, last_name, contact_email, nmls, phone, x_handle, facebook, tiktok, instagram, avatar_url')
+                    .single();
+                data = fallbackResult.data;
+                error = fallbackResult.error;
+            } else {
+                data = result.data;
+                error = result.error;
+            }
+        } else {
+            // No preferences to save
+            const result = await supabaseAdmin
+                .from('users')
+                .update(fields)
+                .eq('id', userId)
+                .select('id, email, name, first_name, last_name, contact_email, nmls, phone, x_handle, facebook, tiktok, instagram, avatar_url')
+                .single();
+            data = result.data;
+            error = result.error;
+        }
 
         if (error || !data) {
             console.error('Profile save error:', {
@@ -143,6 +204,7 @@ export async function PUT(request) {
                 tiktok: userRow?.tiktok ?? null,
                 instagram: userRow?.instagram ?? null,
                 avatarUrl: userRow?.avatar_url ?? null,
+                preferences: userRow?.preferences ?? { emailNotifications: true, theme: 'system' },
             },
         });
     } catch (error) {

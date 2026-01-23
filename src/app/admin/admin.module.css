@@ -248,7 +248,7 @@
 
 @media (max-width: 768px) {
   .searchInput {
-  width: 160px;
+    width: 160px;
     font-size: 0.875rem;
   }
 
@@ -617,7 +617,7 @@
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 8px 24px rgba(31, 122, 110, 0.3),
-              0 4px 12px rgba(31, 122, 110, 0.2);
+    0 4px 12px rgba(31, 122, 110, 0.2);
   position: relative;
   overflow: hidden;
   font-family: var(--font-admin-body), "Space Grotesk", sans-serif;
@@ -636,7 +636,7 @@
 .buttonPrimary:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 32px rgba(31, 122, 110, 0.4),
-              0 6px 16px rgba(31, 122, 110, 0.3);
+    0 6px 16px rgba(31, 122, 110, 0.3);
 }
 
 .buttonPrimary:hover::before {
@@ -678,9 +678,10 @@
 
 .loginWrap {
   min-height: 100vh;
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
-  gap: 48px;
+  display: flex;
+  justify-content: center;
+  /* grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); */
+  /* gap: 48px; */
   padding: 32px clamp(32px, 6vw, 80px);
   position: relative;
   z-index: 1;
@@ -696,8 +697,8 @@
   padding: 48px 56px;
   border: 1px solid rgba(226, 215, 199, 0.6);
   box-shadow: 0 25px 60px rgba(32, 35, 36, 0.12),
-              0 8px 24px rgba(32, 35, 36, 0.08),
-              inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 8px 24px rgba(32, 35, 36, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
   position: relative;
   overflow: hidden;
   max-width: 480px;
@@ -712,9 +713,9 @@
   right: 0;
   height: 6px;
   background: linear-gradient(90deg,
-    var(--admin-accent) 0%,
-    var(--admin-accent-2) 50%,
-    var(--admin-accent) 100%);
+      var(--admin-accent) 0%,
+      var(--admin-accent-2) 50%,
+      var(--admin-accent) 100%);
   border-radius: 28px 28px 0 0;
 }
 

@@ -173,7 +173,11 @@ async function selectNextKey() {
             const usage = usages.find(u => u.key_index === i);
             if (!usage || usage.usage_count < MONTHLY_LIMIT_PER_KEY) {
                 console.log(`[RentCast] Key${nextIndex} exhausted, fallback to Key${i}`);
-                return { key: keys[i], index: i };
+                return {
+                    key: keys[i],
+                    index: i,
+                    usage: usage ? usage.usage_count : 0
+                };
             }
         }
         // 所有 Key 都已达到限制
@@ -183,7 +187,8 @@ async function selectNextKey() {
 
     return {
         key: keys[nextIndex],
-        index: nextIndex
+        index: nextIndex,
+        usage: selectedUsage ? selectedUsage.usage_count : 0
     };
 }
 
@@ -218,6 +223,26 @@ export async function callRentCast(endpoint, options = {}) {
     // 只有成功（200-299）才计数
     if (response.ok) {
         await incrementKeyUsage(index, period);
+
+        // 检查配额是否达到阈值，触发告警
+        // 阈值：80% (警告) 和 100% (耗尽)
+        // 注意：这里用简单判定，可能存在并发重复发送，但对于告警是可以接受的
+        const currentUsage = (keyInfo.usage || 0) + 1;
+        const limit = MONTHLY_LIMIT_PER_KEY;
+
+        // 80% 阈值 (例如 50 * 0.8 = 40)
+        const threshold80 = Math.floor(limit * 0.8);
+
+        if (currentUsage === threshold80 || currentUsage === limit) {
+            console.log(`[RentCast] Triggering usage alert for Key ${index}: ${currentUsage}/${limit}`);
+            // 动态导入避免循环依赖
+            const { sendRentCastUsageAlert } = await import('@/lib/email/mailer');
+            // 异步发送，不阻塞 API 响应
+            sendRentCastUsageAlert(index, currentUsage, limit, period).catch(err => {
+                console.error('[RentCast] Failed to trigger alert:', err);
+            });
+        }
+
     } else {
         console.warn(`[RentCast] API returned ${response.status}, not counting usage`);
     }

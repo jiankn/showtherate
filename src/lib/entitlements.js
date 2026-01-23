@@ -69,10 +69,7 @@ export async function checkQuota(userId, quotaType) {
             bonusQuota = bonusValid ? (entitlement.bonus_ai_quota || 0) : 0;
             break;
         case QUOTA_TYPES.CLOSING_SCRIPT:
-            // Closing Script is subscription-only
-            if (entitlement.type !== 'subscription') {
-                return { hasQuota: false, remaining: 0, reason: 'Subscription required' };
-            }
+            // Closing Script uses AI quota (available to all paid users)
             baseQuota = entitlement.ai_quota;
             baseUsed = entitlement.ai_used;
             bonusQuota = bonusValid ? (entitlement.bonus_ai_quota || 0) : 0;
@@ -261,15 +258,13 @@ export async function getUserQuotas(userId) {
                 bonus: bonusAiQuota,
                 remaining: aiBaseRemaining + bonusAiQuota,
             },
-            closingScript: entitlement.type !== 'subscription'
-                ? { enabled: false, quota: 0, used: 0, remaining: 0 }
-                : {
-                    enabled: true,
-                    quota: entitlement.ai_quota,
-                    used: entitlement.ai_used,
-                    bonus: bonusAiQuota,
-                    remaining: entitlement.ai_quota === -1 ? -1 : aiBaseRemaining + bonusAiQuota,
-                },
+            closingScript: {
+                enabled: true,
+                quota: entitlement.ai_quota,
+                used: entitlement.ai_used,
+                bonus: bonusAiQuota,
+                remaining: entitlement.ai_quota === -1 ? -1 : aiBaseRemaining + bonusAiQuota,
+            },
         },
     };
 }

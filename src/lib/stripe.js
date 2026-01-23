@@ -22,7 +22,7 @@ export const STRIPE_PRODUCTS = {
         entitlement: {
             type: 'starter_pass_7d',
             durationDays: 7,
-            shareQuota: 5,
+            shareQuota: 10,
             propertyQuota: 10,
             aiQuota: 30,
         },

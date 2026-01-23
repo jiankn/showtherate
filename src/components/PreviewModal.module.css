@@ -1,5 +1,5 @@
 /* ===================================
-   Preview Modal - Share Page Preview
+   Preview Modal - Full Screen Preview
    =================================== */
 
 .overlay {
@@ -25,88 +25,97 @@
 }
 
 /* ================================
-   Header with LO Branding
+   Top Bar with Back Button
    ================================ */
-.header {
-    padding: var(--space-lg);
-    background: var(--glass-bg-card);
-    backdrop-filter: var(--glass-blur-sm);
-    -webkit-backdrop-filter: var(--glass-blur-sm);
-    border-bottom: 1px solid var(--color-border);
-    position: sticky;
-    top: 0;
-    z-index: var(--z-sticky);
-}
-
-.headerContent {
-    max-width: 1200px;
-    margin: 0 auto;
+.topBar {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-lg);
+    background: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%);
+    color: white;
+    flex-shrink: 0;
+    position: relative;
 }
 
-.loBranding {
+.backBtn {
     display: flex;
     align-items: center;
-    gap: var(--space-md);
-}
-
-.loAvatar {
-    width: 56px;
-    height: 56px;
-    background: var(--gradient-accent);
-    background-size: 200% 200%;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    overflow: hidden;
-}
-
-.loAvatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.loName {
-    font-size: 1.125rem;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-lg);
+    color: white;
+    font-size: 0.9375rem;
     font-weight: 600;
-    color: var(--color-text);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
 }
 
-.loMeta {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    font-size: 0.875rem;
-    color: var(--color-text-muted);
+.backBtn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-2px);
 }
 
-.loNmls {
-    color: var(--color-text-muted);
-}
-
-.shareViews {
-    color: var(--color-text-secondary);
-}
-
-.poweredBy {
+.upgradeBanner {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    color: var(--color-text-secondary);
+    color: rgba(255, 255, 255, 0.9);
     font-size: 0.875rem;
 }
 
-.brandLink {
-    color: var(--color-primary);
+.upgradeBanner a {
+    color: white;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.bannerIcon {
+    font-size: 1.25rem;
+}
+
+.bannerText {
+    font-size: 0.9375rem;
+}
+
+.bannerBtn {
+    padding: var(--space-xs) var(--space-md);
+    background: white;
+    color: #8B5CF6;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
     font-weight: 600;
     text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.bannerBtn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.closeBtn {
+    position: absolute;
+    right: var(--space-lg);
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition-fast);
+}
+
+.closeBtn:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 /* ================================
@@ -192,33 +201,8 @@
     font-size: 0.9375rem;
     color: var(--color-text-secondary);
     padding: var(--space-xs) var(--space-md);
-    background: var(--color-bg);
+    background: var(--color-surface);
     border-radius: var(--radius-full);
-    margin-bottom: var(--space-md);
-}
-
-.propertyIcon {
-    color: var(--color-primary);
-}
-
-.propertyText {
-    color: var(--color-text);
-}
-
-.propertyMeta {
-    color: var(--color-text-secondary);
-}
-
-.timestamp {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-sm);
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
-}
-
-.timestampIcon {
-    color: var(--color-primary);
 }
 
 /* ================================
@@ -341,12 +325,19 @@
     pointer-events: none;
 }
 
-.ctaContent {
+.ctaCard {
+    /* Removed card styling to let gradient show through, 
+       but container might be needed if original ctaContent served as wrapper */
     max-width: 800px;
     margin: 0 auto;
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+    border: none;
+    backdrop-filter: none;
 }
 
-.ctaContent h2 {
+.ctaTitle {
     font-size: 2.25rem;
     margin-bottom: var(--space-xl);
     color: white;
@@ -372,6 +363,7 @@
     align-items: center;
     gap: var(--space-md);
     margin-bottom: var(--space-lg);
+    text-align: left;
 }
 
 .loCardAvatar {
@@ -382,13 +374,13 @@
     flex-shrink: 0;
 }
 
-.loCardAvatar img {
+.loAvatarImg {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.loCardAvatar span {
+.avatarPlaceholder {
     width: 100%;
     height: 100%;
     background: var(--gradient-accent);
@@ -564,7 +556,6 @@
     max-width: 800px;
     margin: 0 auto;
     padding: var(--space-xl) 0;
-    border-top: 1px solid var(--color-border);
 }
 
 .disclaimer {
@@ -572,78 +563,68 @@
     color: var(--color-text-muted);
     text-align: center;
     line-height: 1.6;
-    margin-bottom: var(--space-lg);
-}
-
-.footerBrand {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: var(--space-sm);
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
-}
-
-.brandLink {
-    color: var(--color-primary);
-    font-weight: 600;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-}
-
-.brandIconSvg {
-    width: 20px;
-    height: 20px;
 }
 
 /* ================================
-   Copy Toast
+   Bottom Actions
    ================================ */
-.copyToast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
+.bottomActions {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-xl) var(--space-lg);
     background: var(--color-bg);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-sm) var(--space-md);
-    box-shadow: var(--card-shadow);
-    z-index: var(--z-toast);
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--color-text);
+    border-top: 1px solid var(--color-border);
+}
+
+.closePreviewBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-2xl);
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-xl);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-spring);
+    box-shadow: var(--shadow-md);
+}
+
+.closePreviewBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
 }
 
 /* ================================
    Mobile Responsive
    ================================ */
 @media (max-width: 768px) {
-    .header {
-        padding: var(--space-md);
-    }
-
-    .loAvatar {
-        width: 44px;
-        height: 44px;
-        font-size: 1.25rem;
-    }
-
-    .loName {
-        font-size: 1rem;
-    }
-
-    .loMeta {
+    .topBar {
+        flex-wrap: wrap;
+        padding: var(--space-sm);
         gap: var(--space-sm);
     }
 
-    .loNmls {
-        font-size: 0.75rem;
+    .backBtn {
+        order: 1;
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 0.8125rem;
     }
 
-    .shareViews {
-        font-size: 0.75rem;
+    .upgradeBanner {
+        order: 2;
+        display: none;
+        /* Hide on mobile to save space */
+    }
+
+    .closeBtn {
+        order: 3;
+        position: static;
+        width: 28px;
+        height: 28px;
     }
 
     .content {
@@ -654,11 +635,18 @@
         font-size: 1.5rem;
     }
 
-    .ctaSection {
-        padding: 0 var(--space-md);
+    .loAvatar {
+        width: 48px;
+        height: 48px;
     }
 
-    .ctaContent h2 {
-        font-size: 1.25rem;
+    .bottomActions {
+        padding: var(--space-md);
+    }
+
+    .closePreviewBtn {
+        width: 100%;
+        padding: var(--space-md);
+        font-size: 0.9375rem;
     }
 }

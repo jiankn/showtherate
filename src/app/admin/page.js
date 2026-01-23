@@ -63,28 +63,6 @@ export default function AdminLoginPage() {
           </button>
         )}
       </div>
-      <div className={styles.loginInfo}>
-        <div className={styles.infoIntro}>
-          <p className={styles.infoKicker}>Operations snapshot</p>
-          <h2 className={styles.infoTitle}>Live platform signals</h2>
-          <p className={styles.infoSubtitle}>Updated moments ago</p>
-        </div>
-        <div className={styles.infoCard}>
-          <div className={styles.infoLabel}>Revenue pulse</div>
-          <div className={styles.infoValue}>$128,400</div>
-          <div className={styles.infoNote}>12% above last cycle</div>
-        </div>
-        <div className={styles.infoCard}>
-          <div className={styles.infoLabel}>Subscriber activity</div>
-          <div className={styles.infoValue}>812</div>
-          <div className={styles.infoNote}>Renewal punctuality: 98%</div>
-        </div>
-        <div className={styles.infoCard}>
-          <div className={styles.infoLabel}>Support queue</div>
-          <div className={styles.infoValue}>14</div>
-          <div className={styles.infoNote}>SLA watch: 2</div>
-        </div>
-      </div>
     </div>
   );
 }

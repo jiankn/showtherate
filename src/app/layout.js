@@ -15,9 +15,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: "ShowTheRate | 60-Second Mortgage Comparison for Loan Officers",
-  description: "Generate professional mortgage comparison reports in 60 seconds. Share instantly via link. AI-powered closing scripts included. Perfect for Loan Officers.",
-  keywords: ["mortgage calculator", "loan officer tools", "mortgage comparison", "real estate", "FHA loan", "VA loan"],
+  title: "ShowTheRate | Mortgage Comparison Tool with Auto Property Data & AI Scripts",
+  description: "Generate mortgage comparisons in 60 seconds. Auto-fill property tax, HOA & home values via RentCast. Get AI-powered closing scripts. Share instantly with clients.",
+  keywords: ["mortgage calculator", "loan officer tools", "mortgage comparison", "property tax lookup", "AI mortgage scripts", "RentCast integration", "HOA lookup", "real estate", "FHA loan", "VA loan"],
   authors: [{ name: "ShowTheRate" }],
   icons: {
     icon: [
@@ -35,8 +35,8 @@ export const metadata = {
   },
   manifest: '/manifest.json',
   openGraph: {
-    title: "ShowTheRate | 60-Second Mortgage Comparison",
-    description: "Generate professional mortgage comparison reports in 60 seconds. Perfect for Loan Officers.",
+    title: "ShowTheRate | Auto-Fill Property Data + AI Closing Scripts",
+    description: "Generate mortgage comparisons in 60 seconds. Auto-fill tax, HOA & values. AI-powered scripts. One-click share.",
     url: "https://showtherate.com",
     siteName: "ShowTheRate",
     type: "website",
@@ -45,14 +45,14 @@ export const metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'ShowTheRate - Compare. Fast.',
+        alt: 'ShowTheRate - Auto-fill property data, AI scripts, 60-second comparisons',
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ShowTheRate | 60-Second Mortgage Comparison",
-    description: "Generate professional mortgage comparison reports in 60 seconds.",
+    title: "ShowTheRate | Auto-Fill Property Data + AI Closing Scripts",
+    description: "Generate mortgage comparisons in 60 seconds. Auto-fill tax, HOA & values. AI-powered scripts.",
     images: ['/og-image.png'],
   },
 };

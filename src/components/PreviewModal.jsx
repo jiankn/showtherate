@@ -1,20 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
-import { formatCurrency } from '@/lib/calculator';
+import { useToast } from '@/components/GlobalToast';
+import ScenarioCard from '@/components/share/ScenarioCard';
+import PaymentComparisonBar from '@/components/share/PaymentComparisonBar';
+import LongTermComparison from '@/components/share/LongTermComparison';
 import {
     PhoneIcon,
     EmailIcon,
     XIcon,
     InstagramIcon,
     TikTokIcon,
-    FacebookIcon,
-    LogoIcon
+    FacebookIcon
 } from '@/components/Icons';
-import ScenarioCard from '@/components/share/ScenarioCard';
-import PaymentComparisonBar from '@/components/share/PaymentComparisonBar';
-import LongTermComparison from '@/components/share/LongTermComparison';
 import styles from './PreviewModal.module.css';
 
 /**
@@ -31,7 +30,7 @@ export default function PreviewModal({
     propertyAddress,
     homePrice,
 }) {
-    const [copyToast, setCopyToast] = useState(null);
+    const { toast } = useToast();
 
     // Close on Escape key
     useEffect(() => {
@@ -50,50 +49,29 @@ export default function PreviewModal({
         };
     }, [isOpen, onClose]);
 
-    // Helper functions for URL generation
-    const phoneDigits = typeof loProfile?.phone === 'string'
-        ? loProfile.phone.replace(/[^\d+]/g, '')
-        : '';
-    const telHref = phoneDigits ? `tel:${phoneDigits}` : null;
-    const smsHref = phoneDigits ? `sms:${phoneDigits}` : null;
-    const emailHref = typeof loProfile?.email === 'string' && loProfile.email.trim()
-        ? `mailto:${loProfile.email.trim()}`
-        : null;
-
-    const normalizeSocialUrl = (value, kind) => {
-        if (typeof value !== 'string') return null;
-        const raw = value.trim();
-        if (!raw) return null;
-        if (/^https?:\/\//i.test(raw)) return raw;
-
-        const cleaned = raw.replace(/^@/, '');
-        if (!cleaned) return null;
-
-        if (kind === 'x') return `https://x.com/${encodeURIComponent(cleaned)}`;
-        if (kind === 'instagram') return `https://www.instagram.com/${encodeURIComponent(cleaned)}`;
-        if (kind === 'tiktok') return `https://www.tiktok.com/@${encodeURIComponent(cleaned)}`;
-        if (kind === 'facebook') return `https://www.facebook.com/${encodeURIComponent(cleaned)}`;
-        return null;
-    };
-
-    const xUrl = normalizeSocialUrl(loProfile?.xHandle, 'x');
-    const instagramUrl = normalizeSocialUrl(loProfile?.instagram, 'instagram');
-    const tiktokUrl = normalizeSocialUrl(loProfile?.tiktok, 'tiktok');
-    const facebookUrl = normalizeSocialUrl(loProfile?.facebook, 'facebook');
-
     const copyToClipboard = async (text, label) => {
+        if (!text) return;
         try {
             await navigator.clipboard.writeText(text);
-            setCopyToast(`${label} copied!`);
-            setTimeout(() => setCopyToast(null), 2000);
-        } catch {
-            setCopyToast('Copy failed');
-            setTimeout(() => setCopyToast(null), 2000);
+            toast.success(`${label} copied to clipboard`);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+            toast.error('Failed to copy to clipboard');
         }
     };
 
     if (!isOpen) return null;
 
+    // Derived profile data
+    const loName = loProfile ? [loProfile.firstName, loProfile.lastName].filter(Boolean).join(' ') : 'Your Name';
+    const loPhone = loProfile?.phone;
+    const loEmail = loProfile?.email;
+    const loNmls = loProfile?.nmls;
+
+    // Action URLs
+    const telHref = loPhone ? `tel:${loPhone.replace(/[^\d+]/g, '')}` : null;
+    const smsHref = loPhone ? `sms:${loPhone.replace(/[^\d+]/g, '')}` : null;
+    const emailHref = loEmail ? `mailto:${loEmail}` : null;
 
     // Format scenarios for display
     const displayScenarios = scenarios.map((s, idx) => ({
@@ -106,68 +84,55 @@ export default function PreviewModal({
     return (
         <div className={styles.overlay} onClick={onClose}>
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-                {/* Header with LO Branding */}
-                <header className={styles.header}>
-                    <div className={styles.headerContent}>
-                        <div className={styles.loBranding}>
-                            <div className={styles.loAvatar}>
-                                {loProfile?.avatarUrl ? (
-                                    <img src={loProfile.avatarUrl} alt={loProfile?.name || 'LO'} className={styles.loAvatarImg} />
-                                ) : '👤'}
-                            </div>
-                            <div className={styles.loInfo}>
-                                <div className={styles.loName}>{loProfile?.name || 'Your Loan Officer'}</div>
-                                <div className={styles.loMeta}>
-                                    <span className={styles.loNmls}>NMLS# {loProfile?.nmls || '------'}</span>
-                                    <span className={styles.shareViews}>👁 0 views</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className={styles.poweredBy}>
-                            <span>Powered by</span>
-                            <Link href="/" className={styles.brandLink}>ShowTheRate</Link>
-                        </div>
+                {/* Top Bar with Back Button */}
+                <div className={styles.topBar}>
+                    <button className={styles.backBtn} onClick={onClose}>
+                        ← Back to Editor
+                    </button>
+                    <div className={styles.upgradeBanner}>
+                        <span className={styles.bannerIcon}>👁</span>
+                        <span className={styles.bannerText}>
+                            Preview Mode • <Link href="/app/upgrade">Upgrade to share</Link>
+                        </span>
                     </div>
-                </header>
+                    <button className={styles.closeBtn} onClick={onClose}>×</button>
+                </div>
 
                 {/* Preview Content */}
                 <div className={styles.content}>
-                    {/* Title */}
+                    {/* Header */}
+                    <div className={styles.header}>
+                        <div className={styles.loBranding}>
+                            <div className={styles.loAvatar}>
+                                {loProfile?.avatarUrl ? (
+                                    <img src={loProfile.avatarUrl} alt={loProfile.name || 'LO'} />
+                                ) : '👤'}
+                            </div>
+                            <div className={styles.loInfo}>
+                                <div className={styles.loName}>{loProfile?.name || 'Your Name'}</div>
+                                <div className={styles.loNmls}>NMLS# {loProfile?.nmls || '------'}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Title Section */}
                     <section className={styles.titleSection}>
                         <h1 className={styles.title}>{title || 'Your Mortgage Options'}</h1>
                         <p className={styles.subtitle}>
                             Compare your options and find the best fit for your situation
                         </p>
-
-                        {/* Property Address */}
                         {propertyAddress && (
                             <div className={styles.propertyAddress}>
-                                <span className={styles.propertyIcon}>📍</span>
-                                <span className={styles.propertyText}>{propertyAddress}</span>
+                                <span>📍</span>
+                                <span>{propertyAddress}</span>
                                 {homePrice && (
-                                    <span className={styles.propertyMeta}>
+                                    <>
                                         <span>•</span>
-                                        <span>{formatCurrency(homePrice)}</span>
-                                    </span>
+                                        <span>${homePrice.toLocaleString()}</span>
+                                    </>
                                 )}
                             </div>
                         )}
-
-                        {/* Timestamp - shows current time as preview */}
-                        <div className={styles.timestamp}>
-                            <span className={styles.timestampIcon}>📅</span>
-                            <span className={styles.timestampText}>
-                                Updated {new Date().toLocaleDateString('en-US', {
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric',
-                                    hour: 'numeric',
-                                    minute: '2-digit',
-                                    hour12: true
-                                })}
-                            </span>
-                        </div>
                     </section>
 
                     {/* Scenario Cards */}
@@ -210,48 +175,44 @@ export default function PreviewModal({
 
                     {/* CTA Section */}
                     <section className={styles.ctaSection}>
-                        <div className={styles.ctaContent}>
-                            <h2>Ready to Move Forward?</h2>
+                        <div className={styles.ctaCard}>
+                            <h2 className={styles.ctaTitle}>Ready to Move Forward?</h2>
 
-                            {/* LO Business Card */}
                             <div className={styles.loCard}>
-                                {/* LO Avatar & Info */}
                                 <div className={styles.loCardHeader}>
                                     <div className={styles.loCardAvatar}>
                                         {loProfile?.avatarUrl ? (
-                                            <img src={loProfile.avatarUrl} alt={loProfile?.name || 'LO'} />
+                                            <img src={loProfile.avatarUrl} alt={loName} className={styles.loAvatarImg} />
                                         ) : (
-                                            <span>{(loProfile?.name || 'LO').charAt(0).toUpperCase()}</span>
+                                            <div className={styles.avatarPlaceholder}>{loName.charAt(0)}</div>
                                         )}
                                     </div>
                                     <div className={styles.loCardInfo}>
-                                        <h3 className={styles.loCardName}>{loProfile?.name || 'Your Loan Officer'}</h3>
-                                        {loProfile?.nmls && (
-                                            <span className={styles.loCardNmls}>NMLS# {loProfile.nmls}</span>
-                                        )}
+                                        <h3 className={styles.loCardName}>{loName}</h3>
+                                        {loNmls && <span className={styles.loCardNmls}>NMLS# {loNmls}</span>}
                                     </div>
                                 </div>
 
                                 {/* Contact Details */}
-                                {(loProfile?.phone || loProfile?.email) && (
+                                {(loPhone || loEmail) && (
                                     <div className={styles.loCardContact}>
-                                        {loProfile?.phone && (
+                                        {loPhone && (
                                             <button
                                                 className={styles.loCardContactItem}
-                                                onClick={() => copyToClipboard(loProfile.phone, 'Phone number')}
+                                                onClick={() => copyToClipboard(loPhone, 'Phone number')}
                                             >
                                                 <PhoneIcon className={styles.loCardIcon} />
-                                                <span>{loProfile.phone}</span>
+                                                <span>{loPhone}</span>
                                                 <span className={styles.copyHint}>📋</span>
                                             </button>
                                         )}
-                                        {loProfile?.email && (
+                                        {loEmail && (
                                             <button
                                                 className={styles.loCardContactItem}
-                                                onClick={() => copyToClipboard(loProfile.email, 'Email')}
+                                                onClick={() => copyToClipboard(loEmail, 'Email')}
                                             >
                                                 <EmailIcon className={styles.loCardIcon} />
-                                                <span>{loProfile.email}</span>
+                                                <span>{loEmail}</span>
                                                 <span className={styles.copyHint}>📋</span>
                                             </button>
                                         )}
@@ -283,25 +244,25 @@ export default function PreviewModal({
                                 )}
 
                                 {/* Social Media */}
-                                {(xUrl || instagramUrl || tiktokUrl || facebookUrl) && (
+                                {(loProfile?.xHandle || loProfile?.instagram || loProfile?.tiktok || loProfile?.facebook) && (
                                     <div className={styles.loCardSocial}>
-                                        {xUrl && (
-                                            <a className={`${styles.loCardSocialBtn} ${styles.socialX}`} href={xUrl} target="_blank" rel="noopener noreferrer">
+                                        {loProfile.xHandle && (
+                                            <a className={`${styles.loCardSocialBtn} ${styles.socialX}`} href={`https://twitter.com/${loProfile.xHandle.replace('@', '')}`} target="_blank" rel="noopener noreferrer">
                                                 <XIcon />
                                             </a>
                                         )}
-                                        {instagramUrl && (
-                                            <a className={`${styles.loCardSocialBtn} ${styles.socialInstagram}`} href={instagramUrl} target="_blank" rel="noopener noreferrer">
+                                        {loProfile.instagram && (
+                                            <a className={`${styles.loCardSocialBtn} ${styles.socialInstagram}`} href={loProfile.instagram} target="_blank" rel="noopener noreferrer">
                                                 <InstagramIcon />
                                             </a>
                                         )}
-                                        {tiktokUrl && (
-                                            <a className={`${styles.loCardSocialBtn} ${styles.socialTiktok}`} href={tiktokUrl} target="_blank" rel="noopener noreferrer">
+                                        {loProfile.tiktok && (
+                                            <a className={`${styles.loCardSocialBtn} ${styles.socialTiktok}`} href={loProfile.tiktok} target="_blank" rel="noopener noreferrer">
                                                 <TikTokIcon />
                                             </a>
                                         )}
-                                        {facebookUrl && (
-                                            <a className={`${styles.loCardSocialBtn} ${styles.socialFacebook}`} href={facebookUrl} target="_blank" rel="noopener noreferrer">
+                                        {loProfile.facebook && (
+                                            <a className={`${styles.loCardSocialBtn} ${styles.socialFacebook}`} href={loProfile.facebook} target="_blank" rel="noopener noreferrer">
                                                 <FacebookIcon />
                                             </a>
                                         )}
@@ -311,30 +272,22 @@ export default function PreviewModal({
                         </div>
                     </section>
 
-                    {/* Disclaimer */}
+                    {/* Footer */}
                     <footer className={styles.footer}>
                         <div className={styles.disclaimer}>
                             <strong>Important Disclaimer:</strong> Estimates only. This is not a loan offer
                             or commitment to lend. Actual rates, payments, and costs may vary based on your
-                            credit profile and property details. Not financial advice. Please consult a
-                            licensed professional for personalized guidance.
-                        </div>
-
-                        <div className={styles.footerBrand}>
-                            <span>Created with</span>
-                            <Link href="/" className={styles.brandLink}>
-                                <LogoIcon className={styles.brandIconSvg} /> ShowTheRate
-                            </Link>
+                            credit profile and property details.
                         </div>
                     </footer>
-                </div>
 
-                {/* Copy Toast */}
-                {copyToast && (
-                    <div className={styles.copyToast}>
-                        ✓ {copyToast}
+                    {/* Bottom Close Button */}
+                    <div className={styles.bottomActions}>
+                        <button className={styles.closePreviewBtn} onClick={onClose}>
+                            ✓ Close Preview & Continue Editing
+                        </button>
                     </div>
-                )}
+                </div>
             </div>
         </div>
     );

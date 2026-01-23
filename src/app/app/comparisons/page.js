@@ -516,8 +516,13 @@ export default function ComparisonsPage() {
                                         👤
                                     </button>
                                 )}
-                                <Link href={`/app/comparisons/${item.id}`} className={styles.actionBtn} title="View Details">
-                                    <EyeIcon />
+                                {item.shareLink && (
+                                    <Link href={`/s/${item.shareLink}`} target="_blank" className={styles.actionBtn} title="Preview as Client">
+                                        <EyeIcon />
+                                    </Link>
+                                )}
+                                <Link href={`/app/new?clone=${item.id}`} className={styles.actionBtn} title="Duplicate & Edit">
+                                    ✏️
                                 </Link>
                                 <button
                                     className={styles.actionBtn}

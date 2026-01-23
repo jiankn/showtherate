@@ -1684,14 +1684,29 @@
     "alternatives": {
         "mortgage-coach-alternative": {
             "type": "alternative",
-            "priority": "P1",
+            "priority": "P0",
             "title": "Mortgage Coach Alternative",
-            "metaTitle": "Mortgage Coach Alternative | ShowTheRate vs Mortgage Coach",
-            "metaDescription": "Looking for a Mortgage Coach alternative? ShowTheRate offers faster, simpler mortgage comparisons for loan officers at a better price.",
+            "metaTitle": "Mortgage Coach Alternative | Save $51/mo vs Mortgage Coach",
+            "metaDescription": "Looking for a Mortgage Coach alternative? ShowTheRate offers faster, simpler mortgage comparisons at $99/mo vs $150/mo - save $612/year.",
             "h1": "Best Mortgage Coach Alternative for LOs",
-            "subtitle": "Compare ShowTheRate vs Mortgage Coach - simpler, faster, more affordable",
+            "subtitle": "Same powerful features. $51/month less. No enterprise pricing games.",
             "competitor": "Mortgage Coach",
             "comparisonPoints": [
+                {
+                    "feature": "Monthly Price",
+                    "us": "$99/mo",
+                    "them": "$150/mo"
+                },
+                {
+                    "feature": "Annual Cost",
+                    "us": "$950/yr",
+                    "them": "$1,800/yr"
+                },
+                {
+                    "feature": "Your Savings",
+                    "us": "Save $612/year",
+                    "them": "—"
+                },
                 {
                     "feature": "Comparison Creation Time",
                     "us": "60 seconds",
@@ -1699,18 +1714,28 @@
                 },
                 {
                     "feature": "Mobile-First Design",
-                    "us": "Yes",
+                    "us": "✓ Yes",
                     "them": "Limited"
                 },
                 {
-                    "feature": "Price",
-                    "us": "$79/month",
-                    "them": "$99+/month"
+                    "feature": "AI Closing Scripts",
+                    "us": "✓ Included",
+                    "them": "✗ Not available"
                 },
                 {
-                    "feature": "Client-Facing View",
-                    "us": "Beautiful, branded",
-                    "them": "Basic"
+                    "feature": "Auto-Fill Property Data",
+                    "us": "✓ RentCast Powered",
+                    "them": "✗ Manual entry"
+                },
+                {
+                    "feature": "One-Click Share Links",
+                    "us": "✓ Yes",
+                    "them": "Requires login"
+                },
+                {
+                    "feature": "Free Trial",
+                    "us": "$9.9 for 7 days",
+                    "them": "Demo only"
                 }
             ],
             "relatedSlugs": [

@@ -49,10 +49,10 @@ export async function POST(request) {
             // Check if user has subscription
             const entitlement = await getActiveEntitlement(session.user.id);
 
-            if (!entitlement || entitlement.type !== 'subscription') {
+            if (!entitlement) {
                 return NextResponse.json({
-                    error: 'AI generation requires subscription',
-                    code: 'SUBSCRIPTION_REQUIRED',
+                    error: 'AI generation requires a paid plan',
+                    code: 'PAID_PLAN_REQUIRED',
                 }, { status: 403 });
             }
 
@@ -162,7 +162,7 @@ export async function POST(request) {
         let aiRemaining = null;
 
         const entitlement = await getActiveEntitlement(session.user.id);
-        if (entitlement?.type === 'subscription' && isAIAvailable()) {
+        if (entitlement && isAIAvailable()) {
             const quotaState = await getClosingScriptQuotaState(session.user.id);
             canUseAI = quotaState.ok && (quotaState.remaining === -1 || quotaState.remaining > 0);
             aiRemaining = quotaState.remaining;

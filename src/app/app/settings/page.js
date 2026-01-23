@@ -78,6 +78,10 @@ export default function SettingsPage() {
     const isLoadingProfile = loadingUserData;
     const isLoadingEntitlements = loadingUserData;
     const [isSaving, setIsSaving] = useState(false);
+    const [isSavingPreferences, setIsSavingPreferences] = useState(false);
+
+    // Preferences state
+    const [emailNotifications, setEmailNotifications] = useState(true);
 
     // 当UserContext中的profile数据更新时，同步到本地状态
     useEffect(() => {
@@ -115,6 +119,13 @@ export default function SettingsPage() {
             });
         }
     }, [userProfile, session?.user]);
+
+    // Sync preferences from userProfile
+    useEffect(() => {
+        if (userProfile?.preferences) {
+            setEmailNotifications(userProfile.preferences.emailNotifications ?? true);
+        }
+    }, [userProfile?.preferences]);
 
     const initials = useMemo(() => {
         const a = (profile.firstName || session?.user?.name || session?.user?.email || 'U').trim();
@@ -626,20 +637,55 @@ export default function SettingsPage() {
                             <h2>App Preferences</h2>
                             <p className={styles.sectionDesc}>Customize your experience.</p>
 
-                            <div className={styles.checkboxGroup}>
-                                <input type="checkbox" defaultChecked />
-                                <div className={styles.checkboxLabel}>
-                                    <span className={styles.labelTitle}>Email Notifications</span>
-                                    <span className={styles.labelDesc}>Receive weekly digest and updates</span>
+                            {/* Email Notifications */}
+                            <div className={styles.preferenceItem}>
+                                <div className={styles.preferenceInfo}>
+                                    <div className={styles.preferenceIcon}>📧</div>
+                                    <div className={styles.preferenceText}>
+                                        <span className={styles.preferenceTitle}>Email Notifications</span>
+                                        <span className={styles.preferenceDesc}>Receive weekly digest and product updates</span>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div className={styles.checkboxGroup}>
-                                <input type="checkbox" defaultChecked />
-                                <div className={styles.checkboxLabel}>
-                                    <span className={styles.labelTitle}>Dark Mode</span>
-                                    <span className={styles.labelDesc}>Use dark theme by default (System synced)</span>
-                                </div>
+                                <button
+                                    type="button"
+                                    role="switch"
+                                    aria-checked={emailNotifications}
+                                    className={`${styles.toggleSwitch} ${emailNotifications ? styles.toggleActive : ''}`}
+                                    disabled={isSavingPreferences || isLoadingProfile}
+                                    onClick={async () => {
+                                        const newValue = !emailNotifications;
+                                        setEmailNotifications(newValue);
+                                        setIsSavingPreferences(true);
+                                        try {
+                                            const res = await fetch('/api/user/profile', {
+                                                method: 'PUT',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({
+                                                    profile: {
+                                                        preferences: {
+                                                            emailNotifications: newValue,
+                                                            theme: theme
+                                                        }
+                                                    }
+                                                }),
+                                            });
+                                            if (res.ok) {
+                                                toast.success(newValue ? 'Notifications enabled' : 'Notifications disabled');
+                                                refreshUserData();
+                                            } else {
+                                                setEmailNotifications(!newValue);
+                                                toast.error('Failed to update preference');
+                                            }
+                                        } catch {
+                                            setEmailNotifications(!newValue);
+                                            toast.error('Failed to update preference');
+                                        } finally {
+                                            setIsSavingPreferences(false);
+                                        }
+                                    }}
+                                >
+                                    <span className={styles.toggleThumb} />
+                                </button>
                             </div>
                         </div>
                     )}

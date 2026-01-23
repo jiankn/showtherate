@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
-import TestimonialsCarousel from '../components/TestimonialsCarousel';
+// TestimonialsCarousel removed to reduce bundle size
 import ScrollProgress from '../components/ScrollProgress';
 import {
   LogoIcon, RocketIcon, LightningIcon, LinkIcon, RobotIcon,
@@ -123,8 +123,8 @@ function HeroSection() {
           </h1>
 
           <p className={styles.heroSubtitle}>
-            Create professional comparison reports, share instantly via link,
-            and close more deals with AI-powered scripts.
+            Auto-fill property taxes, HOA & home values instantly.
+            Get AI-powered closing scripts. Share professional comparisons in one click.
           </p>
 
           <div className={styles.heroActions}>
@@ -143,13 +143,24 @@ function HeroSection() {
               <span className={styles.statLabel}>To Generate</span>
             </div>
             <div className={styles.stat}>
-              <span className={`${styles.statNumber} number`}>1-Click</span>
-              <span className={styles.statLabel}>Share Link</span>
+              <span className={`${styles.statNumber} number`}>Auto</span>
+              <span className={styles.statLabel}>Property Data</span>
             </div>
             <div className={styles.stat}>
               <span className={`${styles.statNumber} number`}>AI</span>
               <span className={styles.statLabel}>Closing Scripts</span>
             </div>
+            <div className={styles.stat}>
+              <span className={`${styles.statNumber} number`}>1-Click</span>
+              <span className={styles.statLabel}>Share Link</span>
+            </div>
+          </div>
+
+          <div className={styles.savingsCallout}>
+            <span className={styles.savingsIcon}>💰</span>
+            <span className={styles.savingsText}>
+              Save <strong>$51/mo</strong> vs Mortgage Coach — <a href="/alternatives/mortgage-coach-alternative">See comparison →</a>
+            </span>
           </div>
         </div>
 
@@ -170,24 +181,24 @@ function FeaturesSection() {
       description: 'Input loan details and generate professional comparison reports instantly. Perfect for Open House scenarios.'
     },
     {
+      icon: <HouseIcon className={styles.featureIconSvg} />,
+      title: 'Auto-Fill Property Data',
+      description: 'Enter any US address and instantly get property tax, HOA fees, home value, square footage & more. Powered by RentCast — no manual research needed.'
+    },
+    {
+      icon: <RobotIcon className={styles.featureIconSvg} />,
+      title: 'AI Closing Scripts',
+      description: 'Get ready-to-send messages that explain your comparison in plain English. Copy, paste, and close — in Professional, Friendly, or Urgency tone.'
+    },
+    {
       icon: <LinkIcon className={styles.featureIconSvg} />,
       title: 'One-Click Share Links',
       description: 'Generate shareable links that clients can open without login. Works on any device, any platform.'
     },
     {
-      icon: <RobotIcon className={styles.featureIconSvg} />,
-      title: 'AI Closing Scripts',
-      description: 'Get AI-generated talking points and recommendations tailored to each comparison scenario.'
-    },
-    {
       icon: <ChartIcon className={styles.featureIconSvg} />,
       title: 'Visual Comparisons',
       description: 'Side-by-side scenario cards with clear breakdowns. Clients understand the difference at a glance.'
-    },
-    {
-      icon: <HouseIcon className={styles.featureIconSvg} />,
-      title: 'Auto Property Tax',
-      description: 'Fetch property tax data automatically. Just enter the address and we handle the rest.'
     },
     {
       icon: <PhoneIcon className={styles.featureIconSvg} />,
@@ -212,6 +223,283 @@ function FeaturesSection() {
               <div className={styles.featureIcon}>{feature.icon}</div>
               <h3 className={styles.featureTitle}>{feature.title}</h3>
               <p className={styles.featureDescription}>{feature.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ===== SMART DATA SECTION (RentCast) =====
+function SmartDataSection() {
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+
+  const handleFetch = () => {
+    setIsAnimating(true);
+    setTimeout(() => {
+      setShowResults(true);
+      setIsAnimating(false);
+    }, 1200);
+  };
+
+  const propertyData = [
+    { label: 'Property Tax', value: '$4,200/yr', icon: '🏛️' },
+    { label: 'HOA Fees', value: '$350/mo', icon: '🏢' },
+    { label: 'Est. Value', value: '$485,000', icon: '💰' },
+    { label: 'Year Built', value: '2018', icon: '📅' },
+    { label: 'Sq Ft', value: '2,150', icon: '📐' },
+    { label: 'Bedrooms', value: '4 Bed / 3 Bath', icon: '🛏️' },
+  ];
+
+  return (
+    <section className={styles.smartData}>
+      <div className="container">
+        <div className="section-header">
+          <span className={styles.sectionBadge}>
+            <span className={styles.badgePulse}></span>
+            ⚡ Powered by RentCast
+          </span>
+          <h2 className="section-title">Stop Googling. Start Closing.</h2>
+          <p className="section-subtitle">
+            Enter any US address — we auto-fill property tax, HOA, estimated value, and more in seconds.
+          </p>
+        </div>
+
+        <div className={styles.smartDataDemo}>
+          <div className={styles.smartDataInput}>
+            <div className={styles.addressInputWrapper}>
+              <HouseIcon className={styles.addressIcon} />
+              <input
+                type="text"
+                placeholder="123 Main St, Austin, TX 78701"
+                className={styles.addressInput}
+                readOnly
+                value="123 Main St, Austin, TX 78701"
+              />
+              <button
+                className={styles.fetchBtn}
+                onClick={handleFetch}
+                disabled={isAnimating}
+              >
+                {isAnimating ? (
+                  <span className={styles.spinner}></span>
+                ) : (
+                  <>Fetch Data →</>
+                )}
+              </button>
+            </div>
+          </div>
+
+          <div className={`${styles.smartDataResults} ${showResults ? styles.smartDataResultsVisible : ''}`}>
+            <div className={styles.resultsHeader}>
+              <span className={styles.resultsIcon}>✓</span>
+              <span>Property Data Retrieved</span>
+            </div>
+            <div className={styles.resultsGrid}>
+              {propertyData.map((item, index) => (
+                <div key={index} className={styles.resultItem} style={{ animationDelay: `${index * 0.1}s` }}>
+                  <span className={styles.resultIcon}>{item.icon}</span>
+                  <div className={styles.resultContent}>
+                    <span className={styles.resultLabel}>{item.label}</span>
+                    <span className={styles.resultValue}>{item.value}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.smartDataFeatures}>
+          <div className={styles.smartFeature}>
+            <CheckIcon className={styles.smartFeatureIcon} />
+            <span>No manual research</span>
+          </div>
+          <div className={styles.smartFeature}>
+            <CheckIcon className={styles.smartFeatureIcon} />
+            <span>150M+ US properties</span>
+          </div>
+          <div className={styles.smartFeature}>
+            <CheckIcon className={styles.smartFeatureIcon} />
+            <span>Real-time data</span>
+          </div>
+          <div className={styles.smartFeature}>
+            <CheckIcon className={styles.smartFeatureIcon} />
+            <span>Always editable</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ===== AI SCRIPT SECTION =====
+function AIScriptSection() {
+  const [activeTone, setActiveTone] = useState('professional');
+  const [copied, setCopied] = useState(false);
+
+  const scripts = {
+    professional: {
+      text: "Based on my analysis, Option B saves you $127/month — that's $1,524 annually. With your 5-year timeline, you'll save over $7,600 in total. The lower rate also means $12,000 less in interest over the loan term. I recommend we lock this rate today.",
+      label: 'Professional'
+    },
+    friendly: {
+      text: "Great news! Option B puts $127 back in your pocket every month — that's like a free gym membership! 🎉 Over 5 years, you're looking at saving more than $7,600. Pretty sweet deal, right? Let me know when you're ready to move forward!",
+      label: 'Friendly'
+    },
+    urgency: {
+      text: "I need to be upfront — rates are moving fast. Option B saves you $127/month, but this rate is only guaranteed until Friday. With the Fed meeting next week, waiting could cost you thousands. Can we get your application in today?",
+      label: 'Urgency'
+    }
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(scripts[activeTone].text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <section className={styles.aiScript}>
+      <div className="container">
+        <div className="section-header">
+          <span className={styles.sectionBadge}>
+            <RobotIcon className={styles.badgeIconSmall} />
+            AI Closing Copilot
+          </span>
+          <h2 className="section-title">Turn Numbers Into Conversations</h2>
+          <p className="section-subtitle">
+            AI analyzes your comparison and generates ready-to-send messages. Copy, paste, close.
+          </p>
+        </div>
+
+        <div className={styles.aiScriptDemo}>
+          <div className={styles.aiScriptCard}>
+            <div className={styles.aiScriptHeader}>
+              <span className={styles.aiScriptLabel}>Generated Script</span>
+              <div className={styles.toneSelector}>
+                {Object.entries(scripts).map(([key, { label }]) => (
+                  <button
+                    key={key}
+                    className={`${styles.toneBtn} ${activeTone === key ? styles.toneBtnActive : ''}`}
+                    onClick={() => setActiveTone(key)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.aiScriptContent}>
+              <div className={styles.scriptBubble}>
+                <p>{scripts[activeTone].text}</p>
+              </div>
+              <button className={styles.copyBtn} onClick={handleCopy}>
+                {copied ? (
+                  <>
+                    <CheckIcon className={styles.copyIcon} />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    📋 Copy to Clipboard
+                  </>
+                )}
+              </button>
+            </div>
+
+            <div className={styles.aiScriptFooter}>
+              <span className={styles.disclaimer}>
+                * Estimates only. Not financial advice. Includes compliant disclaimer.
+              </span>
+            </div>
+          </div>
+
+          <div className={styles.aiScriptBenefits}>
+            <div className={styles.aiBenefit}>
+              <span className={styles.aiBenefitIcon}>💬</span>
+              <div>
+                <h4>Ready for SMS & WhatsApp</h4>
+                <p>Optimized length for mobile messaging</p>
+              </div>
+            </div>
+            <div className={styles.aiBenefit}>
+              <span className={styles.aiBenefitIcon}>🎯</span>
+              <div>
+                <h4>Tailored to Each Scenario</h4>
+                <p>References your actual numbers</p>
+              </div>
+            </div>
+            <div className={styles.aiBenefit}>
+              <span className={styles.aiBenefitIcon}>⚖️</span>
+              <div>
+                <h4>Compliance Built-In</h4>
+                <p>Automatic disclaimer included</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ===== HOW IT WORKS SECTION =====
+function HowItWorksSection() {
+  const steps = [
+    {
+      number: '1',
+      icon: '📍',
+      title: 'Enter Address',
+      description: 'Type any US property address'
+    },
+    {
+      number: '2',
+      icon: '⚡',
+      title: 'Auto-Fill Data',
+      description: 'Tax, HOA, value fetched instantly'
+    },
+    {
+      number: '3',
+      icon: '⚖️',
+      title: 'Compare Scenarios',
+      description: 'Side-by-side Option A vs B'
+    },
+    {
+      number: '4',
+      icon: '🤖',
+      title: 'Get AI Script',
+      description: 'Ready-to-send closing message'
+    },
+    {
+      number: '5',
+      icon: '🔗',
+      title: 'Share Link',
+      description: 'Client views on any device'
+    }
+  ];
+
+  return (
+    <section id="howitworks" className={styles.howItWorks}>
+      <div className="container">
+        <div className="section-header">
+          <h2 className="section-title">How It Works</h2>
+          <p className="section-subtitle">
+            From address to client share in under 60 seconds
+          </p>
+        </div>
+
+        <div className={styles.stepsContainer}>
+          {steps.map((step, index) => (
+            <div key={index} className={styles.step}>
+              <div className={styles.stepIcon}>{step.icon}</div>
+              <div className={styles.stepNumber}>{step.number}</div>
+              <h3 className={styles.stepTitle}>{step.title}</h3>
+              <p className={styles.stepDescription}>{step.description}</p>
+              {index < steps.length - 1 && (
+                <div className={styles.stepConnector}>→</div>
+              )}
             </div>
           ))}
         </div>
@@ -767,7 +1055,7 @@ function PricingSection() {
               <p className={styles.pricingDescription}>Perfect for trying the full experience</p>
 
               <ul className={styles.pricingFeatures}>
-                <li>✓ 5 Share Links</li>
+                <li>✓ 10 Share Links</li>
                 <li>✓ 10 Property Tax Lookups</li>
                 <li>✓ 30 AI Generations</li>
                 <li>✓ Full comparison features</li>
@@ -874,6 +1162,20 @@ function PricingSection() {
           </div>
         )}
 
+        {/* Competitor Comparison Callout */}
+        <div className={styles.competitorCompare}>
+          <div className={styles.competitorCompareInner}>
+            <span className={styles.competitorIcon}>⚡</span>
+            <div className={styles.competitorText}>
+              <strong>Switching from Mortgage Coach?</strong>
+              <span>Save $51/month ($612/year) with the same features you need.</span>
+            </div>
+            <a href="/alternatives/mortgage-coach-alternative" className={styles.competitorBtn}>
+              See Full Comparison →
+            </a>
+          </div>
+        </div>
+
         {/* Link to full pricing page */}
         <div className={styles.pricingPageLink}>
           <a href="/pricing">View Full Pricing & FAQ →</a>
@@ -883,132 +1185,90 @@ function PricingSection() {
   );
 }
 
-// ===== TESTIMONIALS SECTION =====
-// Trusted Partners Logo Wall Component
-function TrustedPartners() {
-  // Use local PNG logos (Google Favicon) for faster loading
-  const partners = [
-    // Major Banks
-    { name: 'Wells Fargo', src: '/images/logos/wellsfargo.png' },
-    { name: 'Chase', src: '/images/logos/chase.png' },
-    { name: 'Bank of America', src: '/images/logos/bankofamerica.png' },
-    { name: 'Citibank', src: '/images/logos/citi.png' },
-    // Mortgage Companies
-    { name: 'Rocket Mortgage', src: '/images/logos/rocketmortgage.png' },
-    { name: 'United Wholesale Mortgage', src: '/images/logos/uwm.png' },
-    { name: 'loanDepot', src: '/images/logos/loandepot.png' },
-    { name: 'Fairway Independent', src: '/images/logos/fairway.svg' },
-    { name: 'Guild Mortgage', src: '/images/logos/guildmortgage.png' },
-    { name: 'CrossCountry Mortgage', src: '/images/logos/crosscountry.png' },
-    // Other Financial
-    { name: 'Movement Mortgage', src: '/images/logos/movement.png' },
-    { name: 'PrimeLending', src: '/images/logos/primelending.png' },
-    { name: 'Caliber Home Loans', src: '/images/logos/caliber.png' },
-    { name: 'Fannie Mae', src: '/images/logos/fanniemae.png' },
-    { name: 'Freddie Mac', src: '/images/logos/freddiemac.png' },
-    // Tech/Real Estate
-    { name: 'Zillow', src: '/images/logos/zillow.png' },
-    { name: 'Redfin', src: '/images/logos/redfin.png' },
-    { name: 'Keller Williams', src: '/images/logos/kellerwilliams.png' },
-    { name: 'RE/MAX', src: '/images/logos/remax.png' },
-    { name: 'Compass', src: '/images/logos/compass.png' },
-    { name: 'Coldwell Banker', src: '/images/logos/coldwellbanker.png' },
-    { name: 'Century 21', src: '/images/logos/century21.png' },
-    // More Mortgage
-    { name: 'Guaranteed Rate', src: '/images/logos/guaranteedrate.png' },
-    { name: 'Mr. Cooper', src: '/images/logos/mrcooper.png' }
-  ];
-
-  return (
-    <div className={styles.trustedPartners}>
-      <p className={styles.trustedLabel}>Our users work at</p>
-      <div className={styles.logoWall}>
-        <div className={styles.logoGrid}>
-          {partners.map((partner, index) => (
-            <div key={index} className={styles.partnerLogo} role="img" aria-label={partner.name}>
-              <img
-                src={partner.src}
-                alt={partner.name}
-                loading="lazy"
-                width="140"
-                height="40"
-                style={{ maxWidth: '120px', height: 'auto' }}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function TestimonialsSection() {
-  const testimonials = [
+// ===== SUCCESS STORIES SECTION =====
+function SuccessStoriesSection() {
+  const stories = [
     {
-      quote: "This tool has completely changed how I present options at Open Houses. Clients get it instantly.",
+      metric: "2 Deals Closed",
+      timeframe: "in 1 Week",
+      quote: "Used ShowTheRate at an Open House on Saturday. By Friday, I had 2 signed contracts.",
+      author: "Kevin W.",
+      role: "Loan Officer, TX",
+      icon: "🏆"
+    },
+    {
+      metric: "$1.2M Funded",
+      timeframe: "First Month",
+      quote: "The AI scripts helped me explain buydowns so clearly. Clients actually understood and moved forward faster.",
       author: "Sarah M.",
-      role: "Loan Officer, CA",
-      avatar: "https://randomuser.me/api/portraits/women/44.jpg"
+      role: "Mortgage Advisor, CA",
+      icon: "💰"
     },
     {
-      quote: "The AI scripts are surprisingly good. They help me explain complex scenarios in simple terms.",
-      author: "Michael R.",
-      role: "Mortgage Broker, TX",
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg"
-    },
-    {
-      quote: "60 seconds is not an exaggeration. I've closed 3 more deals this month using ShowTheRate.",
-      author: "Jennifer L.",
-      role: "Senior LO, FL",
-      avatar: "https://randomuser.me/api/portraits/women/68.jpg"
-    },
-    {
-      quote: "Finally, a tool that makes mortgage comparisons visual and easy. My clients love the side-by-side view.",
-      author: "David K.",
-      role: "Mortgage Consultant, AZ",
-      avatar: "https://randomuser.me/api/portraits/men/67.jpg"
-    },
-    {
-      quote: "The property data integration saves me so much time. No more manual research for comps.",
-      author: "Lisa T.",
-      role: "Real Estate Agent, WA",
-      avatar: "https://randomuser.me/api/portraits/women/29.jpg"
-    },
-    {
-      quote: "Shareable links are a game-changer. Clients can review options anytime, anywhere.",
-      author: "Robert S.",
-      role: "Branch Manager, NV",
-      avatar: "https://randomuser.me/api/portraits/men/45.jpg"
-    },
-    {
-      quote: "Perfect for virtual closings. The digital experience is seamless and professional.",
-      author: "Maria G.",
-      role: "Digital LO, CO",
-      avatar: "https://randomuser.me/api/portraits/women/52.jpg"
-    },
-    {
-      quote: "The 60-second promise is real. I've increased my conversion rate by 40% since using this.",
+      metric: "40% More Closes",
+      timeframe: "vs Last Quarter",
+      quote: "60-second comparisons changed my follow-up game. I respond to leads while they're still warm.",
       author: "James P.",
-      role: "Senior Mortgage Advisor, GA",
-      avatar: "https://randomuser.me/api/portraits/men/81.jpg"
+      role: "Senior LO, FL",
+      icon: "📈"
     }
   ];
 
   return (
-    <section className={styles.testimonials}>
+    <section className={styles.successStories}>
       <div className="container">
-        <TrustedPartners />
-
         <div className="section-header">
-          <h2 className="section-title">Loved by Loan Officers</h2>
-          <p className="section-subtitle">Join hundreds of LOs closing more deals</p>
+          <span className={styles.sectionBadge}>
+            <span className={styles.badgePulse}></span>
+            Real Results
+          </span>
+          <h2 className="section-title">LOs Are Closing More Deals</h2>
+          <p className="section-subtitle">
+            See how loan officers are using ShowTheRate to win more business
+          </p>
         </div>
 
-        <TestimonialsCarousel items={testimonials} speedPxPerSec={40} />
+        <div className={styles.storiesGrid}>
+          {stories.map((story, index) => (
+            <div key={index} className={styles.storyCard}>
+              <div className={styles.storyMetric}>
+                <span className={styles.storyIcon}>{story.icon}</span>
+                <div className={styles.storyNumbers}>
+                  <span className={styles.storyValue}>{story.metric}</span>
+                  <span className={styles.storyTimeframe}>{story.timeframe}</span>
+                </div>
+              </div>
+              <p className={styles.storyQuote}>"{story.quote}"</p>
+              <div className={styles.storyAuthor}>
+                <span className={styles.storyName}>{story.author}</span>
+                <span className={styles.storyRole}>{story.role}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className={styles.proofBar}>
+          <div className={styles.proofItem}>
+            <span className={styles.proofValue}>5,000+</span>
+            <span className={styles.proofLabel}>Comparisons Created</span>
+          </div>
+          <div className={styles.proofDivider}></div>
+          <div className={styles.proofItem}>
+            <span className={styles.proofValue}>$50M+</span>
+            <span className={styles.proofLabel}>in Loans Presented</span>
+          </div>
+          <div className={styles.proofDivider}></div>
+          <div className={styles.proofItem}>
+            <span className={styles.proofValue}>4.9/5</span>
+            <span className={styles.proofLabel}>Average Rating</span>
+          </div>
+        </div>
       </div>
     </section>
   );
 }
+
+// Testimonials section removed to simplify homepage and reduce bundle size
 
 // ===== CTA SECTION =====
 function CTASection() {
@@ -1065,12 +1325,15 @@ export default function HomePage() {
       <Header />
       <main>
         <HeroSection />
+        <TrustBadges />
+        <HowItWorksSection />
+        <SmartDataSection />
+        <AIScriptSection />
         <FeaturesSection />
         <FreeToolsSection />
-        <TrustBadges />
         <DemoSection />
         <PricingSection />
-        <TestimonialsSection />
+        <SuccessStoriesSection />
         <FAQ />
         <CTASection />
       </main>

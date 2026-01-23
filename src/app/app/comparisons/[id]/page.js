@@ -187,14 +187,23 @@ export default function ComparisonDetailPage() {
                         </div>
                     </div>
                 </div>
-                <button
-                    className={styles.shareBtn}
-                    onClick={handleCopyShareLink}
-                    disabled={copying}
-                >
-                    <CopyIcon />
-                    <span>{copying ? 'Copying...' : 'Copy Share Link'}</span>
-                </button>
+                <div className={styles.headerActions}>
+                    <Link
+                        href={`/app/new?clone=${data.id}`}
+                        className={styles.editBtn}
+                    >
+                        ✏️
+                        <span>Duplicate & Edit</span>
+                    </Link>
+                    <button
+                        className={styles.shareBtn}
+                        onClick={handleCopyShareLink}
+                        disabled={copying}
+                    >
+                        <CopyIcon />
+                        <span>{copying ? 'Copying...' : 'Copy Share Link'}</span>
+                    </button>
+                </div>
             </div>
 
             {/* Scenario Cards */}

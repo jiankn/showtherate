@@ -10,7 +10,7 @@ import { STRIPE_PRODUCTS } from '@/lib/stripe';
  * @param {Object} supabaseAdmin - Supabase admin client
  * @returns {Object} result - { success: true } or { error }
  */
-export async function syncSubscriptionToDb(subscription, supabaseAdmin) {
+export async function syncSubscriptionToDb(subscription, supabaseAdmin, stripe = null) {
     try {
         const userId = subscription.metadata?.user_id;
         const customerId = subscription.customer;
@@ -26,10 +26,33 @@ export async function syncSubscriptionToDb(subscription, supabaseAdmin) {
             resolvedUserId = data?.user_id;
         }
 
+        // Additional fallback: get from Stripe customer metadata
+        if (!resolvedUserId && stripe && customerId) {
+            try {
+                const customer = await stripe.customers.retrieve(customerId);
+                resolvedUserId = customer.metadata?.user_id;
+            } catch (e) {
+                console.error('[Sync] Failed to retrieve customer from Stripe:', e.message);
+            }
+        }
+
         if (!resolvedUserId) {
             console.error('[Sync] Could not resolve user ID for subscription', subscription.id);
             return { error: 'Could not resolve user ID' };
         }
+
+        // Helper to safely convert Stripe timestamp to ISO string
+        const toISOSafe = (timestamp) => {
+            if (!timestamp) return new Date().toISOString();
+            // If it's already a string (ISO format), return as-is
+            if (typeof timestamp === 'string' && timestamp.includes('T')) return timestamp;
+            // If it's a number, check if seconds or milliseconds
+            const num = typeof timestamp === 'number' ? timestamp : parseInt(timestamp, 10);
+            // Stripe uses seconds, but check if it looks like milliseconds (> year 2100 in seconds)
+            const ms = num > 4102444800 ? num : num * 1000;
+            const date = new Date(ms);
+            return isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString();
+        };
 
         // Upsert subscription record
         // specified conflict target to stripe_customer_id which has a unique constraint
@@ -39,8 +62,8 @@ export async function syncSubscriptionToDb(subscription, supabaseAdmin) {
             stripe_subscription_id: subscription.id,
             status: subscription.status,
             plan: subscription.items.data[0]?.price?.id,
-            current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+            current_period_start: toISOSafe(subscription.current_period_start),
+            current_period_end: toISOSafe(subscription.current_period_end),
             cancel_at_period_end: subscription.cancel_at_period_end,
         }, { onConflict: 'stripe_customer_id' });
 
@@ -77,7 +100,7 @@ export async function syncSubscriptionToDb(subscription, supabaseAdmin) {
 
             if (existing) {
                 // Update - also reset usage for new billing period and update bonus expiry
-                const newPeriodEnd = new Date(subscription.current_period_end * 1000);
+                const newPeriodEnd = new Date(toISOSafe(subscription.current_period_end));
                 const bonusExpiresAt = new Date(newPeriodEnd);
                 bonusExpiresAt.setMonth(bonusExpiresAt.getMonth() + 3);
 
@@ -98,12 +121,21 @@ export async function syncSubscriptionToDb(subscription, supabaseAdmin) {
 
                 if (updateError) console.error('[Sync] Failed to update entitlement:', updateError);
             } else {
+                // Create new subscription entitlement
+                // First, terminate any existing starter_pass entitlement (upgrade scenario)
+                await supabaseAdmin
+                    .from('entitlements')
+                    .update({ ends_at: new Date().toISOString() })
+                    .eq('user_id', resolvedUserId)
+                    .eq('type', 'starter_pass_7d')
+                    .gte('ends_at', new Date().toISOString());
+
                 // Create
                 const { error: insertError } = await supabaseAdmin.from('entitlements').insert({
                     user_id: resolvedUserId,
                     type: 'subscription',
-                    starts_at: new Date(subscription.current_period_start * 1000).toISOString(),
-                    ends_at: new Date(subscription.current_period_end * 1000).toISOString(),
+                    starts_at: toISOSafe(subscription.current_period_start),
+                    ends_at: toISOSafe(subscription.current_period_end),
                     share_quota: entitlement.shareQuota,
                     share_used: 0,
                     property_quota: entitlement.propertyQuota,

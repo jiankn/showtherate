@@ -72,20 +72,49 @@ export async function POST() {
             });
         }
 
-        // Calculate amounts
-        const amountDue = invoice.amount_due / 100; // Convert from cents to dollars
-        const creditApplied = (invoice.total - invoice.amount_due) / 100;
-        const yearlyPrice = 950; // $950/year
-        const monthlyRemaining = invoice.lines.data
-            .filter(line => line.proration && line.amount < 0)
-            .reduce((sum, line) => sum + Math.abs(line.amount), 0) / 100;
+        // Calculate amounts from invoice lines
+        // Yearly plan line
+        const yearlyLine = invoice.lines.data.find(line =>
+            line.price?.id === STRIPE_PRODUCTS.YEARLY.priceId && line.amount > 0
+        );
+
+        // Proration credit lines (negative amounts)
+        const creditLines = invoice.lines.data.filter(line => line.proration && line.amount < 0);
+        const monthlyRemaining = creditLines.reduce((sum, line) => sum + Math.abs(line.amount), 0) / 100;
+
+        // Get yearly price from line or fallback
+        const yearlyPrice = yearlyLine ? yearlyLine.amount / 100 : 950;
+
+        // Customer balance credit (from Starter Pass purchase, etc.)
+        const startingBalance = invoice.starting_balance || 0;
+        const endingBalance = invoice.ending_balance || 0;
+        const balanceCredit = startingBalance < 0 ? Math.abs(startingBalance) / 100 : 0;
+
+        // Calculate amount due: yearly price - proration credit - balance credit
+        // But don't let it go negative
+        const calculatedDue = Math.max(0, yearlyPrice - monthlyRemaining - balanceCredit);
+
+        // Use Stripe's amount_due as the source of truth, but log for debugging
+        const amountDue = invoice.amount_due / 100;
+
+        console.log('[Upgrade Preview] Invoice details:', {
+            yearlyPrice,
+            monthlyRemaining,
+            startingBalance: startingBalance / 100,
+            endingBalance: endingBalance / 100,
+            balanceCredit,
+            stripeAmountDue: amountDue,
+            calculatedDue,
+            invoiceTotal: invoice.total / 100,
+        });
 
         return NextResponse.json({
             success: true,
             preview: {
                 yearlyPrice,
                 monthlyCredit: monthlyRemaining,
-                amountDue,
+                balanceCredit, // Add balance credit info
+                amountDue: calculatedDue, // Use calculated amount instead of Stripe's
                 currency: invoice.currency.toUpperCase(),
                 currentPeriodEnd: subscription.current_period_end,
                 nextBillingDate: new Date(stripeSubscription.current_period_end * 1000).toISOString(),

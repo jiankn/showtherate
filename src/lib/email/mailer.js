@@ -57,3 +57,39 @@ export async function sendAdminTicketNotification(ticket, requester) {
     text,
   });
 }
+
+export async function sendRentCastUsageAlert(keyIndex, usage, limit, period) {
+  const mailer = getTransporter();
+  if (!mailer) {
+    console.warn('SMTP not configured, skipping RentCast alert email.');
+    return;
+  }
+
+  const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || ADMIN_EMAIL;
+  const percentage = Math.round((usage / limit) * 100);
+  const subject = `[Alert] RentCast Key ${keyIndex} Usage Warning: ${percentage}%`;
+
+  const text = [
+    `RentCast API Key Alert`,
+    ``,
+    `Key Index: ${keyIndex}`,
+    `Billing Period: ${period}`,
+    `Usage: ${usage} / ${limit} (${percentage}%)`,
+    ``,
+    `Please check your quota usage. If all keys are exhausted, the API will stop working.`,
+    `Manage Keys: ${process.env.NEXT_PUBLIC_SITE_URL || ''}/admin/settings`, // 假设有一个设置页面，如果没有可留空或指向 Supabase
+  ].join('\n');
+
+  try {
+    await mailer.sendMail({
+      from: smtpFrom,
+      to: adminEmail,
+      subject,
+      text,
+    });
+    console.log(`[RentCast] Alert email sent for Key ${keyIndex} (${percentage}%)`);
+  } catch (error) {
+    console.error('[RentCast] Failed to send alert email:', error);
+  }
+}
+

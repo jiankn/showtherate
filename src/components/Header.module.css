@@ -9,7 +9,7 @@
 }
 
 .headerScrolled {
-  background: rgba(15, 23, 42, 0.98);
+  background: rgb(15, 23, 42);
   backdrop-filter: var(--glass-blur-lg);
   -webkit-backdrop-filter: var(--glass-blur-lg);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);

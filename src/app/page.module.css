@@ -3247,6 +3247,8 @@
   .addressInput {
     width: 100%;
     min-width: unset;
+    /* Increase height on mobile for better touch targets */
+    height: 72px;
   }
 
   .fetchBtn {

@@ -10,13 +10,14 @@ export async function GET() {
     try {
         const session = await requireAuth();
 
-        // Get subscription details from database
+        // Get latest subscription details from database (active or trialing)
         const { data: subscription, error } = await supabaseAdmin
             .from('subscriptions')
-            .select('stripe_customer_id, stripe_subscription_id, status, plan')
+            .select('stripe_customer_id, stripe_subscription_id, status, plan, updated_at')
             .eq('user_id', session.user.id)
-            .eq('status', 'active')
-            .single();
+            .order('updated_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
 
         if (error || !subscription) {
             return new Response(JSON.stringify({
@@ -36,8 +37,10 @@ export async function GET() {
             billingCycle = 'yearly';
         }
 
+        const hasSubscription = ['active', 'trialing'].includes(subscription.status);
+
         return new Response(JSON.stringify({
-            hasSubscription: true,
+            hasSubscription,
             subscriptionId: subscription.stripe_subscription_id,
             plan: subscription.plan,
             billingCycle,

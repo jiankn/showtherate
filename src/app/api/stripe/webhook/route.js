@@ -30,12 +30,12 @@ export async function POST(request) {
     try {
         switch (event.type) {
             case 'checkout.session.completed':
-                await handleCheckoutComplete(event.data.object, supabaseAdmin, STRIPE_PRODUCTS);
+                await handleCheckoutComplete(event.data.object, supabaseAdmin, STRIPE_PRODUCTS, stripe);
                 break;
 
             case 'customer.subscription.created':
             case 'customer.subscription.updated':
-                await handleSubscriptionUpdate(event.data.object, supabaseAdmin, syncSubscriptionToDb);
+                await handleSubscriptionUpdate(event.data.object, supabaseAdmin, syncSubscriptionToDb, stripe);
                 break;
 
             case 'customer.subscription.deleted':
@@ -48,6 +48,10 @@ export async function POST(request) {
 
             case 'invoice.payment_failed':
                 await handleInvoicePaymentFailed(event.data.object);
+                break;
+
+            case 'charge.refunded':
+                await handleChargeRefunded(event.data.object, supabaseAdmin);
                 break;
 
             default:
@@ -65,7 +69,7 @@ export async function POST(request) {
 /**
  * Handle successful checkout
  */
-async function handleCheckoutComplete(session, supabaseAdmin, STRIPE_PRODUCTS) {
+async function handleCheckoutComplete(session, supabaseAdmin, STRIPE_PRODUCTS, stripe) {
     const userId = session.metadata?.user_id;
     const productKey = session.metadata?.product;
 
@@ -167,6 +171,22 @@ async function handleCheckoutComplete(session, supabaseAdmin, STRIPE_PRODUCTS) {
         const { entitlement } = product;
         if (!entitlement) return;
 
+        // Apply Credit if Starter Pass
+        if (productKey === 'STARTER_PASS' && session.customer && session.amount_total > 0) {
+            try {
+                console.log(`[Webhook] Adding credit to customer ${session.customer} for Starter Pass purchase: ${session.amount_total}`);
+                await stripe.customers.createBalanceTransaction(session.customer, {
+                    amount: -session.amount_total, // Negative amount adds credit to the customer balance (reduces amount due)
+                    currency: session.currency,
+                    description: 'Credit from Starter Pass purchase',
+                });
+                console.log(`[Webhook] Successfully added credit: -${session.amount_total} ${session.currency}`);
+            } catch (creditError) {
+                console.error('[Webhook] Failed to add credit transaction:', creditError);
+                // Non-blocking error, user still gets their pass
+            }
+        }
+
         const now = new Date();
         const endsAt = new Date(now.getTime() + entitlement.durationDays * 24 * 60 * 60 * 1000);
 
@@ -191,8 +211,8 @@ async function handleCheckoutComplete(session, supabaseAdmin, STRIPE_PRODUCTS) {
 /**
  * Handle subscription creation/update
  */
-async function handleSubscriptionUpdate(subscription, supabaseAdmin, syncSubscriptionToDb) {
-    await syncSubscriptionToDb(subscription, supabaseAdmin);
+async function handleSubscriptionUpdate(subscription, supabaseAdmin, syncSubscriptionToDb, stripe) {
+    await syncSubscriptionToDb(subscription, supabaseAdmin, stripe);
 }
 
 /**
@@ -232,11 +252,69 @@ async function handleInvoicePaymentSucceeded(invoice, stripe, supabaseAdmin, syn
     if (!invoice.subscription) return;
 
     const subscription = await stripe.subscriptions.retrieve(invoice.subscription);
-    await syncSubscriptionToDb(subscription, supabaseAdmin);
+    await syncSubscriptionToDb(subscription, supabaseAdmin, stripe);
 }
 
 /**
  * Handle failed invoice payment
  */
 async function handleInvoicePaymentFailed(invoice) {
+}
+
+/**
+ * Handle charge refunded - terminate user's entitlement
+ */
+async function handleChargeRefunded(charge, supabaseAdmin) {
+    const customerId = charge.customer;
+    const paymentIntentId = charge.payment_intent;
+
+    console.log(`[Webhook] Processing refund for charge ${charge.id}, customer ${customerId}`);
+
+    if (!customerId) {
+        console.warn('[Webhook] Refund charge has no customer, skipping');
+        return;
+    }
+
+    // Try to find entitlement by payment_intent first (for one-time payments like Starter Pass)
+    if (paymentIntentId) {
+        const { data: entitlement, error } = await supabaseAdmin
+            .from('entitlements')
+            .select('id, user_id, type')
+            .eq('stripe_payment_intent_id', paymentIntentId)
+            .single();
+
+        if (entitlement) {
+            await supabaseAdmin
+                .from('entitlements')
+                .update({ ends_at: new Date().toISOString() })
+                .eq('id', entitlement.id);
+
+            console.log(`[Webhook] Terminated entitlement ${entitlement.id} (type: ${entitlement.type}) for user ${entitlement.user_id} due to refund`);
+            return;
+        }
+    }
+
+    // Fallback: find user by customer ID and terminate their active entitlement
+    const { data: subscription } = await supabaseAdmin
+        .from('subscriptions')
+        .select('user_id')
+        .eq('stripe_customer_id', customerId)
+        .single();
+
+    if (subscription?.user_id) {
+        // Terminate all active entitlements for this user
+        const { data: updated, error } = await supabaseAdmin
+            .from('entitlements')
+            .update({ ends_at: new Date().toISOString() })
+            .eq('user_id', subscription.user_id)
+            .gte('ends_at', new Date().toISOString());
+
+        if (error) {
+            console.error('[Webhook] Failed to terminate entitlements:', error);
+        } else {
+            console.log(`[Webhook] Terminated active entitlements for user ${subscription.user_id} due to refund`);
+        }
+    } else {
+        console.warn(`[Webhook] Could not find user for customer ${customerId}, refund entitlement update skipped`);
+    }
 }

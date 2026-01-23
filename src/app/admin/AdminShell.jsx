@@ -10,6 +10,7 @@ import { signOut } from 'next-auth/react';
 
 const navItems = [
   { label: 'Overview', href: '/admin/overview', icon: ChartIcon },
+  { label: 'RentCast', href: '/admin/rentcast', icon: RocketIcon },
   { label: 'Subscriptions', href: '/admin/subscriptions', icon: RocketIcon },
   { label: 'Revenue', href: '/admin/revenue', icon: MoneyIcon },
   { label: 'Tickets', href: '/admin/tickets', icon: PhoneIcon },
